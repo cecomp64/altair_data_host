@@ -1,0 +1,8 @@
+# Location: /etc/udev/rules.d/99-solar-serial.rules
+# Installed automatically by scripts/install-udev-rules.sh
+
+# Victron VE.Direct USB Interface (SmartShunt)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyUSB_VICTRON", MODE="0666"
+
+# Eco-Worthy RS485 to USB Adapter (FTDI / CH340 / CP2102)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyUSB_ECOWORTHY", MODE="0666"

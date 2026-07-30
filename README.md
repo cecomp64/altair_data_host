@@ -1,0 +1,253 @@
+# Complete Off-Grid Solar, Weather & Observatory Monitoring System
+
+This repository contains the complete code, configuration files, and deployment scripts to run an off-grid solar, weather, and observatory monitoring system on a Raspberry Pi or Mini PC.
+
+It collects telemetry from a **Victron SmartShunt** (via VE.Direct), an **Eco-Worthy MPPT Charge Controller** (via RS485 Modbus RTU), a **LAN weather station**, a **roll-off-roof controller** (via ASCOM Alpaca), and **N.I.N.A.** astrophotography sessions. Everything is stored in **InfluxDB v2**, rendered in **Grafana**, and the solar summary is also pushed to an **E-Paper display**.
+
+---
+
+## 1. Directory Structure
+
+```text
+altair_data_host/
+├── docker-compose.yml
+├── telegraf.conf
+├── 99-solar-serial.rules
+├── .env.example
+├── docker/
+│   └── telegraf/
+│       └── Dockerfile          # telegraf:latest + python3/pyserial for read_vedirect.py
+├── grafana/
+│   ├── generate_dashboard.py              # regenerates the dashboard JSON below
+│   └── provisioning/
+│       ├── datasources/influxdb.yml       # one Grafana data source per bucket
+│       └── dashboards/
+│           ├── dashboards.yml             # dashboard provider config
+│           └── solar-observatory.json     # generated - do not hand-edit, see §9
+├── scripts/
+│   ├── deploy.sh                          # one-shot end-to-end setup (host + docker)
+│   ├── install-udev-rules.sh              # host: persistent serial device symlinks
+│   ├── install-epaper-service.sh          # host: systemd unit for the e-paper display
+│   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging buckets
+│   ├── epaper-dashboard.service.template  # systemd unit template used above
+│   ├── read_vedirect.py                   # runs inside the telegraf container
+│   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
+│   └── requirements-epaper.txt            # host-side Python deps for the e-paper script
+└── README.md
+```
+
+---
+
+## 2. Quick Start
+
+```bash
+git clone <this repo> altair_data_host
+cd altair_data_host
+scripts/deploy.sh
+```
+
+`scripts/deploy.sh` is the single entry point and is safe to re-run. It:
+
+1. Generates `.env` with random secrets if one doesn't already exist (see [Secrets](#4-secrets)).
+2. Installs the persistent serial device udev rules on the host (`scripts/install-udev-rules.sh`).
+3. Builds the custom Telegraf image and brings up `influxdb`, `grafana`, and `telegraf` with `docker compose` - InfluxDB's first-run setup creates the `power` bucket at this point (`DOCKER_INFLUXDB_INIT_BUCKET` in `docker-compose.yml`).
+4. Waits for InfluxDB's healthcheck before continuing.
+5. Creates the remaining `weather`, `observatory`, and `imaging` buckets (`scripts/init-influx-buckets.sh`) - a separate step because InfluxDB's first-run setup only creates one bucket.
+6. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
+
+Each of these steps is also runnable standalone (e.g. to re-apply udev rules after editing them, or to add a bucket after changing the list in `init-influx-buckets.sh`).
+
+After that, edit `.env` to point `WEATHER_API_URL` and `ALPACA_BASE_URL` at your real devices (see §6/§7), and configure N.I.N.A.'s InfluxDB Exporter plugin per §8. Grafana at `http://<host>:3000` will already have all four data sources and the full dashboard provisioned - no manual data-source setup or dashboard import needed.
+
+---
+
+## 3. InfluxDB Architecture (audit findings)
+
+The original design used one bucket (`battery_metrics`) for everything. Extending this to weather, observatory, and imaging data surfaced a few things worth fixing up front:
+
+- **One bucket per domain**, not one shared bucket. Retention needs differ a lot: high-frequency solar/weather telemetry is cheap to sample but not very valuable per-point after a while, while observatory and imaging events are low-volume and worth keeping forever (they're your operational and session history). A shared bucket forces one retention policy on everything. `scripts/init-influx-buckets.sh` creates:
+
+  | Bucket | Contents | Retention | Why |
+  |---|---|---|---|
+  | `power` | Victron SmartShunt + Eco-Worthy MPPT (5s interval) | 730d | High-frequency, cheap to resample, not worth infinite storage |
+  | `weather` | LAN weather station (60s interval) | 730d | Same reasoning as power |
+  | `observatory` | Roof shutter/slew/home/connected state | infinite | Low volume, valuable for uptime/reliability history |
+  | `imaging` | N.I.N.A. equipment + per-frame stats | infinite | Low volume, this *is* your session log |
+
+  Retention is only set at creation time - change it later with `influx bucket update --retention <duration>`.
+
+- **One telegraf agent, four outputs.** Rather than running separate telegraf containers per domain, `telegraf.conf` has one `[[outputs.influxdb_v2]]` block per bucket, each scoped with `namepass` to the measurements that belong there. This keeps the "one collector" mental model while still getting bucket-level retention isolation.
+
+- **Shared admin token.** All four outputs (and the Grafana data sources) currently use the same all-access `INFLUXDB_ADMIN_TOKEN`. That's fine for a single-host hobby system; if you ever expose InfluxDB beyond your LAN, consider `influx auth create` with per-bucket read/write scopes instead.
+
+- **Cardinality stays low.** Tags are only added where there's a real identity to distinguish (`station`, `device_number`, camera/focuser/mount names from N.I.N.A., image target/filter). The solar measurements still carry no tags, which is correct for a single-shunt, single-controller system - if you ever add a second shunt, tag it (e.g. `device="house_bank"`) rather than encoding it in the measurement name.
+
+- **Not implemented (candidate future work, not built here to avoid speculative complexity):** downsampling tasks that roll 5s power/weather data up to 1-minute averages after N days. Worth doing if disk usage ever becomes a problem; skipped for now since a Pi-class SSD comfortably holds 2 years of 5s samples for ~10 fields.
+
+---
+
+## 4. Secrets
+
+Credentials (InfluxDB admin user/password/token, Grafana admin user/password, all four bucket names) live in a git-ignored `.env` file at the repo root, not hardcoded in `docker-compose.yml` or `telegraf.conf`. `docker-compose.yml` interpolates them via `${VAR}`, and the `telegraf` and `grafana` services load the whole file via `env_file` so `telegraf.conf` and Grafana's datasource provisioning can reference `${INFLUXDB_ADMIN_TOKEN}` etc. directly.
+
+`scripts/deploy.sh` generates a `.env` with random secrets (and placeholder device URLs you must edit) on first run. To set your own instead, copy `.env.example` to `.env` and edit it before running `deploy.sh`:
+
+```bash
+cp .env.example .env
+$EDITOR .env
+```
+
+The host-side e-paper service also reads these values via `EnvironmentFile=` in its systemd unit (see [§10](#10-e-paper-display-systemd-service)), so there's a single source of truth for credentials across containers and the host process. N.I.N.A.'s plugin (§8) needs the org/bucket/token values entered manually into its own settings UI, since it runs on a separate Windows PC outside this repo's reach.
+
+---
+
+## 5. Linux System Configuration
+
+### Persistent Serial Device Rules (`99-solar-serial.rules`)
+To prevent `/dev/ttyUSB0` and `/dev/ttyUSB1` from swapping positions on reboot, persistent symlinks are created based on hardware vendor/product IDs:
+
+```ini
+# Victron VE.Direct USB Interface (SmartShunt)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyUSB_VICTRON", MODE="0666"
+
+# Eco-Worthy RS485 to USB Adapter (FTDI / CH340 / CP2102)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyUSB_ECOWORTHY", MODE="0666"
+```
+
+The telegraf container bind-mounts `/dev`, so it automatically sees whatever symlinks udev creates on the host - no container-side configuration needed.
+
+*Apply on the host:* `scripts/install-udev-rules.sh` (installs the rules file to `/etc/udev/rules.d/`, then reloads and triggers udev; re-execs itself with `sudo` if needed).
+
+---
+
+## 6. Docker Orchestration
+
+### Docker Compose (`docker-compose.yml`)
+Runs InfluxDB v2, Grafana, and Telegraf with serial bus access. `influxdb` has a healthcheck that `grafana` and `telegraf` wait on via `depends_on: condition: service_healthy`, so neither starts hammering InfluxDB before it's actually ready to accept writes.
+
+`telegraf` is built from `docker/telegraf/Dockerfile` rather than using the stock `telegraf:latest` image directly: the stock image is Debian-based and has no Python interpreter, but `inputs.exec` needs `python3` to run `read_vedirect.py`. The Dockerfile installs `python3` and `python3-serial` (pyserial) via `apt`, so no internet/pip access is needed inside the container at runtime.
+
+`grafana` mounts `./grafana/provisioning` read-only, which auto-configures all four data sources and the dashboard on startup - no manual Grafana UI setup required.
+
+Bring the stack up directly (bypassing `deploy.sh`) with:
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+---
+
+## 7. Telegraf Configuration (`telegraf.conf`)
+
+One telegraf agent, four `[[outputs.influxdb_v2]]` blocks (one per bucket, each restricted via `namepass` - see §3), and inputs grouped by domain.
+
+### Power: Victron SmartShunt (VE.Direct) + Eco-Worthy MPPT (Modbus RTU)
+Unchanged from the original design: `inputs.exec` runs `read_vedirect.py` for the Victron shunt's text protocol, `inputs.modbus` polls the Eco-Worthy controller's holding registers directly (no custom script needed there - telegraf's modbus plugin is enough).
+
+### Weather: LAN station, polled directly
+```toml
+[[inputs.http]]
+  urls = ["${WEATHER_API_URL}"]
+  method = "GET"
+  timeout = "5s"
+  interval = "60s"
+  name_override = "weather_station"
+  data_format = "json_v2"
+```
+No custom script - it's a single stateless JSON GET, which telegraf's `json_v2` parser handles natively. The field mappings (`tempf`, `humidity`, `windspeedmph`, etc.) match the common Ecowitt/Ambient-Weather-compatible flat JSON schema. **Verify against your actual station**: `curl "$WEATHER_API_URL"` and compare keys against the `path = "..."` lines in `telegraf.conf`, adjusting if your model differs.
+
+### Observatory: roll-off-roof via ASCOM Alpaca
+Four `[[inputs.http]]` blocks poll the standardized Alpaca dome REST endpoints (`shutterstatus`, `slewing`, `athome`, `connected`) every 15s. This is a versioned, documented REST spec, so confidence here is high - no verification step needed beyond confirming `ALPACA_BASE_URL` (including the device number) is correct. `shutterstatus` returns the ASCOM enum (0=Open, 1=Closed, 2=Opening, 3=Closing, 4=Error); Grafana maps it to readable labels/colors rather than telegraf doing translation.
+
+### Imaging: nothing in telegraf
+N.I.N.A.'s own plugin writes to InfluxDB directly - see §8.
+
+---
+
+## 8. Imaging: N.I.N.A. "InfluxDB Exporter" Plugin
+
+Imaging data comes from [daleghent/nina-influxdb-exporter](https://github.com/daleghent/nina-influxdb-exporter), a N.I.N.A. plugin that writes metrics straight to InfluxDB from the imaging PC - telegraf and this repo are not involved in that path at all.
+
+**Schema note** (confirmed from the plugin's README and its own example dashboard): every metric is its own InfluxDB *measurement* (e.g. `image_hfr`, `camera_sensor_temperature`, `guider_rms_arcsec`), each with a single field always literally named `value`, plus tags per equipment class (`camera_name`, `focuser_name`, `target_name`, etc., plus global `profile_name`/`host_name`). This is a different shape than the other three buckets (which use one measurement with several named fields) - `grafana/generate_dashboard.py`'s `nina_last`/`nina_range` helpers query it accordingly.
+
+**Install and configure the plugin** in N.I.N.A. (Options → Plugins → InfluxDB Exporter), on the imaging PC:
+
+| Plugin setting | Value |
+|---|---|
+| InfluxDB Url | `http://<this-docker-host's-LAN-IP-or-hostname>:8086` (not `localhost`, and not `influxdb` - that only resolves inside the Docker network) |
+| InfluxDB Bucket | value of `INFLUXDB_BUCKET_IMAGING` in `.env` (default `imaging`) |
+| InfluxDB Org | value of `INFLUXDB_ORG` in `.env` |
+| InfluxDB Token | value of `INFLUXDB_ADMIN_TOKEN` in `.env` |
+
+Metrics the plugin can produce (only for connected equipment / `LIGHT` frames): camera temp/cooler power/battery, focuser position/temp, mount altitude/azimuth, rotator angle, guiding RMS (RA/Dec/combined, arcsec and pixels), sun/moon altitude, and per-image stats (HFR, star count, mean/median/std-dev ADU, eccentricity/FWHM if the Hocus Focus plugin is installed). Full list in the plugin's own README.
+
+---
+
+## 9. Grafana Dashboard
+
+`grafana/provisioning/dashboards/solar-observatory.json` is provisioned automatically on Grafana startup (`http://<host>:3000`, default admin credentials from `.env`) - no manual data source setup or dashboard import needed. It's organized into four row sections matching the buckets:
+
+- **Power** - battery SOC gauge, time-to-go, controller temp, consumed Ah, battery voltage, battery/charging current, net vs. solar power, PV voltage/current.
+- **Weather** - current conditions (temp/humidity/wind/pressure) plus trends for temperature, humidity, wind speed/gust, rain accumulation, solar radiation/UV.
+- **Observatory** - roof shutter status (color-coded stat + history state-timeline), slewing/at-home/connected indicators.
+- **Imaging** - camera/focuser/cooler status, HFR and star-count trends, guiding RMS, sun/moon altitude, and a recent-frames table.
+
+It's generated by `grafana/generate_dashboard.py` rather than hand-authored, since Grafana's raw JSON (grid math, ids, repeated fieldConfig boilerplate) is tedious and error-prone to edit by hand. **To change the dashboard, edit the generator and re-run it**, don't hand-edit the JSON:
+
+```bash
+python3 grafana/generate_dashboard.py
+```
+
+Grafana's dashboard provider has `allowUiUpdates: true`, so you can also tweak panels directly in the Grafana UI - just know that regenerating and re-committing the JSON will overwrite anything you didn't also make in the generator.
+
+---
+
+## 10. Python Scripts
+
+### VE.Direct Serial Parser (`scripts/read_vedirect.py`)
+Runs inside the `telegraf` container (via the custom image from §6). Parses the ASCII serial stream coming from the Victron SmartShunt and translates VE.Direct keys into Influx Line Protocol.
+
+### E-Paper Display Controller (`scripts/epaper_dashboard.py`)
+Runs on the host OS, not in Docker, since it needs direct GPIO/SPI access to the Waveshare e-Paper HAT. Queries InfluxDB every 60 seconds over the host network (`http://localhost:8086`, exposed by the `influxdb` container's port mapping) and renders an updated power dashboard onto a Waveshare **7.5" V2** E-Paper display (800x480, monochrome). If you have a different 7.5" variant (tri-color `7in5b_V2`, or the 880x528 grayscale `7in5_HD`), swap the driver import at the top of the script - the layout constants assume 800x480 and would need adjusting for the HD panel's resolution.
+
+Layout: a two-column dashboard (Battery | Solar) with a hero SOC%/PV-power number and a fill gauge per column, secondary stats below (voltage, net power, time-to-go, consumed Ah / PV voltage & current, charge current, controller temp), and a footer with the timestamp plus a CHARGING/DISCHARGING/IDLE state derived from net power's sign.
+
+Install its host-side Python dependencies with:
+
+```bash
+pip install -r scripts/requirements-epaper.txt
+```
+
+`waveshare_epd` isn't on PyPI - install it from [Waveshare's e-Paper repo](https://github.com/waveshare/e-Paper) following the driver's instructions for your specific display model.
+
+---
+
+## 11. E-Paper Display Systemd Service
+
+`scripts/install-epaper-service.sh` installs and starts a systemd unit that keeps the E-Paper display updating in the background on boot. It's docker-aware: it warns (without failing) if the `influxdb` container isn't running yet, since the e-paper script depends on it.
+
+It renders `scripts/epaper-dashboard.service.template` into `/etc/systemd/system/epaper-dashboard.service`, substituting the repo's actual path and the invoking user, then runs `systemctl daemon-reload` and `systemctl enable --now`:
+
+```ini
+[Unit]
+Description=Solar E-Paper Display Updater
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=<detected automatically>
+WorkingDirectory=<repo path, detected automatically>
+EnvironmentFile=<repo path>/.env
+ExecStart=/usr/bin/python3 <repo path>/scripts/epaper_dashboard.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+*Install and start standalone* (requires `.env` to already exist - run `scripts/deploy.sh` or copy `.env.example` first):
+```bash
+scripts/install-epaper-service.sh
+```

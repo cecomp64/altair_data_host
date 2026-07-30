@@ -1,0 +1,54 @@
+# Auto-provisions one Grafana data source per InfluxDB bucket. Grafana expands
+# $VARIABLE references against its own process environment at startup, which
+# is why docker-compose.yml gives the grafana service `env_file: .env`.
+apiVersion: 1
+
+datasources:
+  - name: Power
+    uid: influxdb-power
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: $INFLUXDB_ORG
+      defaultBucket: $INFLUXDB_BUCKET_POWER
+    secureJsonData:
+      token: $INFLUXDB_ADMIN_TOKEN
+    isDefault: true
+
+  - name: Weather
+    uid: influxdb-weather
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: $INFLUXDB_ORG
+      defaultBucket: $INFLUXDB_BUCKET_WEATHER
+    secureJsonData:
+      token: $INFLUXDB_ADMIN_TOKEN
+
+  - name: Observatory
+    uid: influxdb-observatory
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: $INFLUXDB_ORG
+      defaultBucket: $INFLUXDB_BUCKET_OBSERVATORY
+    secureJsonData:
+      token: $INFLUXDB_ADMIN_TOKEN
+
+  - name: Imaging
+    uid: influxdb-imaging
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: $INFLUXDB_ORG
+      defaultBucket: $INFLUXDB_BUCKET_IMAGING
+    secureJsonData:
+      token: $INFLUXDB_ADMIN_TOKEN

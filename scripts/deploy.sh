@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# End-to-end deployment: generates secrets, installs host-level udev rules,
+# builds/starts the Docker stack, waits for InfluxDB to be healthy, creates
+# the weather/observatory/imaging buckets, then installs the host-level
+# e-paper systemd service. Safe to re-run.
+set -euo pipefail
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_DIR"
+
+# 1. Ensure secrets exist (never overwrite an existing .env)
+if [[ ! -f .env ]]; then
+  echo "No .env found - generating one with random secrets at ${REPO_DIR}/.env"
+  cat > .env <<EOF
+INFLUXDB_ADMIN_USERNAME=admin
+INFLUXDB_ADMIN_PASSWORD=$(openssl rand -base64 24)
+INFLUXDB_ORG=solar
+INFLUXDB_ADMIN_TOKEN=$(openssl rand -hex 32)
+
+INFLUXDB_BUCKET_POWER=power
+INFLUXDB_BUCKET_WEATHER=weather
+INFLUXDB_BUCKET_OBSERVATORY=observatory
+INFLUXDB_BUCKET_IMAGING=imaging
+
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=$(openssl rand -base64 24)
+
+# EDIT THESE to point at your actual weather/roof endpoints - see
+# .env.example for what each one means. Imaging needs no entry here; N.I.N.A.'s
+# InfluxDB Exporter plugin is configured separately (see README "Imaging").
+WEATHER_API_URL=http://weather-station.local/v1/current
+WEATHER_STATION_NAME=primary
+ALPACA_BASE_URL=http://roof-controller.local:11111/api/v1/dome/0
+ALPACA_DOME_DEVICE_NUMBER=0
+EOF
+  chmod 600 .env
+  echo "Review ${REPO_DIR}/.env - in particular, fill in the real WEATHER_API_URL and ALPACA_BASE_URL."
+fi
+
+# 2. Persistent serial device symlinks (host-level, idempotent)
+"${REPO_DIR}/scripts/install-udev-rules.sh"
+
+# 3. Build the custom telegraf image and start the stack
+docker compose build
+docker compose up -d
+
+# 4. Wait for InfluxDB to report healthy before wiring up the host-side service
+echo "Waiting for InfluxDB to become healthy..."
+status="starting"
+for _ in $(seq 1 30); do
+  status="$(docker inspect --format '{{.State.Health.Status}}' influxdb 2>/dev/null || echo starting)"
+  [[ "$status" == "healthy" ]] && break
+  sleep 2
+done
+if [[ "$status" != "healthy" ]]; then
+  echo "InfluxDB did not become healthy in time; check 'docker compose logs influxdb'" >&2
+  exit 1
+fi
+
+# 5. Create the weather/observatory/imaging buckets (idempotent)
+"${REPO_DIR}/scripts/init-influx-buckets.sh"
+
+# 6. Host-level e-paper systemd service
+"${REPO_DIR}/scripts/install-epaper-service.sh"
+
+echo
+echo "Deployment complete."
+docker compose ps

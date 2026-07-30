@@ -1,0 +1,15 @@
+[Unit]
+Description=Solar E-Paper Display Updater
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=__SERVICE_USER__
+WorkingDirectory=__REPO_DIR__
+EnvironmentFile=__REPO_DIR__/.env
+ExecStart=/usr/bin/python3 __REPO_DIR__/scripts/epaper_dashboard.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
