@@ -1,9 +1,11 @@
 # Host-side dependencies for scripts/epaper_dashboard.py (runs outside Docker,
 # since it needs direct GPIO/SPI access to the Waveshare e-Paper HAT).
-# Install with: pip install -r scripts/requirements-epaper.txt
+# Installed automatically by scripts/install-epaper-deps.sh into .venv/.
 influxdb-client>=1.36
 Pillow>=10.0
 
-# waveshare_epd is not on PyPI - install it from Waveshare's e-Paper repo
-# (https://github.com/waveshare/e-Paper) following the driver's own instructions
-# for your specific display model.
+# waveshare_epd isn't on PyPI - scripts/install-epaper-deps.sh vendors it from
+# Waveshare's e-Paper repo (https://github.com/waveshare/e-Paper) and installs
+# it into the venv alongside these. On a Raspberry Pi 5, that script also
+# swaps its RPi.GPIO dependency for rpi-lgpio (Pi 5's GPIO chip isn't
+# supported by legacy RPi.GPIO).

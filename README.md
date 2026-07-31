@@ -27,12 +27,14 @@ altair_data_host/
 ├── scripts/
 │   ├── deploy.sh                          # one-shot end-to-end setup (host + docker)
 │   ├── install-udev-rules.sh              # host: persistent serial device symlinks
+│   ├── install-epaper-deps.sh             # host: SPI + venv + waveshare_epd driver for the e-paper script
 │   ├── install-epaper-service.sh          # host: systemd unit for the e-paper display
 │   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging buckets
 │   ├── epaper-dashboard.service.template  # systemd unit template used above
 │   ├── read_vedirect.py                   # runs inside the telegraf container
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
 │   └── requirements-epaper.txt            # host-side Python deps for the e-paper script
+├── vendor/                                # gitignored - waveshare-epaper cloned here by install-epaper-deps.sh
 └── README.md
 ```
 
@@ -53,7 +55,10 @@ scripts/deploy.sh
 3. Builds the custom Telegraf image and brings up `influxdb`, `grafana`, and `telegraf` with `docker compose` - InfluxDB's first-run setup creates the `power` bucket at this point (`DOCKER_INFLUXDB_INIT_BUCKET` in `docker-compose.yml`).
 4. Waits for InfluxDB's healthcheck before continuing.
 5. Creates the remaining `weather`, `observatory`, and `imaging` buckets (`scripts/init-influx-buckets.sh`) - a separate step because InfluxDB's first-run setup only creates one bucket.
-6. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
+6. Installs the e-paper display's host-side Python dependencies (`scripts/install-epaper-deps.sh`): enables SPI, creates a `.venv/`, and vendors + installs Waveshare's `waveshare_epd` driver (see [§10](#10-python-scripts)).
+7. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
+
+If step 6 enabled SPI for the first time, reboot the Pi before the e-paper display will actually work - the service will otherwise start and fail to talk to the panel until the SPI overlay is loaded.
 
 Each of these steps is also runnable standalone (e.g. to re-apply udev rules after editing them, or to add a bucket after changing the list in `init-influx-buckets.sh`).
 
@@ -213,13 +218,17 @@ Runs on the host OS, not in Docker, since it needs direct GPIO/SPI access to the
 
 Layout: a two-column dashboard (Battery | Solar) with a hero SOC%/PV-power number and a fill gauge per column, secondary stats below (voltage, net power, time-to-go, consumed Ah / PV voltage & current, charge current, controller temp), and a footer with the timestamp plus a CHARGING/DISCHARGING/IDLE state derived from net power's sign.
 
-Install its host-side Python dependencies with:
+Its host-side dependencies are installed automatically by `scripts/deploy.sh` (step 6, `scripts/install-epaper-deps.sh`), which is also runnable standalone and safe to re-run:
 
 ```bash
-pip install -r scripts/requirements-epaper.txt
+scripts/install-epaper-deps.sh
 ```
 
-`waveshare_epd` isn't on PyPI - install it from [Waveshare's e-Paper repo](https://github.com/waveshare/e-Paper) following the driver's instructions for your specific display model.
+This enables SPI (via `raspi-config`, skipped with a manual-setup note on non-Raspberry Pi OS hosts), creates a Python venv at `.venv/`, installs `scripts/requirements-epaper.txt` into it, and vendors + installs Waveshare's `waveshare_epd` driver (not on PyPI) from [Waveshare's e-Paper repo](https://github.com/waveshare/e-Paper) into `vendor/waveshare-epaper/` (gitignored). If you have a different 7.5" panel than the V2, the vendored repo has the other drivers too - just swap the import in `epaper_dashboard.py` as noted above.
+
+On a **Raspberry Pi 5**, the script also detects the board (via `/proc/device-tree/model`) and swaps the driver's `RPi.GPIO` dependency for `rpi-lgpio`, a drop-in replacement - the Pi 5's RP1-based GPIO chip isn't supported by legacy `RPi.GPIO`.
+
+The systemd service (`scripts/epaper-dashboard.service.template`) runs the script with `.venv/bin/python3`, not the system interpreter, so `install-epaper-deps.sh` must run before `install-epaper-service.sh` (deploy.sh already orders them this way).
 
 ---
 

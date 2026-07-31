@@ -7,7 +7,7 @@ Type=simple
 User=__SERVICE_USER__
 WorkingDirectory=__REPO_DIR__
 EnvironmentFile=__REPO_DIR__/.env
-ExecStart=/usr/bin/python3 __REPO_DIR__/scripts/epaper_dashboard.py
+ExecStart=__REPO_DIR__/.venv/bin/python3 __REPO_DIR__/scripts/epaper_dashboard.py
 Restart=always
 RestartSec=10
 

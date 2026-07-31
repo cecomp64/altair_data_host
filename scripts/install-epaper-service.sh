@@ -24,6 +24,11 @@ if [[ ! -f "${REPO_DIR}/.env" ]]; then
   exit 1
 fi
 
+if [[ ! -x "${REPO_DIR}/.venv/bin/python3" ]]; then
+  echo "Missing ${REPO_DIR}/.venv - run scripts/install-epaper-deps.sh first so the service has its Python deps." >&2
+  exit 1
+fi
+
 if command -v docker >/dev/null 2>&1; then
   if ! docker compose -f "${REPO_DIR}/docker-compose.yml" --project-directory "${REPO_DIR}" ps --status running influxdb 2>/dev/null | grep -q influxdb; then
     echo "Warning: influxdb container is not running. Start the stack with 'docker compose up -d' (or scripts/deploy.sh) before relying on the e-paper display." >&2
