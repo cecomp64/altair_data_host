@@ -1,0 +1,11 @@
+# Host-side dependencies for scripts/charge_cutoff.py (runs outside Docker,
+# needs direct GPIO access to drive the charge-cutoff contactor's coil
+# driver). Installed automatically by scripts/install-charge-cutoff-deps.sh
+# into .venv-charge-cutoff/.
+influxdb-client>=1.36
+
+# gpiozero auto-selects a pin factory; installing lgpio makes it pick the
+# lgpio backend, which (unlike RPi.GPIO) works on the Raspberry Pi 5's RP1
+# GPIO chip as well as older Pi models.
+gpiozero>=2.0
+lgpio>=0.2

@@ -29,11 +29,16 @@ altair_data_host/
 │   ├── install-udev-rules.sh              # host: persistent serial device symlinks
 │   ├── install-epaper-deps.sh             # host: SPI + venv + waveshare_epd driver for the e-paper script
 │   ├── install-epaper-service.sh          # host: systemd unit for the e-paper display
+│   ├── install-charge-cutoff-deps.sh      # host: venv + gpio-group membership for the charge-cutoff relay
+│   ├── install-charge-cutoff-service.sh   # host: systemd unit for the charge-cutoff relay
 │   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging buckets
 │   ├── epaper-dashboard.service.template  # systemd unit template used above
+│   ├── charge-cutoff.service.template     # systemd unit template used above
 │   ├── read_vedirect.py                   # runs inside the telegraf container
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
-│   └── requirements-epaper.txt            # host-side Python deps for the e-paper script
+│   ├── charge_cutoff.py                   # runs on the host (needs GPIO) - see §12
+│   ├── requirements-epaper.txt            # host-side Python deps for the e-paper script
+│   └── requirements-charge-cutoff.txt     # host-side Python deps for the charge-cutoff script
 ├── vendor/                                # gitignored - waveshare-epaper cloned here by install-epaper-deps.sh
 └── README.md
 ```
@@ -57,6 +62,8 @@ scripts/deploy.sh
 5. Creates the remaining `weather`, `observatory`, and `imaging` buckets (`scripts/init-influx-buckets.sh`) - a separate step because InfluxDB's first-run setup only creates one bucket.
 6. Installs the e-paper display's host-side Python dependencies (`scripts/install-epaper-deps.sh`): enables SPI, creates a `.venv/`, and vendors + installs Waveshare's `waveshare_epd` driver (see [§10](#10-python-scripts)).
 7. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
+8. Installs the charge-cutoff relay's host-side Python dependencies (`scripts/install-charge-cutoff-deps.sh`): creates a `.venv-charge-cutoff/` and adds the invoking user to the `gpio` group (see [§12](#12-charge-cutoff-relay)).
+9. Installs and starts the `charge-cutoff` systemd service (`scripts/install-charge-cutoff-service.sh`) - **skipped** until `CHARGE_CUTOFF_GPIO_PIN` is set in `.env`, since that depends on hardware you may not have wired yet. Re-run `scripts/deploy.sh` (or just this script) once it is.
 
 If step 6 enabled SPI for the first time, reboot the Pi before the e-paper display will actually work - the service will otherwise start and fail to talk to the panel until the SPI overlay is loaded.
 
@@ -248,7 +255,7 @@ Type=simple
 User=<detected automatically>
 WorkingDirectory=<repo path, detected automatically>
 EnvironmentFile=<repo path>/.env
-ExecStart=/usr/bin/python3 <repo path>/scripts/epaper_dashboard.py
+ExecStart=<repo path>/.venv/bin/python3 <repo path>/scripts/epaper_dashboard.py
 Restart=always
 RestartSec=10
 
@@ -256,7 +263,65 @@ RestartSec=10
 WantedBy=multi-user.target
 ```
 
-*Install and start standalone* (requires `.env` to already exist - run `scripts/deploy.sh` or copy `.env.example` first):
+*Install and start standalone* (requires `.env` to already exist, and `.venv/` from `install-epaper-deps.sh` - run `scripts/deploy.sh`, or those two steps individually, first):
 ```bash
 scripts/install-epaper-service.sh
 ```
+
+---
+
+## 12. Charge Cutoff Relay
+
+Stops solar charging once the battery hits a configurable SOC (default 85%), using a physical DC contactor in the charge line between the MPPT controller's `BATT+` output and the battery bank - not the shunt's shared negative path, so house loads are unaffected while charging is paused.
+
+**This is a hardware feature.** Nothing here replaces careful part selection and wiring for a switch that carries real battery current - see the design notes below before building it. `scripts/charge_cutoff.py` is the software half; it does nothing useful without the contactor and its coil driver wired to a GPIO pin.
+
+### Circuit design
+
+```
+PV Array → MPPT (BATT+) ──[Contactor]──[Manual Disconnect]──[Fuse]── Battery (+)
+                                                                        │
+                                                        Shunt (unaffected) ── Loads
+```
+
+- **Contactor**: normally-closed / energize-to-open, DC-rated (not an automotive AC relay - DC arcs don't self-extinguish at zero-crossing), sized with margin over your actual max charge current. NC/energize-to-open contactors are a less common part than the ubiquitous NO ones - verify the contact configuration against the datasheet before buying, since this determines which way the system fails if it loses control power. This repo's default (`.env`'s `CHARGE_CUTOFF_*` variables, `charge_cutoff.py`'s startup behavior) assumes **fail-closed / keep-charging**: on a Pi crash or coil-circuit failure, the contactor's own spring returns it to closed, and charging continues rather than silently stopping. If your battery bank has no BMS-level overcharge protection of its own, reconsider this default - fail-open (stop charging) needs only a standard NO contactor and is the simpler/cheaper part.
+- **Manual master disconnect**: a mechanical, non-electronic, DC-rated battery disconnect switch in series with the contactor, mounted somewhere physically reachable. This is the real emergency stop - contactor contacts can weld shut under fault current, and when that happens the manual disconnect is the only thing left that can still open the circuit.
+- **Inline fuse**: sized to the wiring/contactor rating, independent of the Pi or contactor entirely.
+- **3-position selector switch (AUTO / FORCE-ON / FORCE-OFF)**: sits in the low-current coil circuit (not the battery path), gives day-to-day override of the automatic SOC logic without tools - AUTO lets the daemon drive the coil, FORCE-OFF manually stops charging, FORCE-ON blocks the coil from ever energizing so the contactor stays closed regardless of what the daemon says.
+- **Opto-isolated driver**: between the Pi's GPIO pin and the coil, so a fault on the 12V coil circuit can't back-feed into the Pi.
+
+### Software (`scripts/charge_cutoff.py`)
+
+Runs on the host OS, not in Docker, since it needs direct GPIO access. Polls the SmartShunt's SOC from InfluxDB (same query pattern as `epaper_dashboard.py`) and drives one GPIO pin:
+
+- Disconnects (drives the pin HIGH, opening the NC contactor) once SOC ≥ `CHARGE_CUTOFF_SOC_HIGH` (default 85%).
+- Reconnects (drives the pin LOW) only once SOC drops to ≤ `CHARGE_CUTOFF_SOC_LOW` (default 80%) - the gap is hysteresis, so the contactor doesn't chatter open/closed right at one threshold.
+- Enforces a minimum dwell time between transitions (`CHARGE_CUTOFF_MIN_DWELL`, default 300s) as a second guard against noisy readings.
+- Defaults to *not* energizing the coil on startup and on any InfluxDB read failure - same fail-closed direction as the hardware, so software and hardware agree on which way to fail.
+- Writes a `charge_cutoff` point (relay state + the SOC it was evaluated against) back to the `power` bucket on every poll - both a record of relay behavior and a heartbeat: if this stream goes stale, the daemon (or the Pi) is down, worth alerting on in Grafana even though it's not unsafe given the fail-closed default.
+
+Uses `gpiozero` with the `lgpio` backend rather than `RPi.GPIO` directly, so it works unmodified on a Raspberry Pi 5's RP1 GPIO chip as well as older Pi models - no Pi5-detection branch needed here, unlike the e-paper driver (§10), because this script owns its own GPIO code rather than depending on a third-party library that hardcodes `RPi.GPIO`.
+
+Configuration, all via `.env`:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `CHARGE_CUTOFF_GPIO_PIN` | *(required, no default)* | BCM pin driving the coil's opto-isolated driver |
+| `CHARGE_CUTOFF_SOC_HIGH` | `85.0` | Disconnect threshold (%) |
+| `CHARGE_CUTOFF_SOC_LOW` | `80.0` | Reconnect threshold (%) - must be lower than `SOC_HIGH` |
+| `CHARGE_CUTOFF_POLL_INTERVAL` | `60` | Seconds between SOC polls |
+| `CHARGE_CUTOFF_MIN_DWELL` | `300` | Minimum seconds between contactor state changes |
+
+### Install
+
+Host-side deps (venv + `gpio`-group membership):
+```bash
+scripts/install-charge-cutoff-deps.sh
+```
+
+Systemd service - **skips** (doesn't fail) until `CHARGE_CUTOFF_GPIO_PIN` is set in `.env`, since it's specific to hardware you may not have wired yet:
+```bash
+scripts/install-charge-cutoff-service.sh
+```
+
+Both are already wired into `scripts/deploy.sh` (steps 8-9), so once the relay is built and `CHARGE_CUTOFF_GPIO_PIN` is set, re-running `scripts/deploy.sh` picks it up automatically.

@@ -2,8 +2,9 @@
 # End-to-end deployment: generates secrets, installs host-level udev rules,
 # builds/starts the Docker stack, waits for InfluxDB to be healthy, creates
 # the weather/observatory/imaging buckets, installs the host-level e-paper
-# Python deps (SPI + venv + waveshare_epd driver), then installs the
-# host-level e-paper systemd service. Safe to re-run.
+# Python deps (SPI + venv + waveshare_epd driver) and systemd service, then
+# installs the host-level charge-cutoff relay's Python deps and (once
+# CHARGE_CUTOFF_GPIO_PIN is set in .env) its systemd service. Safe to re-run.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -66,6 +67,13 @@ fi
 
 # 7. Host-level e-paper systemd service
 "${REPO_DIR}/scripts/install-epaper-service.sh"
+
+# 8. Host-level charge-cutoff relay Python deps (venv, gpiozero/lgpio)
+"${REPO_DIR}/scripts/install-charge-cutoff-deps.sh"
+
+# 9. Host-level charge-cutoff systemd service - skips (doesn't fail) until
+# CHARGE_CUTOFF_GPIO_PIN is set in .env, since that's hardware-wiring specific
+"${REPO_DIR}/scripts/install-charge-cutoff-service.sh"
 
 echo
 echo "Deployment complete."

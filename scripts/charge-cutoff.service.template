@@ -1,0 +1,15 @@
+[Unit]
+Description=Solar Charge Cutoff Controller
+After=network.target docker.service
+
+[Service]
+Type=simple
+User=__SERVICE_USER__
+WorkingDirectory=__REPO_DIR__
+EnvironmentFile=__REPO_DIR__/.env
+ExecStart=__REPO_DIR__/.venv-charge-cutoff/bin/python3 __REPO_DIR__/scripts/charge_cutoff.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
