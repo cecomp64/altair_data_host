@@ -314,7 +314,7 @@ Runs on the host OS, not in Docker, since it needs direct GPIO access. Polls the
 - Defaults to *not* energizing the coil on startup and on any InfluxDB read failure - same fail-closed direction as the hardware, so software and hardware agree on which way to fail.
 - Writes a `charge_cutoff` point (relay state + the SOC it was evaluated against) back to the `power` bucket on every poll - both a record of relay behavior and a heartbeat: if this stream goes stale, the daemon (or the Pi) is down, worth alerting on in Grafana even though it's not unsafe given the fail-closed default.
 
-Uses `gpiozero` with the `lgpio` backend rather than `RPi.GPIO` directly, so it works unmodified on a Raspberry Pi 5's RP1 GPIO chip as well as older Pi models - no Pi5-detection branch needed here, unlike the e-paper driver (§10), because this script owns its own GPIO code rather than depending on a third-party library that hardcodes `RPi.GPIO`.
+Uses `gpiozero` with the `lgpio` backend rather than `RPi.GPIO` directly, so it works unmodified on a Raspberry Pi 5's RP1 GPIO chip as well as older Pi models - no Pi5-detection branch needed here, unlike the e-paper driver (§10), because this script owns its own GPIO code rather than depending on a third-party library that hardcodes `RPi.GPIO`. Both `gpiozero` and `lgpio` come from apt (`python3-gpiozero`, `python3-lgpio`), not pip - the `lgpio` PyPI package ships no prebuilt wheels and fails to build from source without the native `liblgpio` C library, which apt's `python3-lgpio` already bundles precompiled. `install-charge-cutoff-deps.sh` creates `.venv-charge-cutoff/` with `--system-site-packages` so it can see them.
 
 Configuration, all via `.env`:
 

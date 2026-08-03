@@ -4,8 +4,10 @@
 # into .venv-charge-cutoff/.
 influxdb-client>=1.36
 
-# gpiozero auto-selects a pin factory; installing lgpio makes it pick the
-# lgpio backend, which (unlike RPi.GPIO) works on the Raspberry Pi 5's RP1
-# GPIO chip as well as older Pi models.
-gpiozero>=2.0
-lgpio>=0.2
+# gpiozero and its lgpio backend (needed on a Raspberry Pi 5's RP1 GPIO chip,
+# unlike RPi.GPIO) come from apt (python3-gpiozero, python3-lgpio), not pip -
+# the lgpio PyPI package ships no prebuilt wheels and fails to build from
+# source without the native liblgpio C library, which apt's python3-lgpio
+# already bundles precompiled. The venv is created with
+# --system-site-packages so it can see them - see
+# scripts/install-charge-cutoff-deps.sh.
