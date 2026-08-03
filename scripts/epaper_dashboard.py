@@ -92,12 +92,21 @@ def draw_soc_gauge(draw, x, y, w, h, soc_pct):
         draw.rectangle((x + 3, y + 3, x + 3 + fill_w, y + h - 3), fill=0)
 
 
-def draw_and_update_display():
-    """Renders pixel canvas and flashes e-Paper screen."""
+def draw_and_update_display(full_clear=False):
+    """Renders pixel canvas and flashes e-Paper screen.
+
+    Repeated full refreshes without an occasional hard Clear() let residual
+    "ghosting" build up on the panel (most visible around the timestamp,
+    since that's the region that changes every refresh) - see
+    waveshare/e-Paper's own epd_7in5_V2_test.py, which calls Clear() before
+    its first display() for the same reason. full_clear forces that reset.
+    """
     metrics = fetch_latest_metrics()
 
     epd = epd7in5_V2.EPD()
     epd.init()
+    if full_clear:
+        epd.Clear()
 
     # 800x480 monochrome canvas
     image = Image.new('1', (epd.width, epd.height), 255)
@@ -181,7 +190,11 @@ def draw_and_update_display():
     epd.sleep()
 
 
+CLEAR_EVERY_N_UPDATES = 60  # full panel clear once an hour (60s sleep * 60)
+
 if __name__ == "__main__":
+    update_count = 0
     while True:
-        draw_and_update_display()
+        draw_and_update_display(full_clear=(update_count % CLEAR_EVERY_N_UPDATES == 0))
+        update_count += 1
         time.sleep(60)
