@@ -1,16 +1,22 @@
 #!/usr/bin/env bash
-# End-to-end deployment: generates secrets, installs host-level udev rules,
-# builds/starts the Docker stack, waits for InfluxDB to be healthy, creates
-# the weather/observatory/imaging buckets, installs the host-level e-paper
-# Python deps (SPI + venv + waveshare_epd driver) and systemd service, then
-# installs the host-level charge-cutoff relay's Python deps and (once
-# CHARGE_CUTOFF_GPIO_PIN is set in .env) its systemd service. Safe to re-run.
+# End-to-end deployment: installs Docker itself, generates secrets, installs
+# host-level udev rules, builds/starts the Docker stack, waits for InfluxDB
+# to be healthy, creates the weather/observatory/imaging buckets, installs
+# the host-level e-paper Python deps (SPI + venv + waveshare_epd driver) and
+# systemd service, then installs the host-level charge-cutoff relay's Python
+# deps and (once CHARGE_CUTOFF_GPIO_PIN is set in .env) its systemd service.
+# Safe to re-run.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_DIR"
 
-# 1. Ensure secrets exist (never overwrite an existing .env)
+# 1. Install Docker Engine + Compose plugin if not already present. On a
+# genuinely fresh install this exits with instructions to log back in (group
+# membership needs a new session) - re-run this script after that.
+"${REPO_DIR}/scripts/install-docker.sh"
+
+# 2. Ensure secrets exist (never overwrite an existing .env)
 if [[ ! -f .env ]]; then
   echo "No .env found - generating one with random secrets at ${REPO_DIR}/.env"
   cat > .env <<EOF
@@ -39,14 +45,14 @@ EOF
   echo "Review ${REPO_DIR}/.env - in particular, fill in the real WEATHER_API_URL and ALPACA_BASE_URL."
 fi
 
-# 2. Persistent serial device symlinks (host-level, idempotent)
+# 3. Persistent serial device symlinks (host-level, idempotent)
 "${REPO_DIR}/scripts/install-udev-rules.sh"
 
-# 3. Build the custom telegraf image and start the stack
+# 4. Build the custom telegraf image and start the stack
 docker compose build
 docker compose up -d
 
-# 4. Wait for InfluxDB to report healthy before wiring up the host-side service
+# 5. Wait for InfluxDB to report healthy before wiring up the host-side service
 echo "Waiting for InfluxDB to become healthy..."
 status="starting"
 for _ in $(seq 1 30); do
@@ -59,19 +65,19 @@ if [[ "$status" != "healthy" ]]; then
   exit 1
 fi
 
-# 5. Create the weather/observatory/imaging buckets (idempotent)
+# 6. Create the weather/observatory/imaging buckets (idempotent)
 "${REPO_DIR}/scripts/init-influx-buckets.sh"
 
-# 6. Host-level e-paper Python deps (SPI, venv, waveshare_epd driver)
+# 7. Host-level e-paper Python deps (SPI, venv, waveshare_epd driver)
 "${REPO_DIR}/scripts/install-epaper-deps.sh"
 
-# 7. Host-level e-paper systemd service
+# 8. Host-level e-paper systemd service
 "${REPO_DIR}/scripts/install-epaper-service.sh"
 
-# 8. Host-level charge-cutoff relay Python deps (venv, gpiozero/lgpio)
+# 9. Host-level charge-cutoff relay Python deps (venv, gpiozero/lgpio)
 "${REPO_DIR}/scripts/install-charge-cutoff-deps.sh"
 
-# 9. Host-level charge-cutoff systemd service - skips (doesn't fail) until
+# 10. Host-level charge-cutoff systemd service - skips (doesn't fail) until
 # CHARGE_CUTOFF_GPIO_PIN is set in .env, since that's hardware-wiring specific
 "${REPO_DIR}/scripts/install-charge-cutoff-service.sh"
 

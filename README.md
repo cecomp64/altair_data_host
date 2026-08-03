@@ -26,6 +26,7 @@ altair_data_host/
 │           └── solar-observatory.json     # generated - do not hand-edit, see §9
 ├── scripts/
 │   ├── deploy.sh                          # one-shot end-to-end setup (host + docker)
+│   ├── install-docker.sh                  # host: Docker Engine + Compose plugin
 │   ├── install-udev-rules.sh              # host: persistent serial device symlinks
 │   ├── install-epaper-deps.sh             # host: SPI + venv + waveshare_epd driver for the e-paper script
 │   ├── install-epaper-service.sh          # host: systemd unit for the e-paper display
@@ -55,17 +56,20 @@ scripts/deploy.sh
 
 `scripts/deploy.sh` is the single entry point and is safe to re-run. It:
 
-1. Generates `.env` with random secrets if one doesn't already exist (see [Secrets](#4-secrets)).
-2. Installs the persistent serial device udev rules on the host (`scripts/install-udev-rules.sh`).
-3. Builds the custom Telegraf image and brings up `influxdb`, `grafana`, and `telegraf` with `docker compose` - InfluxDB's first-run setup creates the `power` bucket at this point (`DOCKER_INFLUXDB_INIT_BUCKET` in `docker-compose.yml`).
-4. Waits for InfluxDB's healthcheck before continuing.
-5. Creates the remaining `weather`, `observatory`, and `imaging` buckets (`scripts/init-influx-buckets.sh`) - a separate step because InfluxDB's first-run setup only creates one bucket.
-6. Installs the e-paper display's host-side Python dependencies (`scripts/install-epaper-deps.sh`): enables SPI, creates a `.venv/`, and vendors + installs Waveshare's `waveshare_epd` driver (see [§10](#10-python-scripts)).
-7. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
-8. Installs the charge-cutoff relay's host-side Python dependencies (`scripts/install-charge-cutoff-deps.sh`): creates a `.venv-charge-cutoff/` and adds the invoking user to the `gpio` group (see [§12](#12-charge-cutoff-relay)).
-9. Installs and starts the `charge-cutoff` systemd service (`scripts/install-charge-cutoff-service.sh`) - **skipped** until `CHARGE_CUTOFF_GPIO_PIN` is set in `.env`, since that depends on hardware you may not have wired yet. Re-run `scripts/deploy.sh` (or just this script) once it is.
+1. Installs Docker Engine + the Compose plugin if not already present (`scripts/install-docker.sh`), via Docker's official apt repository, and adds the invoking user to the `docker` group.
+2. Generates `.env` with random secrets if one doesn't already exist (see [Secrets](#4-secrets)).
+3. Installs the persistent serial device udev rules on the host (`scripts/install-udev-rules.sh`).
+4. Builds the custom Telegraf image and brings up `influxdb`, `grafana`, and `telegraf` with `docker compose` - InfluxDB's first-run setup creates the `power` bucket at this point (`DOCKER_INFLUXDB_INIT_BUCKET` in `docker-compose.yml`).
+5. Waits for InfluxDB's healthcheck before continuing.
+6. Creates the remaining `weather`, `observatory`, and `imaging` buckets (`scripts/init-influx-buckets.sh`) - a separate step because InfluxDB's first-run setup only creates one bucket.
+7. Installs the e-paper display's host-side Python dependencies (`scripts/install-epaper-deps.sh`): enables SPI, creates a `.venv/`, and vendors + installs Waveshare's `waveshare_epd` driver (see [§10](#10-python-scripts)).
+8. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
+9. Installs the charge-cutoff relay's host-side Python dependencies (`scripts/install-charge-cutoff-deps.sh`): creates a `.venv-charge-cutoff/` and adds the invoking user to the `gpio` group (see [§12](#12-charge-cutoff-relay)).
+10. Installs and starts the `charge-cutoff` systemd service (`scripts/install-charge-cutoff-service.sh`) - **skipped** until `CHARGE_CUTOFF_GPIO_PIN` is set in `.env`, since that depends on hardware you may not have wired yet. Re-run `scripts/deploy.sh` (or just this script) once it is.
 
-If step 6 enabled SPI for the first time, reboot the Pi before the e-paper display will actually work - the service will otherwise start and fail to talk to the panel until the SPI overlay is loaded.
+**On a genuinely fresh machine, step 1 will exit with instructions to log out and back in** (or reboot) before re-running `scripts/deploy.sh` - Linux group membership changes (needed so `docker compose` works without `sudo`) only take effect in a new login session, and there's no way around that being a one-time speed bump. Every later re-run is a no-op if Docker's already installed and usable.
+
+If step 7 enabled SPI for the first time, reboot the Pi before the e-paper display will actually work - the service will otherwise start and fail to talk to the panel until the SPI overlay is loaded.
 
 Each of these steps is also runnable standalone (e.g. to re-apply udev rules after editing them, or to add a bucket after changing the list in `init-influx-buckets.sh`).
 
@@ -133,6 +137,16 @@ The telegraf container bind-mounts `/dev`, so it automatically sees whatever sym
 ---
 
 ## 6. Docker Orchestration
+
+### Installing Docker (`scripts/install-docker.sh`)
+`scripts/deploy.sh` runs this first (step 1). It's idempotent - if `docker` and `docker compose` are already installed and usable, it's a no-op. Otherwise it installs Docker Engine + the Compose plugin from Docker's official apt repository (only supports apt-based distros - Debian/Raspberry Pi OS/Ubuntu), removing any conflicting distro-packaged `docker.io`/`podman-docker`/etc. first, per Docker's own install docs. It then adds the invoking user to the `docker` group.
+
+Run it standalone with:
+```bash
+scripts/install-docker.sh
+```
+
+On a genuinely fresh machine this will install Docker, add you to the `docker` group, then **exit 1 with instructions to log out and back in** - group membership changes don't apply to the current login session, only new ones, and there's no scriptable way around that. Re-run `scripts/deploy.sh` (or this script) after logging back in and it'll pick up cleanly.
 
 ### Docker Compose (`docker-compose.yml`)
 Runs InfluxDB v2, Grafana, and Telegraf with serial bus access. `influxdb` has a healthcheck that `grafana` and `telegraf` wait on via `depends_on: condition: service_healthy`, so neither starts hammering InfluxDB before it's actually ready to accept writes.
