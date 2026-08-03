@@ -8,6 +8,15 @@
 # depends on doesn't work (Pi 5 replaced the old GPIO block with the RP1
 # southbridge) - this script detects Pi 5 and swaps in rpi-lgpio, a drop-in
 # replacement that exposes the same RPi.GPIO API on top of lgpio.
+#
+# lgpio itself (rpi-lgpio's backend) ships no prebuilt wheels on PyPI and
+# fails to build from source without the native liblgpio C library, which
+# has no predictable apt dev-package. Raspberry Pi OS instead ships a
+# precompiled python3-lgpio (bindings + native lib together) via apt, so the
+# venv here is created with --system-site-packages to see it, and rpi-lgpio
+# is installed with --no-deps so pip doesn't try to satisfy its lgpio
+# dependency by building it anyway (see install-charge-cutoff-deps.sh, which
+# hit this same failure first).
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -44,14 +53,24 @@ else
 fi
 
 # 2. System packages needed to create the venv and clone the driver repo.
+# python3-lgpio is only actually used on a Pi 5 (step 5 below), but it's a
+# no-op install elsewhere so it's simpler to always install it here.
 if command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update
-  sudo apt-get install -y --no-install-recommends python3-venv python3-pip git
+  sudo apt-get install -y --no-install-recommends \
+    python3-venv python3-pip python3-lgpio git
 fi
 
-# 3. Python venv with requirements-epaper.txt.
+# 3. Python venv with requirements-epaper.txt. --system-site-packages so it
+# can see the apt-installed python3-lgpio above (see the lgpio note up top).
+# Recreate if an existing venv predates that flag (or is left over from a
+# failed pip-compile attempt).
+if [[ -d "$VENV_DIR" ]] && ! grep -q "^include-system-site-packages = true$" "${VENV_DIR}/pyvenv.cfg" 2>/dev/null; then
+  echo "Recreating ${VENV_DIR} with --system-site-packages access to the apt-installed lgpio."
+  rm -rf "$VENV_DIR"
+fi
 if [[ ! -d "$VENV_DIR" ]]; then
-  python3 -m venv "$VENV_DIR"
+  python3 -m venv --system-site-packages "$VENV_DIR"
 fi
 "${VENV_DIR}/bin/pip" install --upgrade pip
 "${VENV_DIR}/bin/pip" install -r "${REPO_DIR}/scripts/requirements-epaper.txt"
@@ -70,7 +89,7 @@ fi
 if grep -q "Raspberry Pi 5" /proc/device-tree/model 2>/dev/null; then
   echo "Raspberry Pi 5 detected - swapping RPi.GPIO for rpi-lgpio."
   "${VENV_DIR}/bin/pip" uninstall -y RPi.GPIO || true
-  "${VENV_DIR}/bin/pip" install rpi-lgpio
+  "${VENV_DIR}/bin/pip" install --no-deps rpi-lgpio
 fi
 
 echo

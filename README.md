@@ -247,7 +247,7 @@ scripts/install-epaper-deps.sh
 
 This enables SPI (via `raspi-config`, skipped with a manual-setup note on non-Raspberry Pi OS hosts), creates a Python venv at `.venv/`, installs `scripts/requirements-epaper.txt` into it, and vendors + installs Waveshare's `waveshare_epd` driver (not on PyPI) from [Waveshare's e-Paper repo](https://github.com/waveshare/e-Paper) into `vendor/waveshare-epaper/` (gitignored). If you have a different 7.5" panel than the V2, the vendored repo has the other drivers too - just swap the import in `epaper_dashboard.py` as noted above.
 
-On a **Raspberry Pi 5**, the script also detects the board (via `/proc/device-tree/model`) and swaps the driver's `RPi.GPIO` dependency for `rpi-lgpio`, a drop-in replacement - the Pi 5's RP1-based GPIO chip isn't supported by legacy `RPi.GPIO`.
+On a **Raspberry Pi 5**, the script also detects the board (via `/proc/device-tree/model`) and swaps the driver's `RPi.GPIO` dependency for `rpi-lgpio`, a drop-in replacement - the Pi 5's RP1-based GPIO chip isn't supported by legacy `RPi.GPIO`. `rpi-lgpio`'s backend (`lgpio`) has no prebuilt PyPI wheels and fails to build from source without the native `liblgpio` C library, so - same as the charge-cutoff relay (§12) - this installs Raspberry Pi OS's precompiled `python3-lgpio` via apt and creates `.venv/` with `--system-site-packages` so it's visible, installing `rpi-lgpio` itself with `--no-deps` so pip doesn't try to satisfy that dependency by compiling it anyway.
 
 The systemd service (`scripts/epaper-dashboard.service.template`) runs the script with `.venv/bin/python3`, not the system interpreter, so `install-epaper-deps.sh` must run before `install-epaper-service.sh` (deploy.sh already orders them this way).
 
