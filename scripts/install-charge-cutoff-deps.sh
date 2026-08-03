@@ -18,7 +18,10 @@ SERVICE_USER="${SUDO_USER:-${USER}}"
 
 if command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update
-  sudo apt-get install -y --no-install-recommends python3-venv python3-pip
+  # swig + build-essential + python3-dev: lgpio has no prebuilt arm64 wheel
+  # on PyPI, so pip compiles its _lgpio C extension from source.
+  sudo apt-get install -y --no-install-recommends \
+    python3-venv python3-pip python3-dev build-essential swig
 fi
 
 if [[ ! -d "$VENV_DIR" ]]; then
