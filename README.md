@@ -123,16 +123,46 @@ The host-side e-paper service also reads these values via `EnvironmentFile=` in 
 To prevent `/dev/ttyUSB0` and `/dev/ttyUSB1` from swapping positions on reboot, persistent symlinks are created based on hardware vendor/product IDs:
 
 ```ini
-# Victron VE.Direct USB Interface (SmartShunt)
-SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyUSB_VICTRON", MODE="0666"
+# Victron VE.Direct USB Interface (SmartShunt) - genuine Victron cable enumerates as FT-X (idProduct 6015)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", SYMLINK+="ttyUSB_VICTRON", MODE="0666"
 
-# Eco-Worthy RS485 to USB Adapter (FTDI / CH340 / CP2102)
+# Eco-Worthy RS485 to USB Adapter (FTDI FT232R variant, idProduct 6001)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyUSB_ECOWORTHY", MODE="0666"
+
+# Eco-Worthy RS485 to USB Adapter (CH340 variant, seen on some cables)
 SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="ttyUSB_ECOWORTHY", MODE="0666"
 ```
+
+Both the Victron cable and the FT232R-based Eco-Worthy adapter use FTDI vendor ID `0403`, distinguished only by product ID (`6015` vs `6001`) - don't assume vendor ID alone identifies the device. Verify with `udevadm info -a -n /dev/ttyUSBx | grep -E "idVendor|idProduct"` and cross-check against `dmesg` (which prints the USB product string, e.g. `VE Direct cable` vs `FT232R USB UART`) before trusting either symlink.
 
 The telegraf container bind-mounts `/dev`, so it automatically sees whatever symlinks udev creates on the host - no container-side configuration needed.
 
 *Apply on the host:* `scripts/install-udev-rules.sh` (installs the rules file to `/etc/udev/rules.d/`, then reloads and triggers udev; re-execs itself with `sudo` if needed).
+
+### Eco-Worthy MPPT: RS485 RJ45 Pinout (don't trust a generic cable)
+
+The controller's RJ45 communication port, per Eco-Worthy's own manual:
+
+| Pin | Function |
+|---|---|
+| 1 | RS485-A |
+| 2 | RS485-B |
+| 3–4 | Dry contact |
+| 5–6 | GND (isolated) |
+| 7–8 | +5V (isolated) |
+
+This is **not** the pinout most off-the-shelf "USB to RS485 RJ45" cables use - most (including cables sold for Seplos/PUSUNG/SUTEN and other server-rack BMS packs) put RS485-A/B on pins 7/8 instead. Plugging one of those in doesn't just fail to communicate - it lands the adapter's A/B lines on this controller's +5V pins. Symptom: telegraf's `inputs.modbus` gets a clean `serial: timeout` (port opens fine, slave never responds) under every baud rate/slave ID/function code, because the query never reaches the controller's actual RS485 transceiver.
+
+**Fix: use a generic USB-RS485 adapter with bare screw terminals and wire it to this controller's pinout yourself**, rather than trusting a pre-wired RJ45 cable's convention:
+
+| Controller RJ45 pin | Signal | Wire to |
+|---|---|---|
+| 1 | RS485-A | adapter's `A` terminal |
+| 2 | RS485-B | adapter's `B` terminal |
+| 5 or 6 | GND | adapter's `GND` terminal |
+| 3–4, 7–8 | dry contact / +5V | leave disconnected |
+
+Identify which physical wire in the patch cable corresponds to pins 1/2/5 with a multimeter's continuity function rather than trusting color coding - cheap/off-brand Cat5 cables don't reliably follow T568A/T568B. No `telegraf.conf` changes are needed once wired correctly; the existing `inputs.modbus` block (9600 baud, 8N1, slave 1) already matches the controller's defaults.
 
 ---
 
@@ -235,9 +265,15 @@ Grafana's dashboard provider has `allowUiUpdates: true`, so you can also tweak p
 Runs inside the `telegraf` container (via the custom image from §6). Parses the ASCII serial stream coming from the Victron SmartShunt and translates VE.Direct keys into Influx Line Protocol.
 
 ### E-Paper Display Controller (`scripts/epaper_dashboard.py`)
-Runs on the host OS, not in Docker, since it needs direct GPIO/SPI access to the Waveshare e-Paper HAT. Queries InfluxDB every 60 seconds over the host network (`http://localhost:8086`, exposed by the `influxdb` container's port mapping) and renders an updated power dashboard onto a Waveshare **7.5" V2** E-Paper display (800x480, monochrome). If you have a different 7.5" variant (tri-color `7in5b_V2`, or the 880x528 grayscale `7in5_HD`), swap the driver import at the top of the script - the layout constants assume 800x480 and would need adjusting for the HD panel's resolution.
+Runs on the host OS, not in Docker, since it needs direct GPIO/SPI access to the Waveshare e-Paper HAT. Queries InfluxDB every 60 seconds over the host network (`http://localhost:8086`, exposed by the `influxdb` container's port mapping) and renders an updated power dashboard onto a Waveshare **7.5" B V2** E-Paper display (800x480, tri-color black/white/red - the dashboard itself is drawn black-on-white only, with the red plane left blank). If you have a different 7.5" variant (monochrome `epd7in5_V2`, or the 880x528 grayscale `7in5_HD`), swap the driver import at the top of the script - **the mono and tri-color drivers use commands 0x10/0x13 for completely different purposes** (old/new frame vs. black-plane/red-plane), so also update `draw_and_update_display()`'s final `epd.display(...)` call to match the target driver's signature. The layout constants assume 800x480 and would need adjusting for the HD panel's resolution.
 
 Layout: a two-column dashboard (Battery | Solar) with a hero SOC%/PV-power number and a fill gauge per column, secondary stats below (voltage, net power, time-to-go, consumed Ah / PV voltage & current, charge current, controller temp), and a footer with the timestamp plus a CHARGING/DISCHARGING/IDLE state derived from net power's sign.
+
+**Refresh cadence and ghosting.** The script uses the driver's `init_Fast()` instead of `init()` - different booster/temperature registers that select a shorter waveform. Measured on this panel: ~12.6s per full refresh under `init_Fast()` vs ~19s under standard `init()`, for both `Clear()` and `display()`, with no visible quality loss. This chip has no way to load a custom LUT over SPI (no `0x20`-`0x24` commands in this driver), so `init_Fast()` is the fastest full-refresh mode actually available - `EPAPER_REFRESH_SECONDS` (default 60) comfortably fits it with room to spare.
+
+A full refresh's waveform flashes every pixel through black/red/white regardless of the previous frame before settling on the new one - it's a reset-and-redraw, not a diff against the old frame, so **it's already self-cleaning on every call**. Tested directly: drawing a solid black block, then a different solid block, then plain white, back-to-back with no `Clear()` anywhere in between, came out completely clean on the real panel. So the old "deep-clear every N refreshes" behavior was mostly redundant overhead once the driver mismatch (above) was fixed - `EPAPER_DEEP_CLEAR_EVERY` (default 1440, ~once a day at 60s/refresh) is now just a cheap safety net against slower degradation that a handful of back-to-back refreshes wouldn't reveal, not routine de-ghosting. Set it to `0` to disable entirely.
+
+**Partial refresh doesn't work on this hardware - don't try it.** The vendored driver exposes `init_part()`/`display_Partial()`, which looks like an obvious way to go even faster (it does - to ~3s), but its partial-refresh RAM write only touches the black plane; it has no path to move the red pigment at all. Testing confirmed this directly: a few consecutive partial refreshes left visible red bleed-through from unrelated earlier content and visible ghosting on the black plane, recoverable only with a full `Clear()`. This is a known general limitation of black/white/red e-paper (unlike monochrome panels, which usually support partial refresh across many cycles) - full refresh is the only refresh mode that reliably resets both pigment layers on this panel.
 
 Its host-side dependencies are installed automatically by `scripts/deploy.sh` (step 6, `scripts/install-epaper-deps.sh`), which is also runnable standalone and safe to re-run:
 

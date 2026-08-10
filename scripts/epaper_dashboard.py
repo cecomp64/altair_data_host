@@ -4,10 +4,16 @@ import time
 import datetime
 from PIL import Image, ImageDraw, ImageFont
 from influxdb_client import InfluxDBClient
-from waveshare_epd import epd7in5_V2  # Waveshare 7.5" V2 driver module, 800x480 monochrome
+from waveshare_epd import epd7in5b_V2  # Waveshare 7.5" B V2 tri-color (black/white/red) driver, 800x480
 # Different 7.5" model? Swap the import/class above:
-#   tri-color (red/black/white): epd7in5b_V2
+#   monochrome:                  epd7in5_V2
 #   HD (880x528, grayscale):     epd7in5_HD
+# These have a different display()/Clear() protocol - the tri-color driver writes
+# separate black-plane (0x10) and red-plane (0x13) bitmaps, while the monochrome
+# driver's display() uses those same two commands for an old/new frame pair
+# instead. Passing a mono-driver buffer through the tri-color driver's display()
+# (or vice versa) silently misinterprets the second buffer as red-channel data -
+# every "black" pixel bleeds into red on this panel.
 
 # Runs on the host OS (see scripts/install-epaper-service.sh), which loads
 # these from the repo's .env via the systemd unit's EnvironmentFile=.
@@ -92,20 +98,32 @@ def draw_soc_gauge(draw, x, y, w, h, soc_pct):
         draw.rectangle((x + 3, y + 3, x + 3 + fill_w, y + h - 3), fill=0)
 
 
-def draw_and_update_display(full_clear=False):
+def draw_and_update_display(safety_clear=False):
     """Renders pixel canvas and flashes e-Paper screen.
 
-    Repeated full refreshes without an occasional hard Clear() let residual
-    "ghosting" build up on the panel (most visible around the timestamp,
-    since that's the region that changes every refresh) - see
-    waveshare/e-Paper's own epd_7in5_V2_test.py, which calls Clear() before
-    its first display() for the same reason. full_clear forces that reset.
+    Every call here is already a full refresh (never partial - see the
+    REFRESH_SECONDS comment below on why), and a full refresh's waveform
+    flashes every pixel through black/red/white regardless of the previous
+    frame before settling on the new one - it's a reset-and-redraw, not a
+    diff against the old frame. Testing confirmed this directly: drawing a
+    solid black block, then a different solid block, then plain white, with
+    no Clear() anywhere in between, came out completely clean - no ghosting
+    from either prior frame. So a separate deep-clear before drawing is not
+    needed for routine ghosting; safety_clear exists purely as a cheap,
+    rare insurance pass (see DEEP_CLEAR_EVERY_N_UPDATES) against slower
+    degradation a few back-to-back refreshes wouldn't reveal.
     """
     metrics = fetch_latest_metrics()
 
-    epd = epd7in5_V2.EPD()
-    epd.init()
-    if full_clear:
+    epd = epd7in5b_V2.EPD()
+    # init_Fast() (different booster/temperature registers than init()) selects
+    # a shorter waveform - measured ~12.6s per full refresh here vs ~19s under
+    # the standard init(), for both Clear() and display(), with no visible
+    # quality loss. This chip has no exposed way to load a custom LUT over SPI
+    # (no 0x20-0x24 commands in this driver), so init_Fast() is the fastest
+    # full-refresh mode actually available - not something to hand-roll further.
+    epd.init_Fast()
+    if safety_clear:
         epd.Clear()
 
     # 800x480 monochrome canvas
@@ -186,15 +204,36 @@ def draw_and_update_display(full_clear=False):
     draw.text((W - MARGIN - 15 - state_w, FOOTER_Y + 15), state, font=font_footer_bold, fill=0)
 
     # Update Display & Sleep Screen (Prevents burn-in)
-    epd.display(epd.getbuffer(image))
+    # The dashboard is drawn black-on-white only, so the red plane stays blank -
+    # this driver's display() takes black/red as two separate bitmaps, not an
+    # old/new frame pair like the monochrome driver.
+    black_buf = epd.getbuffer(image)
+    red_buf = bytearray(len(black_buf))
+    epd.display(black_buf, red_buf)
     epd.sleep()
 
 
-CLEAR_EVERY_N_UPDATES = 60  # full panel clear once an hour (60s sleep * 60)
+# A full display() on this panel takes ~12.6s under init_Fast() regardless of
+# whether Clear() ran first - full refresh is a flash-and-reset waveform, not a
+# diff against the old frame, so it's already self-cleaning every time (see
+# draw_and_update_display's docstring). Partial refresh (display_Partial) looked
+# like a way to go faster still, but this driver's partial mode only touches the
+# black plane - it can't move the red pigment at all, and testing showed a few
+# partial cycles in a row leave visible red bleed-through and black-plane
+# ghosting within minutes. Don't use display_Partial()/init_part() on this
+# hardware for anything beyond a single throwaway test.
+REFRESH_SECONDS = int(os.environ.get("EPAPER_REFRESH_SECONDS", "60"))
+# Purely a rare safety net (see draw_and_update_display) - at 60s/refresh this
+# is roughly once a day. Set to 0 to disable it outright.
+DEEP_CLEAR_EVERY_N_UPDATES = int(os.environ.get("EPAPER_DEEP_CLEAR_EVERY", "1440"))
 
 if __name__ == "__main__":
     update_count = 0
     while True:
-        draw_and_update_display(full_clear=(update_count % CLEAR_EVERY_N_UPDATES == 0))
+        safety_clear = (
+            DEEP_CLEAR_EVERY_N_UPDATES > 0
+            and update_count % DEEP_CLEAR_EVERY_N_UPDATES == 0
+        )
+        draw_and_update_display(safety_clear=safety_clear)
         update_count += 1
-        time.sleep(60)
+        time.sleep(REFRESH_SECONDS)
