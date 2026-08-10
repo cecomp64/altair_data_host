@@ -145,7 +145,6 @@ def draw_gauge(draw, x, y, w, h, pct):
 def render_dashboard(power, weather, W=EPD_W, H=EPD_H):
     """Renders the dashboard to a 1-bit PIL Image. Pure function of the metrics
     dicts, so it can be exercised without any e-Paper hardware present."""
-    font_title = ImageFont.truetype(FONT_BOLD, 30)
     font_heading = ImageFont.truetype(FONT_BOLD, 36)
     font_stat_label = ImageFont.truetype(FONT_REGULAR, 15)
     font_stat_value = ImageFont.truetype(FONT_BOLD, 23)
@@ -156,29 +155,25 @@ def render_dashboard(power, weather, W=EPD_W, H=EPD_H):
     draw = ImageDraw.Draw(image)
 
     MARGIN = 10
-    HEADER_Y = 60
+    CONTENT_TOP = MARGIN + 14
     FOOTER_Y = H - 50
     MID_X = W // 2
 
     # Frame
     draw.rectangle((MARGIN, MARGIN, W - MARGIN, H - MARGIN), outline=0, width=2)
-    draw.line((MARGIN, HEADER_Y, W - MARGIN, HEADER_Y), fill=0, width=2)
-    draw.line((MID_X, HEADER_Y, MID_X, FOOTER_Y), fill=0, width=2)
+    draw.line((MID_X, MARGIN, MID_X, FOOTER_Y), fill=0, width=2)
     draw.line((MARGIN, FOOTER_Y, W - MARGIN, FOOTER_Y), fill=0, width=2)
-
-    # Header
-    draw.text((MARGIN + 15, 15), "OFF-GRID DASHBOARD", font=font_title, fill=0)
 
     # ================= Left half: POWER (battery + solar, stacked) =================
     lx = MARGIN + 20
     lw = MID_X - lx - 20
     stat_w = lw // 2
 
-    # Battery and Solar each get an equal half of the vertical space below the
-    # header, so the two zones read as evenly spaced regardless of content.
-    ZONE_H = (FOOTER_Y - HEADER_Y) // 2
-    zone1_top = HEADER_Y
-    zone2_top = HEADER_Y + ZONE_H
+    # Battery and Solar each get an equal half of the vertical space, so the
+    # two zones read as evenly spaced regardless of content.
+    ZONE_H = (FOOTER_Y - CONTENT_TOP) // 2
+    zone1_top = CONTENT_TOP
+    zone2_top = CONTENT_TOP + ZONE_H
 
     # Divider between the battery and solar zones
     div_y = zone2_top
