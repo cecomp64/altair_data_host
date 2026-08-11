@@ -74,6 +74,16 @@ def gauge_panel(title, domain, flux, x, y, w=6, h=STAT_H, unit="percent", thresh
 
 def timeseries_panel(title, domain, queries, x, y, w=12, h=TS_H, unit="none"):
     targets = [_target(domain, flux, ref_id=chr(65 + i)) for i, (_, flux) in enumerate(queries)]
+    # Flux queries all return a generically-named value field (or, post the
+    # _start/_stop fix, one named after the InfluxDB field) - with two
+    # targets in one panel that's not enough to tell series apart in the
+    # legend/tooltip, so pin each target's series name explicitly via a
+    # byFrameRefID override rather than relying on whatever Grafana infers.
+    overrides = [
+        {"matcher": {"id": "byFrameRefID", "options": chr(65 + i)},
+         "properties": [{"id": "displayName", "value": label}]}
+        for i, (label, _) in enumerate(queries)
+    ]
     return {
         "id": next_id(), "type": "timeseries", "title": title,
         "gridPos": {"h": h, "w": w, "x": x, "y": y},
@@ -84,7 +94,7 @@ def timeseries_panel(title, domain, queries, x, y, w=12, h=TS_H, unit="none"):
             "color": {"mode": "palette-classic"},
             "custom": {"drawStyle": "line", "lineWidth": 2, "fillOpacity": 10,
                        "pointSize": 5, "spanNulls": True, "showPoints": "never"},
-        }, "overrides": []},
+        }, "overrides": overrides},
         "options": {"legend": {"displayMode": "list", "placement": "bottom", "calcs": []},
                     "tooltip": {"mode": "multi"}},
     }
@@ -136,8 +146,18 @@ def bool_mappings(true_text, true_color, false_text, false_color):
 # reading. The pinned hostname stops new fragmentation; this stops the
 # already-recorded fragments from still showing as duplicates, without
 # having to delete/rewrite any historical points.
+#
+# Also drops "_start"/"_stop" - Flux's range() annotates every row with the
+# query window's boundaries, not the row's own timestamp. Those two columns
+# are also time-typed and, left in, sort ahead of "_time" in the returned
+# frame's field order - Grafana's timeseries panel picks the first
+# time-typed field as its X axis, so it was plotting every row at the
+# constant "_start" value instead of its actual "_time", collapsing an
+# entire range of points onto one X position (confirmed via Panel ->
+# Inspect -> Data: full, correctly-varying series arrives in the browser,
+# it's only the chart's X-axis field choice that was wrong).
 def _drop_host(flux):
-    return flux + '\n  |> drop(columns: ["host"])\n  |> group(columns: ["_measurement", "_field"])'
+    return flux + '\n  |> drop(columns: ["host", "_start", "_stop"])\n  |> group(columns: ["_measurement", "_field"])'
 
 
 def flux_range(bucket, measurement, fields):
@@ -245,31 +265,31 @@ def build():
     y += STAT_H
 
     panels.append(timeseries_panel("Outdoor vs Indoor Temperature", "weather",
-                                    [("temp_f", flux_range("weather", "weather_station", ["temp_f"])),
-                                     ("temp_in_f", flux_range("weather", "weather_station", ["temp_in_f"]))],
+                                    [("Outdoor", flux_range("weather", "weather_station", ["temp_f"])),
+                                     ("Indoor", flux_range("weather", "weather_station", ["temp_in_f"]))],
                                     0, y, unit="fahrenheit"))
     panels.append(timeseries_panel("Outdoor vs Indoor Humidity", "weather",
-                                    [("humidity_pct", flux_range("weather", "weather_station", ["humidity_pct"])),
-                                     ("humidity_in_pct", flux_range("weather", "weather_station", ["humidity_in_pct"]))],
+                                    [("Outdoor", flux_range("weather", "weather_station", ["humidity_pct"])),
+                                     ("Indoor", flux_range("weather", "weather_station", ["humidity_in_pct"]))],
                                     12, y, unit="percent"))
     y += TS_H
 
     panels.append(timeseries_panel("Wind Speed & Gust", "weather",
-                                    [("wind_speed_mph", flux_range("weather", "weather_station", ["wind_speed_mph"])),
-                                     ("wind_gust_mph", flux_range("weather", "weather_station", ["wind_gust_mph"]))],
+                                    [("Speed", flux_range("weather", "weather_station", ["wind_speed_mph"])),
+                                     ("Gust", flux_range("weather", "weather_station", ["wind_gust_mph"]))],
                                     0, y, unit="velocitymph"))
     panels.append(bar_panel("Rain Accumulation", "weather",
-                             [("rain_hourly_in", flux_range("weather", "weather_station", ["rain_hourly_in"])),
-                              ("rain_daily_in", flux_range("weather", "weather_station", ["rain_daily_in"]))],
+                             [("Hourly", flux_range("weather", "weather_station", ["rain_hourly_in"])),
+                              ("Daily", flux_range("weather", "weather_station", ["rain_daily_in"]))],
                              12, y, unit="lengthin"))
     y += TS_H
 
     panels.append(timeseries_panel("Solar Radiation & UV Index", "weather",
-                                    [("solar_radiation_wm2", flux_range("weather", "weather_station", ["solar_radiation_wm2"])),
-                                     ("uv_index", flux_range("weather", "weather_station", ["uv_index"]))],
+                                    [("Solar Radiation (W/m²)", flux_range("weather", "weather_station", ["solar_radiation_wm2"])),
+                                     ("UV Index", flux_range("weather", "weather_station", ["uv_index"]))],
                                     0, y, w=12, unit="none"))
     panels.append(timeseries_panel("Moon Illumination", "weather",
-                                    [("moon_illumination_pct", flux_range("weather", "weather_station", ["moon_illumination_pct"]))],
+                                    [("Illumination", flux_range("weather", "weather_station", ["moon_illumination_pct"]))],
                                     12, y, w=12, unit="percent"))
     y += TS_H
 
