@@ -127,9 +127,22 @@ def bool_mappings(true_text, true_color, false_text, false_color):
     ]
 
 
+# Every query below drops "host" and regroups on just (_measurement, _field)
+# before returning data. telegraf tags every metric with the collecting
+# container's hostname; without a pinned hostname (see telegraf.conf
+# [agent].hostname), each container recreate got a new random one, silently
+# fragmenting every field into a separate "host" series - which Grafana then
+# rendered as multiple overlapping lines for what's actually one continuous
+# reading. The pinned hostname stops new fragmentation; this stops the
+# already-recorded fragments from still showing as duplicates, without
+# having to delete/rewrite any historical points.
+def _drop_host(flux):
+    return flux + '\n  |> drop(columns: ["host"])\n  |> group(columns: ["_measurement", "_field"])'
+
+
 def flux_range(bucket, measurement, fields):
     field_filter = " or ".join(f'r._field == "{f}"' for f in fields)
-    return (
+    return _drop_host(
         f'from(bucket: "{bucket}")\n'
         f'  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
         f'  |> filter(fn: (r) => r._measurement == "{measurement}" and ({field_filter}))'
@@ -137,12 +150,11 @@ def flux_range(bucket, measurement, fields):
 
 
 def flux_last(bucket, measurement, field):
-    return (
+    return _drop_host(
         f'from(bucket: "{bucket}")\n'
         f'  |> range(start: -1h)\n'
-        f'  |> filter(fn: (r) => r._measurement == "{measurement}" and r._field == "{field}")\n'
-        f'  |> last()'
-    )
+        f'  |> filter(fn: (r) => r._measurement == "{measurement}" and r._field == "{field}")'
+    ) + '\n  |> last()'
 
 
 # N.I.N.A.'s InfluxDB Exporter plugin (daleghent/nina-influxdb-exporter) uses
@@ -209,21 +221,36 @@ def build():
 
     # -------------------------------------------------------------- Weather
     panels.append(row("Weather", y)); y += ROW_H
-    panels.append(stat_panel("Temperature", "weather", flux_last("weather", "weather_station", "temp_f"),
+    panels.append(stat_panel("Outdoor Temperature", "weather", flux_last("weather", "weather_station", "temp_f"),
                               0, y, unit="fahrenheit"))
-    panels.append(stat_panel("Humidity", "weather", flux_last("weather", "weather_station", "humidity_pct"),
+    panels.append(stat_panel("Outdoor Humidity", "weather", flux_last("weather", "weather_station", "humidity_pct"),
                               6, y, unit="percent"))
-    panels.append(stat_panel("Wind Speed", "weather", flux_last("weather", "weather_station", "wind_speed_mph"),
-                              12, y, unit="velocitymph"))
-    panels.append(stat_panel("Pressure", "weather", flux_last("weather", "weather_station", "pressure_inhg"),
-                              18, y, unit="pressurehg"))
+    panels.append(stat_panel("Indoor Temperature", "weather", flux_last("weather", "weather_station", "temp_in_f"),
+                              12, y, unit="fahrenheit"))
+    panels.append(stat_panel("Indoor Humidity", "weather", flux_last("weather", "weather_station", "humidity_in_pct"),
+                              18, y, unit="percent"))
     y += STAT_H
 
-    panels.append(timeseries_panel("Temperature", "weather",
-                                    [("temp_f", flux_range("weather", "weather_station", ["temp_f"]))],
+    panels.append(stat_panel("Wind Speed", "weather", flux_last("weather", "weather_station", "wind_speed_mph"),
+                              0, y, unit="velocitymph"))
+    panels.append(stat_panel("Pressure", "weather", flux_last("weather", "weather_station", "pressure_inhg"),
+                              6, y, unit="pressurehg"))
+    panels.append(gauge_panel("Sensor Battery", "weather", flux_last("weather", "weather_station", "battery_pct"),
+                               12, y, unit="percent",
+                               thresholds=[{"value": None, "color": "red"},
+                                           {"value": 40, "color": "yellow"},
+                                           {"value": 60, "color": "green"}]))
+    panels.append(stat_panel("Moon Phase", "weather", flux_last("weather", "weather_station", "moon_phase_name"),
+                              18, y, unit="none", color_mode="fixed"))
+    y += STAT_H
+
+    panels.append(timeseries_panel("Outdoor vs Indoor Temperature", "weather",
+                                    [("temp_f", flux_range("weather", "weather_station", ["temp_f"])),
+                                     ("temp_in_f", flux_range("weather", "weather_station", ["temp_in_f"]))],
                                     0, y, unit="fahrenheit"))
-    panels.append(timeseries_panel("Humidity", "weather",
-                                    [("humidity_pct", flux_range("weather", "weather_station", ["humidity_pct"]))],
+    panels.append(timeseries_panel("Outdoor vs Indoor Humidity", "weather",
+                                    [("humidity_pct", flux_range("weather", "weather_station", ["humidity_pct"])),
+                                     ("humidity_in_pct", flux_range("weather", "weather_station", ["humidity_in_pct"]))],
                                     12, y, unit="percent"))
     y += TS_H
 
@@ -240,7 +267,10 @@ def build():
     panels.append(timeseries_panel("Solar Radiation & UV Index", "weather",
                                     [("solar_radiation_wm2", flux_range("weather", "weather_station", ["solar_radiation_wm2"])),
                                      ("uv_index", flux_range("weather", "weather_station", ["uv_index"]))],
-                                    0, y, w=WIDTH, unit="none"))
+                                    0, y, w=12, unit="none"))
+    panels.append(timeseries_panel("Moon Illumination", "weather",
+                                    [("moon_illumination_pct", flux_range("weather", "weather_station", ["moon_illumination_pct"]))],
+                                    12, y, w=12, unit="percent"))
     y += TS_H
 
     # --------------------------------------------------------- Observatory

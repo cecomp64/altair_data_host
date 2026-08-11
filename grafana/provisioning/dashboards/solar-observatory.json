@@ -50,7 +50,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"soc\")\n  |> last()",
+          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"soc\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -111,7 +111,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"time_to_go_min\")\n  |> last()",
+          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"time_to_go_min\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -158,7 +158,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and r._field == \"controller_temp\")\n  |> last()",
+          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and r._field == \"controller_temp\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -222,7 +222,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"consumed_ah\")\n  |> last()",
+          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"consumed_ah\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -269,7 +269,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"voltage\"))",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"voltage\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         }
       ],
@@ -321,7 +321,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"current\"))",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"current\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -329,7 +329,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"charging_current\"))",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"charging_current\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -381,7 +381,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"power\"))",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"power\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -389,7 +389,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_power\"))",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_power\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -441,7 +441,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_voltage\"))",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_voltage\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -449,7 +449,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_current\"))",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_current\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -497,7 +497,7 @@
     {
       "id": 12,
       "type": "stat",
-      "title": "Temperature",
+      "title": "Outdoor Temperature",
       "gridPos": {
         "h": 6,
         "w": 6,
@@ -514,7 +514,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"temp_f\")\n  |> last()",
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"temp_f\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -544,7 +544,7 @@
     {
       "id": 13,
       "type": "stat",
-      "title": "Humidity",
+      "title": "Outdoor Humidity",
       "gridPos": {
         "h": 6,
         "w": 6,
@@ -561,7 +561,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"humidity_pct\")\n  |> last()",
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"humidity_pct\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -591,7 +591,7 @@
     {
       "id": 14,
       "type": "stat",
-      "title": "Wind Speed",
+      "title": "Indoor Temperature",
       "gridPos": {
         "h": 6,
         "w": 6,
@@ -608,7 +608,101 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"wind_speed_mph\")\n  |> last()",
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"temp_in_f\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "fahrenheit",
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "Indoor Humidity",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 24
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"humidity_in_pct\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "Wind Speed",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 30
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"wind_speed_mph\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -636,14 +730,14 @@
       }
     },
     {
-      "id": 15,
+      "id": 17,
       "type": "stat",
       "title": "Pressure",
       "gridPos": {
         "h": 6,
         "w": 6,
-        "x": 18,
-        "y": 24
+        "x": 6,
+        "y": 30
       },
       "datasource": {
         "type": "influxdb",
@@ -655,7 +749,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"pressure_inhg\")\n  |> last()",
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"pressure_inhg\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -683,13 +777,13 @@
       }
     },
     {
-      "id": 16,
-      "type": "timeseries",
-      "title": "Temperature",
+      "id": 18,
+      "type": "gauge",
+      "title": "Sensor Battery",
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
+        "h": 6,
+        "w": 6,
+        "x": 12,
         "y": 30
       },
       "datasource": {
@@ -702,8 +796,124 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"temp_f\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"battery_pct\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "red"
+              },
+              {
+                "value": 40,
+                "color": "yellow"
+              },
+              {
+                "value": 60,
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 19,
+      "type": "stat",
+      "title": "Moon Phase",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 30
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"moon_phase_name\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "fixed"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Outdoor vs Indoor Temperature",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 36
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"temp_f\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"temp_in_f\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
         }
       ],
       "fieldConfig": {
@@ -735,14 +945,14 @@
       }
     },
     {
-      "id": 17,
+      "id": 21,
       "type": "timeseries",
-      "title": "Humidity",
+      "title": "Outdoor vs Indoor Humidity",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 30
+        "y": 36
       },
       "datasource": {
         "type": "influxdb",
@@ -754,8 +964,16 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"humidity_pct\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"humidity_pct\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"humidity_in_pct\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
         }
       ],
       "fieldConfig": {
@@ -787,14 +1005,14 @@
       }
     },
     {
-      "id": 18,
+      "id": 22,
       "type": "timeseries",
       "title": "Wind Speed & Gust",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 38
+        "y": 44
       },
       "datasource": {
         "type": "influxdb",
@@ -806,7 +1024,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_speed_mph\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_speed_mph\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -814,7 +1032,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_gust_mph\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_gust_mph\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -847,14 +1065,14 @@
       }
     },
     {
-      "id": 19,
+      "id": 23,
       "type": "barchart",
       "title": "Rain Accumulation",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 38
+        "y": 44
       },
       "datasource": {
         "type": "influxdb",
@@ -866,7 +1084,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_hourly_in\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_hourly_in\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -874,7 +1092,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -907,14 +1125,14 @@
       }
     },
     {
-      "id": 20,
+      "id": 24,
       "type": "timeseries",
       "title": "Solar Radiation & UV Index",
       "gridPos": {
         "h": 8,
-        "w": 24,
+        "w": 12,
         "x": 0,
-        "y": 46
+        "y": 52
       },
       "datasource": {
         "type": "influxdb",
@@ -926,7 +1144,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"solar_radiation_wm2\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"solar_radiation_wm2\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -934,7 +1152,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"uv_index\"))",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"uv_index\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -967,27 +1185,79 @@
       }
     },
     {
-      "id": 21,
+      "id": 25,
+      "type": "timeseries",
+      "title": "Moon Illumination",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 52
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"moon_illumination_pct\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "pointSize": 5,
+            "spanNulls": true,
+            "showPoints": "never"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 26,
       "type": "row",
       "title": "Observatory",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 54
+        "y": 60
       },
       "collapsed": false,
       "panels": []
     },
     {
-      "id": 22,
+      "id": 27,
       "type": "stat",
       "title": "Roof Shutter Status",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 55
+        "y": 61
       },
       "datasource": {
         "type": "influxdb",
@@ -999,7 +1269,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"shutter_status\")\n  |> last()",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"shutter_status\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -1054,14 +1324,14 @@
       }
     },
     {
-      "id": 23,
+      "id": 28,
       "type": "stat",
       "title": "Slewing",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 55
+        "y": 61
       },
       "datasource": {
         "type": "influxdb",
@@ -1073,7 +1343,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"slewing\")\n  |> last()",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"slewing\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -1123,14 +1393,14 @@
       }
     },
     {
-      "id": 24,
+      "id": 29,
       "type": "stat",
       "title": "At Home",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 55
+        "y": 61
       },
       "datasource": {
         "type": "influxdb",
@@ -1142,7 +1412,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"at_home\")\n  |> last()",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"at_home\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -1192,14 +1462,14 @@
       }
     },
     {
-      "id": 25,
+      "id": 30,
       "type": "stat",
       "title": "Connected",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 18,
-        "y": 55
+        "y": 61
       },
       "datasource": {
         "type": "influxdb",
@@ -1211,7 +1481,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"connected\")\n  |> last()",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"connected\")\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
           "refId": "A"
         }
       ],
@@ -1261,14 +1531,14 @@
       }
     },
     {
-      "id": 26,
+      "id": 31,
       "type": "state-timeline",
       "title": "Roof Shutter Status History",
       "gridPos": {
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 61
+        "y": 67
       },
       "datasource": {
         "type": "influxdb",
@@ -1280,7 +1550,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"shutter_status\"))",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"shutter_status\"))\n  |> drop(columns: [\"host\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         }
       ],
@@ -1335,27 +1605,27 @@
       }
     },
     {
-      "id": 27,
+      "id": 32,
       "type": "row",
       "title": "Imaging",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 67
+        "y": 73
       },
       "collapsed": false,
       "panels": []
     },
     {
-      "id": 28,
+      "id": 33,
       "type": "stat",
       "title": "Camera Sensor Temp",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 68
+        "y": 74
       },
       "datasource": {
         "type": "influxdb",
@@ -1395,14 +1665,14 @@
       }
     },
     {
-      "id": 29,
+      "id": 34,
       "type": "stat",
       "title": "Cooler Power",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 68
+        "y": 74
       },
       "datasource": {
         "type": "influxdb",
@@ -1442,14 +1712,14 @@
       }
     },
     {
-      "id": 30,
+      "id": 35,
       "type": "stat",
       "title": "Focuser Position",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 68
+        "y": 74
       },
       "datasource": {
         "type": "influxdb",
@@ -1489,14 +1759,14 @@
       }
     },
     {
-      "id": 31,
+      "id": 36,
       "type": "stat",
       "title": "Sun Altitude",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 18,
-        "y": 68
+        "y": 74
       },
       "datasource": {
         "type": "influxdb",
@@ -1536,14 +1806,14 @@
       }
     },
     {
-      "id": 32,
+      "id": 37,
       "type": "timeseries",
       "title": "Image HFR Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 74
+        "y": 80
       },
       "datasource": {
         "type": "influxdb",
@@ -1588,14 +1858,14 @@
       }
     },
     {
-      "id": 33,
+      "id": 38,
       "type": "timeseries",
       "title": "Image Star Count Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 74
+        "y": 80
       },
       "datasource": {
         "type": "influxdb",
@@ -1640,14 +1910,14 @@
       }
     },
     {
-      "id": 34,
+      "id": 39,
       "type": "timeseries",
       "title": "Guiding RMS",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 82
+        "y": 88
       },
       "datasource": {
         "type": "influxdb",
@@ -1708,14 +1978,14 @@
       }
     },
     {
-      "id": 35,
+      "id": 40,
       "type": "timeseries",
       "title": "Sun & Moon Altitude",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 82
+        "y": 88
       },
       "datasource": {
         "type": "influxdb",
@@ -1768,14 +2038,14 @@
       }
     },
     {
-      "id": 36,
+      "id": 41,
       "type": "timeseries",
       "title": "Camera Sensor Temp Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 90
+        "y": 96
       },
       "datasource": {
         "type": "influxdb",
@@ -1820,14 +2090,14 @@
       }
     },
     {
-      "id": 37,
+      "id": 42,
       "type": "timeseries",
       "title": "Focuser Temp Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 90
+        "y": 96
       },
       "datasource": {
         "type": "influxdb",
@@ -1872,14 +2142,14 @@
       }
     },
     {
-      "id": 38,
+      "id": 43,
       "type": "table",
       "title": "Recent Frames (LIGHT only)",
       "gridPos": {
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 98
+        "y": 104
       },
       "datasource": {
         "type": "influxdb",

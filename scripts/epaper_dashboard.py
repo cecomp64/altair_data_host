@@ -35,9 +35,16 @@ def fetch_power_metrics():
     client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
     query_api = client.query_api()
 
+    # drop/group on host: telegraf tags every metric with its collecting
+    # container's hostname (pinned in telegraf.conf, but historical/stale
+    # values can still linger in a lookback window right after a container
+    # recreate) - without this, last() runs per host-tag group instead of
+    # globally, and results become dependent on flux's group iteration order.
     flux_query = f'''
     from(bucket: "{INFLUX_BUCKET_POWER}")
       |> range(start: -5m)
+      |> drop(columns: ["host"])
+      |> group(columns: ["_measurement", "_field"])
       |> last()
     '''
 
@@ -87,10 +94,13 @@ def fetch_weather_metrics():
     client = InfluxDBClient(url=INFLUX_URL, token=INFLUX_TOKEN, org=INFLUX_ORG)
     query_api = client.query_api()
 
+    # See fetch_power_metrics for why host is dropped before last().
     flux_query = f'''
     from(bucket: "{INFLUX_BUCKET_WEATHER}")
       |> range(start: -30m)
       |> filter(fn: (r) => r.station == "{WEATHER_STATION_NAME}")
+      |> drop(columns: ["host"])
+      |> group(columns: ["_measurement", "_field"])
       |> last()
     '''
 
@@ -101,8 +111,15 @@ def fetch_weather_metrics():
         'wind_speed_mph': 0.0,
         'wind_gust_mph': 0.0,
         'rain_daily_in': 0.0,
+        'solar_radiation_wm2': 0.0,
         'uv_index': 0.0,
+        'temp_in_f': 0.0,
+        'humidity_in_pct': 0.0,
+        'battery_pct': 0.0,
+        'moon_illumination_pct': 0.0,
+        'moon_phase_name': '',
     }
+    string_fields = {'moon_phase_name'}
 
     try:
         result = query_api.query(query=flux_query, org=INFLUX_ORG)
@@ -112,8 +129,9 @@ def fetch_weather_metrics():
                     continue
                 field = record.get_field()
                 val = record.get_value()
-                if field in metrics:
-                    metrics[field] = float(val)
+                if field not in metrics:
+                    continue
+                metrics[field] = val if field in string_fields else float(val)
     except Exception as e:
         print(f"InfluxDB Query Error (weather): {e}")
     finally:
@@ -140,6 +158,20 @@ def draw_gauge(draw, x, y, w, h, pct):
     fill_w = int((w - 6) * max(0.0, min(100.0, pct)) / 100.0)
     if fill_w > 0:
         draw.rectangle((x + 3, y + 3, x + 3 + fill_w, y + h - 3), fill=0)
+
+
+# Full phase names ("Waxing Crescent") don't fit a stat_value column at this
+# panel's width/font size - abbreviated for display only, not stored data.
+MOON_PHASE_ABBREV = {
+    "New Moon": "New",
+    "Waxing Crescent": "Waxing Cr.",
+    "First Quarter": "1st Qtr",
+    "Waxing Gibbous": "Waxing Gib.",
+    "Full Moon": "Full",
+    "Waning Gibbous": "Waning Gib.",
+    "Last Quarter": "Last Qtr",
+    "Waning Crescent": "Waning Cr.",
+}
 
 
 def render_dashboard(power, weather, W=EPD_W, H=EPD_H):
@@ -211,28 +243,33 @@ def render_dashboard(power, weather, W=EPD_W, H=EPD_H):
               font_stat_label, font_stat_value)
 
     # ================= Right half: WEATHER =================
+    # Outdoor temp/humidity get the heading + gauge treatment (like SOC on
+    # the power side); everything else - wind, pressure, solar/UV, rain,
+    # indoor conditions, sensor battery, moon phase - is a tight 5-row x
+    # 2-column stat grid below, sized to fit this panel's ~406px height.
     rx = MID_X + 20
     rw = (W - MARGIN) - rx - 20
     wy = zone1_top + 18
     draw_heading(draw, rx, wy, "WEATHER", f"{weather['temp_f']:.0f}°F", font_heading)
     draw_gauge(draw, rx, wy + 48, rw, 18, weather['humidity_pct'])
-    draw.text((rx, wy + 74), f"Humidity {weather['humidity_pct']:.0f}%",
+    draw.text((rx, wy + 74), f"Outdoor Humidity {weather['humidity_pct']:.0f}%",
               font=font_stat_label, fill=0)
 
-    stat_y = wy + 108
+    moon_label = MOON_PHASE_ABBREV.get(weather['moon_phase_name'], weather['moon_phase_name'] or "-")
     stat_w = rw // 2
-    draw_stat(draw, rx, stat_y, stat_w - 10, "Wind Speed", f"{weather['wind_speed_mph']:.0f} mph",
-              font_stat_label, font_stat_value)
-    draw_stat(draw, rx + stat_w + 10, stat_y, stat_w - 10, "Wind Gust", f"{weather['wind_gust_mph']:.0f} mph",
-              font_stat_label, font_stat_value)
-    stat_y += 70
-    draw_stat(draw, rx, stat_y, stat_w - 10, "Pressure", f"{weather['pressure_inhg']:.2f} inHg",
-              font_stat_label, font_stat_value)
-    draw_stat(draw, rx + stat_w + 10, stat_y, stat_w - 10, "Rain Today", f"{weather['rain_daily_in']:.2f} in",
-              font_stat_label, font_stat_value)
-    stat_y += 70
-    draw_stat(draw, rx, stat_y, stat_w - 10, "UV Index", f"{weather['uv_index']:.1f}",
-              font_stat_label, font_stat_value)
+    grid_rows = [
+        ("Wind Speed", f"{weather['wind_speed_mph']:.0f} mph", "Wind Gust", f"{weather['wind_gust_mph']:.0f} mph"),
+        ("Pressure", f"{weather['pressure_inhg']:.2f} inHg", "Solar", f"{weather['solar_radiation_wm2']:.0f} W/m2"),
+        ("UV Index", f"{weather['uv_index']:.1f}", "Rain Today", f"{weather['rain_daily_in']:.2f} in"),
+        ("Indoor Temp", f"{weather['temp_in_f']:.0f}°F", "Indoor Humidity", f"{weather['humidity_in_pct']:.0f}%"),
+        ("Sensor Battery", f"{weather['battery_pct']:.0f}%", "Moon Phase", moon_label),
+    ]
+    grid_top = wy + 102
+    row_pitch = 54
+    for i, (label1, value1, label2, value2) in enumerate(grid_rows):
+        gy = grid_top + i * row_pitch
+        draw_stat(draw, rx, gy, stat_w - 10, label1, value1, font_stat_label, font_stat_value)
+        draw_stat(draw, rx + stat_w + 10, gy, stat_w - 10, label2, value2, font_stat_label, font_stat_value)
 
     # Footer: timestamp (left) + charge state (right)
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

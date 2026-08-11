@@ -201,17 +201,14 @@ One telegraf agent, four `[[outputs.influxdb_v2]]` blocks (one per bucket, each 
 ### Power: Victron SmartShunt (VE.Direct) + Eco-Worthy MPPT (Modbus RTU)
 Unchanged from the original design: `inputs.exec` runs `read_vedirect.py` for the Victron shunt's text protocol, `inputs.modbus` polls the Eco-Worthy controller's holding registers directly (no custom script needed there - telegraf's modbus plugin is enough).
 
-### Weather: LAN station, polled directly
+### Weather: LAN station, via `scripts/read_ecowitt.py`
 ```toml
-[[inputs.http]]
-  urls = ["${WEATHER_API_URL}"]
-  method = "GET"
+[[inputs.exec]]
+  commands = [["python3", "/scripts/read_ecowitt.py"]]
   timeout = "5s"
-  interval = "60s"
-  name_override = "weather_station"
-  data_format = "json_v2"
+  data_format = "influx"
 ```
-No custom script - it's a single stateless JSON GET, which telegraf's `json_v2` parser handles natively. The field mappings (`tempf`, `humidity`, `windspeedmph`, etc.) match the common Ecowitt/Ambient-Weather-compatible flat JSON schema. **Verify against your actual station**: `curl "$WEATHER_API_URL"` and compare keys against the `path = "..."` lines in `telegraf.conf`, adjusting if your model differs.
+Like the Victron shunt, this goes through a script rather than `inputs.http`/`json_v2` directly - an Ecowitt GW1000/GW2000-style gateway's local API (`get_livedata_info`) returns nested `id`/`val` arrays with units baked into the value string (e.g. `"0.00 mph"`, `"31%"`), which telegraf's `json_v2` float parser can't strip. `read_ecowitt.py` fetches `$WEATHER_API_URL`, looks up each sensor by its documented id (`COMMON_LIST_IDS`/`PIEZO_RAIN_IDS` at the top of the script), strips the unit suffix, and emits Influx line protocol directly. **Verify against your actual station**: `curl --compressed "$WEATHER_API_URL"` and compare the `id` values in `common_list`/`piezoRain`/`wh25` against the script's id maps, adjusting if your model differs. Note `rain_hourly_in` is intentionally not emitted - this station's rain gauge doesn't report an hourly-total id (only event/day/week/month/year), so Grafana's hourly-rain panel will read "No data" rather than a fabricated value.
 
 ### Observatory: roll-off-roof via ASCOM Alpaca
 Four `[[inputs.http]]` blocks poll the standardized Alpaca dome REST endpoints (`shutterstatus`, `slewing`, `athome`, `connected`) every 15s. This is a versioned, documented REST spec, so confidence here is high - no verification step needed beyond confirming `ALPACA_BASE_URL` (including the device number) is correct. `shutterstatus` returns the ASCOM enum (0=Open, 1=Closed, 2=Opening, 3=Closing, 4=Error); Grafana maps it to readable labels/colors rather than telegraf doing translation.
