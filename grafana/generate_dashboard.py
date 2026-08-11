@@ -160,13 +160,25 @@ def _drop_host(flux):
     return flux + '\n  |> drop(columns: ["host", "_start", "_stop"])\n  |> group(columns: ["_measurement", "_field"])'
 
 
-def flux_range(bucket, measurement, fields):
+def flux_range(bucket, measurement, fields, aggregate="mean"):
+    # telegraf samples most of these every 5s, so an un-aggregated 24h range
+    # is 17000+ raw points - Grafana silently truncates any single query at
+    # 1001 points ("results have been truncated..."), which keeps only the
+    # earliest chronological slice and drops everything after, making a
+    # perfectly continuous series look like it stops partway through the
+    # window. aggregateWindow(v.windowPeriod) downsamples to roughly one
+    # point per pixel instead, which stays under that cap at any zoom level.
+    # `aggregate` is the Flux reducer name; pass "last" for discrete/enum
+    # fields (e.g. shutter_status) where averaging would be meaningless.
     field_filter = " or ".join(f'r._field == "{f}"' for f in fields)
-    return _drop_host(
+    flux = (
         f'from(bucket: "{bucket}")\n'
         f'  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
         f'  |> filter(fn: (r) => r._measurement == "{measurement}" and ({field_filter}))'
     )
+    if aggregate:
+        flux += f'\n  |> aggregateWindow(every: v.windowPeriod, fn: {aggregate}, createEmpty: false)'
+    return _drop_host(flux)
 
 
 def flux_last(bucket, measurement, field):
@@ -183,13 +195,16 @@ def flux_last(bucket, measurement, field):
 # with a single field always literally named "value". Confirmed against the
 # plugin's README and its own example Grafana dashboard (both fetched from
 # github.com/daleghent/nina-influxdb-exporter).
-def nina_range(bucket, measurements):
+def nina_range(bucket, measurements, aggregate="mean"):
     measurement_filter = " or ".join(f'r._measurement == "{m}"' for m in measurements)
-    return (
+    flux = (
         f'from(bucket: "{bucket}")\n'
         f'  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
         f'  |> filter(fn: (r) => ({measurement_filter}) and r._field == "value")'
     )
+    if aggregate:
+        flux += f'\n  |> aggregateWindow(every: v.windowPeriod, fn: {aggregate}, createEmpty: false)'
+    return flux
 
 
 def nina_last(bucket, measurement):
@@ -314,7 +329,7 @@ def build():
     y += STAT_H
 
     panels.append(state_timeline_panel("Roof Shutter Status History", "observatory",
-                                        flux_range("observatory", "observatory_roof", ["shutter_status"]),
+                                        flux_range("observatory", "observatory_roof", ["shutter_status"], aggregate="last"),
                                         0, y, shutter_mappings))
     y += STATE_H
 

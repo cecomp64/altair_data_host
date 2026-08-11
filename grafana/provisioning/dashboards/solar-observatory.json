@@ -269,7 +269,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"voltage\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"voltage\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         }
       ],
@@ -334,7 +334,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"current\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"current\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -342,7 +342,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"charging_current\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"charging_current\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -419,7 +419,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"power\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"power\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -427,7 +427,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_power\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_power\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -504,7 +504,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_voltage\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_voltage\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -512,7 +512,7 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_current\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"pv_current\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -992,7 +992,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"temp_f\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"temp_f\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -1000,7 +1000,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"temp_in_f\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"temp_in_f\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -1077,7 +1077,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"humidity_pct\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"humidity_pct\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -1085,7 +1085,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"humidity_in_pct\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"humidity_in_pct\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -1162,7 +1162,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_speed_mph\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_speed_mph\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -1170,7 +1170,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_gust_mph\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_gust_mph\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -1247,7 +1247,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_hourly_in\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_hourly_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -1255,7 +1255,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -1332,7 +1332,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"solar_radiation_wm2\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"solar_radiation_wm2\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -1340,7 +1340,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"uv_index\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"uv_index\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         }
       ],
@@ -1417,7 +1417,7 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"moon_illumination_pct\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"moon_illumination_pct\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         }
       ],
@@ -1776,7 +1776,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"shutter_status\"))\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"shutter_status\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         }
       ],
@@ -2051,7 +2051,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_hfr\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_hfr\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ],
@@ -2116,7 +2116,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_star_count\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_star_count\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ],
@@ -2181,7 +2181,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"guider_rms_ra_arcsec\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"guider_rms_ra_arcsec\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         },
         {
@@ -2189,7 +2189,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"guider_rms_dec_arcsec\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"guider_rms_dec_arcsec\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "B"
         },
         {
@@ -2197,7 +2197,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"guider_rms_arcsec\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"guider_rms_arcsec\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "C"
         }
       ],
@@ -2286,7 +2286,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"astro_sun_altitude\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"astro_sun_altitude\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         },
         {
@@ -2294,7 +2294,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"astro_moon_altitude\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"astro_moon_altitude\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "B"
         }
       ],
@@ -2371,7 +2371,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"camera_sensor_temperature\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"camera_sensor_temperature\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ],
@@ -2436,7 +2436,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"focuser_temperature\") and r._field == \"value\")",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"focuser_temperature\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ],
@@ -2501,7 +2501,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_hfr\" or r._measurement == \"image_star_count\" or r._measurement == \"image_mean\" or r._measurement == \"image_median\" or r._measurement == \"image_eccentricity\") and r._field == \"value\")\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_measurement\"], valueColumn: \"_value\")\n  |> sort(columns: [\"_time\"], desc: true)",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_hfr\" or r._measurement == \"image_star_count\" or r._measurement == \"image_mean\" or r._measurement == \"image_median\" or r._measurement == \"image_eccentricity\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_measurement\"], valueColumn: \"_value\")\n  |> sort(columns: [\"_time\"], desc: true)",
           "refId": "A"
         }
       ],
