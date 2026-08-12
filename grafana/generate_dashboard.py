@@ -42,19 +42,35 @@ def _target(domain, flux, ref_id="A"):
     return {"datasource": DS[domain], "query": flux, "refId": ref_id}
 
 
-def stat_panel(title, domain, flux, x, y, w=6, h=STAT_H, unit="none", thresholds=None, mappings=None, color_mode="thresholds"):
+def stat_panel(title, domain, flux, x, y, w=6, h=STAT_H, unit="none", thresholds=None, mappings=None, color_mode="thresholds", value_field=None):
     defaults = {"unit": unit, "color": {"mode": color_mode}}
     if thresholds:
         defaults["thresholds"] = {"mode": "absolute", "steps": thresholds}
     if mappings:
         defaults["mappings"] = mappings
+    # reduceOptions.fields: "" means "Numeric Fields" in Grafana's Stat
+    # panel - the right default for plain numeric readings (temps, voltages,
+    # etc.), and it implicitly excludes the "Time" field along with
+    # string/bool-valued fields, since none of those are numeric either.
+    # String/bool metrics (roof_state, slewing, connected, ...) need
+    # value_field set to their literal InfluxDB field name (e.g. "slewing")
+    # instead, matched by exact anchored name ("/^slewing$/"). Earlier
+    # attempts here used "" (excluded non-numeric fields -> "No data"),
+    # then "/^_value/" (broke once the query stopped returning a field
+    # literally named "_value"), then "/.*/" ("All Fields" - matches
+    # literally everything including "Time" itself, showing a timestamp
+    # stacked with the real value). Matching the field's own exact name is
+    # the only one of these that isn't relying on some other property
+    # (numeric-ness, a specific query-shape-dependent alias, "match
+    # everything") staying true by coincidence.
+    fields = f"/^{value_field}$/" if value_field else ""
     return {
         "id": next_id(), "type": "stat", "title": title,
         "gridPos": {"h": h, "w": w, "x": x, "y": y},
         "datasource": DS[domain],
         "targets": [_target(domain, flux)],
         "fieldConfig": {"defaults": defaults, "overrides": []},
-        "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": False},
+        "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": fields, "values": False},
                     "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "none"},
     }
 
@@ -106,15 +122,24 @@ def bar_panel(title, domain, queries, x, y, w=12, h=TS_H, unit="none"):
     return p
 
 
-def state_timeline_panel(title, domain, flux, x, y, mappings, w=WIDTH, h=STATE_H):
+def state_timeline_panel(title, domain, queries, x, y, mappings, w=WIDTH, h=STATE_H):
+    targets = [_target(domain, flux, ref_id=chr(65 + i)) for i, (_, flux) in enumerate(queries)]
+    # Without this, Grafana auto-names each row from its raw tag columns
+    # (e.g. "device_number shutter_status") instead of a clean label - same
+    # displayName-via-byFrameRefID pattern timeseries_panel uses above.
+    overrides = [
+        {"matcher": {"id": "byFrameRefID", "options": chr(65 + i)},
+         "properties": [{"id": "displayName", "value": label}]}
+        for i, (label, _) in enumerate(queries)
+    ]
     return {
         "id": next_id(), "type": "state-timeline", "title": title,
         "gridPos": {"h": h, "w": w, "x": x, "y": y},
         "datasource": DS[domain],
-        "targets": [_target(domain, flux)],
+        "targets": targets,
         "fieldConfig": {"defaults": {"mappings": mappings, "color": {"mode": "thresholds"},
                                       "thresholds": {"mode": "absolute", "steps": [{"value": None, "color": "green"}]}},
-                        "overrides": []},
+                        "overrides": overrides},
         "options": {"mergeValues": True, "showValue": "auto", "rowHeight": 0.9},
     }
 
@@ -160,6 +185,21 @@ def _drop_host(flux):
     return flux + '\n  |> drop(columns: ["host", "_start", "_stop"])\n  |> group(columns: ["_measurement", "_field"])'
 
 
+# observatory_roof-only: telegraf's inputs.http plugin auto-tags every metric
+# with the polled url, and the Alpaca endpoints additionally carry a
+# device_number tag (see telegraf.conf) - no other measurement in this file
+# has either column, so this is deliberately its own helper rather than
+# folded into the shared _drop_host, to keep its blast radius limited to
+# roof panels. Left in, panels that don't restrict which field they display
+# (state-timeline has no equivalent of a stat panel's reduceOptions.fields)
+# render each of these as its own extra row/value alongside the real one -
+# and worse, device_number's value ("0") can coincidentally collide with an
+# unrelated value mapping's key (e.g. shutter_mappings' "0" -> "Open"),
+# silently showing the wrong label instead of "No data" or an obvious error.
+def _drop_roof_tags(flux):
+    return flux + '\n  |> drop(columns: ["device_number", "url"])'
+
+
 def flux_range(bucket, measurement, fields, aggregate="mean"):
     # telegraf samples most of these every 5s, so an un-aggregated 24h range
     # is 17000+ raw points - Grafana silently truncates any single query at
@@ -181,12 +221,35 @@ def flux_range(bucket, measurement, fields, aggregate="mean"):
     return _drop_host(flux)
 
 
+def as_string(flux):
+    # Value mappings' keys are always strings ("4", "open", ...). A numeric
+    # field's value normally still matches (Grafana coerces for comparison),
+    # but the state-timeline panel didn't - shutter_status (int) rendered as
+    # an unmapped threshold fallback ("-∞+") instead of its mapped text/color
+    # while the identically-mapped stat panel worked fine. Casting to string
+    # removes the type ambiguity outright rather than relying on a panel
+    # type's coercion behavior.
+    return flux + '\n  |> map(fn: (r) => ({r with _value: string(v: r._value)}))'
+
+
 def flux_last(bucket, measurement, field):
     return _drop_host(
         f'from(bucket: "{bucket}")\n'
         f'  |> range(start: -1h)\n'
         f'  |> filter(fn: (r) => r._measurement == "{measurement}" and r._field == "{field}")'
     ) + '\n  |> last()'
+
+
+# observatory_roof-specific variants that also strip device_number/url (see
+# _drop_roof_tags) - use these instead of flux_last/flux_range for anything
+# in the Observatory section so the tag-drop stays scoped to roof panels
+# only and never touches power/weather/imaging queries.
+def flux_last_roof(field):
+    return _drop_roof_tags(flux_last("observatory", "observatory_roof", field))
+
+
+def flux_range_roof(fields, aggregate="mean"):
+    return _drop_roof_tags(flux_range("observatory", "observatory_roof", fields, aggregate))
 
 
 # N.I.N.A.'s InfluxDB Exporter plugin (daleghent/nina-influxdb-exporter) uses
@@ -235,8 +298,16 @@ def build():
                               18, y, unit="none"))
     y += STAT_H
 
-    panels.append(timeseries_panel("Battery Voltage", "power",
-                                    [("voltage", flux_range("power", "victron_smartshunt", ["voltage"]))],
+    panels.append(stat_panel("Battery Voltage", "power", flux_last("power", "victron_smartshunt", "voltage"),
+                              0, y, unit="volt"))
+    y += STAT_H
+
+    # Two independent voltage readings of the same battery bank (shunt vs.
+    # charge controller) - plotted together so a persistent gap flags wiring/
+    # fuse voltage drop between the two devices rather than a sensor fault.
+    panels.append(timeseries_panel("Battery Voltage (Shunt vs Charge Controller)", "power",
+                                    [("shunt_voltage", flux_range("power", "victron_smartshunt", ["voltage"])),
+                                     ("mppt_battery_voltage", flux_range("power", "eco_worthy_mppt", ["battery_voltage"]))],
                                     0, y, unit="volt"))
     panels.append(timeseries_panel("Battery & Charging Current", "power",
                                     [("current", flux_range("power", "victron_smartshunt", ["current"])),
@@ -308,6 +379,11 @@ def build():
                                     12, y, w=12, unit="percent"))
     y += TS_H
 
+    panels.append(timeseries_panel("Wind Direction", "weather",
+                                    [("Direction", flux_range("weather", "weather_station", ["wind_dir_deg"]))],
+                                    0, y, w=WIDTH, unit="degree"))
+    y += TS_H
+
     # --------------------------------------------------------- Observatory
     panels.append(row("Observatory", y)); y += ROW_H
     shutter_mappings = [{"type": "value", "options": {
@@ -317,21 +393,65 @@ def build():
         "3": {"text": "Closing", "color": "yellow"},
         "4": {"text": "Error", "color": "red"},
     }}]
-    panels.append(stat_panel("Roof Shutter Status", "observatory",
-                              flux_last("observatory", "observatory_roof", "shutter_status"),
+    # roof_state comes from the controller's own native /status endpoint, not
+    # Alpaca (see telegraf.conf comments) - it's the only field that can tell
+    # "stopped partway open" apart from a genuine driver error, which
+    # shutter_status's ASCOM enum (above) has no state for.
+    roof_state_mappings = [{"type": "value", "options": {
+        "open": {"text": "Open", "color": "green"},
+        "closed": {"text": "Closed", "color": "blue"},
+        "opening": {"text": "Opening", "color": "yellow"},
+        "closing": {"text": "Closing", "color": "yellow"},
+        "partially_open": {"text": "Partially Open", "color": "orange"},
+    }}]
+    panels.append(stat_panel("Roof Shutter Status (Alpaca)", "observatory",
+                              flux_last_roof("shutter_status"),
                               0, y, mappings=shutter_mappings, color_mode="fixed"))
-    panels.append(stat_panel("Slewing", "observatory", flux_last("observatory", "observatory_roof", "slewing"),
-                              6, y, mappings=bool_mappings("Slewing", "yellow", "Idle", "green"), color_mode="fixed"))
-    panels.append(stat_panel("At Home", "observatory", flux_last("observatory", "observatory_roof", "at_home"),
-                              12, y, mappings=bool_mappings("Yes", "green", "No", "text"), color_mode="fixed"))
-    panels.append(stat_panel("Connected", "observatory", flux_last("observatory", "observatory_roof", "connected"),
-                              18, y, mappings=bool_mappings("Yes", "green", "No", "red"), color_mode="fixed"))
+    panels.append(stat_panel("Roof State (native)", "observatory",
+                              flux_last_roof("roof_state"),
+                              6, y, mappings=roof_state_mappings, color_mode="fixed", value_field="roof_state"))
+    panels.append(stat_panel("Slewing", "observatory", flux_last_roof("slewing"),
+                              12, y, mappings=bool_mappings("Slewing", "yellow", "Idle", "green"), color_mode="fixed", value_field="slewing"))
+    panels.append(stat_panel("Connected", "observatory", flux_last_roof("connected"),
+                              18, y, mappings=bool_mappings("Yes", "green", "No", "red"), color_mode="fixed", value_field="connected"))
     y += STAT_H
 
-    panels.append(state_timeline_panel("Roof Shutter Status History", "observatory",
-                                        flux_range("observatory", "observatory_roof", ["shutter_status"], aggregate="last"),
-                                        0, y, shutter_mappings))
+    panels.append(stat_panel("Safety Monitor", "observatory",
+                              flux_last_roof("safety_monitor_safe"),
+                              0, y, mappings=bool_mappings("Safe", "green", "UNSAFE", "red"), color_mode="fixed", value_field="safety_monitor_safe"))
+    panels.append(stat_panel("Weather Lock", "observatory",
+                              flux_last_roof("weather_locked"),
+                              6, y, mappings=bool_mappings("Locked", "orange", "Clear", "green"), color_mode="fixed", value_field="weather_locked"))
+    # Raw units unconfirmed (not necessarily volts/amps) - see telegraf.conf
+    # comments. Labeled "(raw)" rather than given a volt/amp unit so the
+    # dashboard doesn't assert a conversion nobody's verified yet.
+    panels.append(stat_panel("Controller Voltage (raw)", "observatory",
+                              flux_last_roof("roof_controller_voltage_raw"),
+                              12, y, unit="none"))
+    panels.append(stat_panel("Controller Current (raw)", "observatory",
+                              flux_last_roof("roof_controller_current_raw"),
+                              18, y, unit="none"))
+    y += STAT_H
+
+    # Both status sources on one timeline for direct comparison. Mapping
+    # keys don't collide (shutter_mappings: "0".."4", roof_state_mappings:
+    # "open"/"closed"/...) so a single combined mappings list correctly
+    # colors each row from its own field's value.
+    panels.append(state_timeline_panel("Roof Status History", "observatory",
+                                        [("Shutter Status (Alpaca)",
+                                          as_string(flux_range_roof(["shutter_status"], aggregate="last"))),
+                                         ("Roof State (native)",
+                                          flux_range_roof(["roof_state"], aggregate="last"))],
+                                        0, y, shutter_mappings + roof_state_mappings))
     y += STATE_H
+
+    panels.append(timeseries_panel("Roof Controller Voltage (raw)", "observatory",
+                                    [("voltage_raw", flux_range_roof(["roof_controller_voltage_raw"]))],
+                                    0, y, unit="none"))
+    panels.append(timeseries_panel("Roof Controller Current (raw)", "observatory",
+                                    [("current_raw", flux_range_roof(["roof_controller_current_raw"]))],
+                                    12, y, unit="none"))
+    y += TS_H
 
     # ------------------------------------------------------------- Imaging
     # Schema here comes from N.I.N.A.'s InfluxDB Exporter plugin, not

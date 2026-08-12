@@ -251,11 +251,11 @@
     },
     {
       "id": 7,
-      "type": "timeseries",
+      "type": "stat",
       "title": "Battery Voltage",
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 6,
+        "w": 6,
         "x": 0,
         "y": 7
       },
@@ -269,8 +269,63 @@
             "type": "influxdb",
             "uid": "influxdb-power"
           },
+          "query": "from(bucket: \"power\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"voltage\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "volt",
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Battery Voltage (Shunt vs Charge Controller)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-power"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-power"
+          },
           "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and (r._field == \"voltage\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-power"
+          },
+          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"eco_worthy_mppt\" and (r._field == \"battery_voltage\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
         }
       ],
       "fieldConfig": {
@@ -297,7 +352,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "voltage"
+                "value": "shunt_voltage"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "mppt_battery_voltage"
               }
             ]
           }
@@ -315,14 +382,14 @@
       }
     },
     {
-      "id": 8,
+      "id": 9,
       "type": "timeseries",
       "title": "Battery & Charging Current",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 7
+        "y": 13
       },
       "datasource": {
         "type": "influxdb",
@@ -400,14 +467,14 @@
       }
     },
     {
-      "id": 9,
+      "id": 10,
       "type": "timeseries",
       "title": "Net Power vs Solar (PV) Power",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 15
+        "y": 21
       },
       "datasource": {
         "type": "influxdb",
@@ -485,14 +552,14 @@
       }
     },
     {
-      "id": 10,
+      "id": 11,
       "type": "timeseries",
       "title": "PV Voltage & Current",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 15
+        "y": 21
       },
       "datasource": {
         "type": "influxdb",
@@ -570,27 +637,27 @@
       }
     },
     {
-      "id": 11,
+      "id": 12,
       "type": "row",
       "title": "Weather",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 29
       },
       "collapsed": false,
       "panels": []
     },
     {
-      "id": 12,
+      "id": 13,
       "type": "stat",
       "title": "Outdoor Temperature",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 24
+        "y": 30
       },
       "datasource": {
         "type": "influxdb",
@@ -630,14 +697,14 @@
       }
     },
     {
-      "id": 13,
+      "id": 14,
       "type": "stat",
       "title": "Outdoor Humidity",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 24
+        "y": 30
       },
       "datasource": {
         "type": "influxdb",
@@ -677,14 +744,14 @@
       }
     },
     {
-      "id": 14,
+      "id": 15,
       "type": "stat",
       "title": "Indoor Temperature",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 24
+        "y": 30
       },
       "datasource": {
         "type": "influxdb",
@@ -724,14 +791,14 @@
       }
     },
     {
-      "id": 15,
+      "id": 16,
       "type": "stat",
       "title": "Indoor Humidity",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 18,
-        "y": 24
+        "y": 30
       },
       "datasource": {
         "type": "influxdb",
@@ -771,14 +838,14 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "type": "stat",
       "title": "Wind Speed",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 30
+        "y": 36
       },
       "datasource": {
         "type": "influxdb",
@@ -818,14 +885,14 @@
       }
     },
     {
-      "id": 17,
+      "id": 18,
       "type": "stat",
       "title": "Pressure",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 30
+        "y": 36
       },
       "datasource": {
         "type": "influxdb",
@@ -865,14 +932,14 @@
       }
     },
     {
-      "id": 18,
+      "id": 19,
       "type": "gauge",
       "title": "Sensor Battery",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 30
+        "y": 36
       },
       "datasource": {
         "type": "influxdb",
@@ -926,14 +993,14 @@
       }
     },
     {
-      "id": 19,
+      "id": 20,
       "type": "stat",
       "title": "Moon Phase",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 18,
-        "y": 30
+        "y": 36
       },
       "datasource": {
         "type": "influxdb",
@@ -973,14 +1040,14 @@
       }
     },
     {
-      "id": 20,
+      "id": 21,
       "type": "timeseries",
       "title": "Outdoor vs Indoor Temperature",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 36
+        "y": 42
       },
       "datasource": {
         "type": "influxdb",
@@ -1058,14 +1125,14 @@
       }
     },
     {
-      "id": 21,
+      "id": 22,
       "type": "timeseries",
       "title": "Outdoor vs Indoor Humidity",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 36
+        "y": 42
       },
       "datasource": {
         "type": "influxdb",
@@ -1143,14 +1210,14 @@
       }
     },
     {
-      "id": 22,
+      "id": 23,
       "type": "timeseries",
       "title": "Wind Speed & Gust",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 44
+        "y": 50
       },
       "datasource": {
         "type": "influxdb",
@@ -1228,14 +1295,14 @@
       }
     },
     {
-      "id": 23,
+      "id": 24,
       "type": "barchart",
       "title": "Rain Accumulation",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 44
+        "y": 50
       },
       "datasource": {
         "type": "influxdb",
@@ -1313,14 +1380,14 @@
       }
     },
     {
-      "id": 24,
+      "id": 25,
       "type": "timeseries",
       "title": "Solar Radiation & UV Index",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 52
+        "y": 58
       },
       "datasource": {
         "type": "influxdb",
@@ -1398,14 +1465,14 @@
       }
     },
     {
-      "id": 25,
+      "id": 26,
       "type": "timeseries",
       "title": "Moon Illumination",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 52
+        "y": 58
       },
       "datasource": {
         "type": "influxdb",
@@ -1463,27 +1530,92 @@
       }
     },
     {
-      "id": 26,
+      "id": 27,
+      "type": "timeseries",
+      "title": "Wind Direction",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 66
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"wind_dir_deg\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "degree",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "pointSize": 5,
+            "spanNulls": true,
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Direction"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 28,
       "type": "row",
       "title": "Observatory",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 60
+        "y": 74
       },
       "collapsed": false,
       "panels": []
     },
     {
-      "id": 27,
+      "id": 29,
       "type": "stat",
-      "title": "Roof Shutter Status",
+      "title": "Roof Shutter Status (Alpaca)",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 61
+        "y": 75
       },
       "datasource": {
         "type": "influxdb",
@@ -1495,7 +1627,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"shutter_status\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"shutter_status\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
           "refId": "A"
         }
       ],
@@ -1550,14 +1682,14 @@
       }
     },
     {
-      "id": 28,
+      "id": 30,
       "type": "stat",
-      "title": "Slewing",
+      "title": "Roof State (native)",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 61
+        "y": 75
       },
       "datasource": {
         "type": "influxdb",
@@ -1569,7 +1701,81 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"slewing\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"roof_state\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "open": {
+                  "text": "Open",
+                  "color": "green"
+                },
+                "closed": {
+                  "text": "Closed",
+                  "color": "blue"
+                },
+                "opening": {
+                  "text": "Opening",
+                  "color": "yellow"
+                },
+                "closing": {
+                  "text": "Closing",
+                  "color": "yellow"
+                },
+                "partially_open": {
+                  "text": "Partially Open",
+                  "color": "orange"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^roof_state$/",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 31,
+      "type": "stat",
+      "title": "Slewing",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 75
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"slewing\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
           "refId": "A"
         }
       ],
@@ -1609,7 +1815,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "",
+          "fields": "/^slewing$/",
           "values": false
         },
         "orientation": "auto",
@@ -1619,83 +1825,14 @@
       }
     },
     {
-      "id": 29,
-      "type": "stat",
-      "title": "At Home",
-      "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 61
-      },
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb-observatory"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"at_home\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
-          "refId": "A"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "color": {
-            "mode": "fixed"
-          },
-          "mappings": [
-            {
-              "type": "special",
-              "options": {
-                "match": "true",
-                "result": {
-                  "text": "Yes",
-                  "color": "green"
-                }
-              }
-            },
-            {
-              "type": "special",
-              "options": {
-                "match": "false",
-                "result": {
-                  "text": "No",
-                  "color": "text"
-                }
-              }
-            }
-          ]
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "background",
-        "graphMode": "none"
-      }
-    },
-    {
-      "id": 30,
+      "id": 32,
       "type": "stat",
       "title": "Connected",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 18,
-        "y": 61
+        "y": 75
       },
       "datasource": {
         "type": "influxdb",
@@ -1707,7 +1844,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"connected\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"connected\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
           "refId": "A"
         }
       ],
@@ -1747,7 +1884,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "",
+          "fields": "/^connected$/",
           "values": false
         },
         "orientation": "auto",
@@ -1757,14 +1894,14 @@
       }
     },
     {
-      "id": 31,
-      "type": "state-timeline",
-      "title": "Roof Shutter Status History",
+      "id": 33,
+      "type": "stat",
+      "title": "Safety Monitor",
       "gridPos": {
         "h": 6,
-        "w": 24,
+        "w": 6,
         "x": 0,
-        "y": 67
+        "y": 81
       },
       "datasource": {
         "type": "influxdb",
@@ -1776,8 +1913,248 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"shutter_status\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"safety_monitor_safe\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
           "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "true",
+                "result": {
+                  "text": "Safe",
+                  "color": "green"
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "false",
+                "result": {
+                  "text": "UNSAFE",
+                  "color": "red"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^safety_monitor_safe$/",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 34,
+      "type": "stat",
+      "title": "Weather Lock",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 81
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"weather_locked\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "true",
+                "result": {
+                  "text": "Locked",
+                  "color": "orange"
+                }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "false",
+                "result": {
+                  "text": "Clear",
+                  "color": "green"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^weather_locked$/",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 35,
+      "type": "stat",
+      "title": "Controller Voltage (raw)",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 81
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"roof_controller_voltage_raw\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 36,
+      "type": "stat",
+      "title": "Controller Current (raw)",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 81
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"roof_controller_current_raw\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 37,
+      "type": "state-timeline",
+      "title": "Roof Status History",
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 87
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"shutter_status\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])\n  |> map(fn: (r) => ({r with _value: string(v: r._value)}))",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_state\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "B"
         }
       ],
       "fieldConfig": {
@@ -1807,6 +2184,31 @@
                   "color": "red"
                 }
               }
+            },
+            {
+              "type": "value",
+              "options": {
+                "open": {
+                  "text": "Open",
+                  "color": "green"
+                },
+                "closed": {
+                  "text": "Closed",
+                  "color": "blue"
+                },
+                "opening": {
+                  "text": "Opening",
+                  "color": "yellow"
+                },
+                "closing": {
+                  "text": "Closing",
+                  "color": "yellow"
+                },
+                "partially_open": {
+                  "text": "Partially Open",
+                  "color": "orange"
+                }
+              }
             }
           ],
           "color": {
@@ -1822,7 +2224,32 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Shutter Status (Alpaca)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Roof State (native)"
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "mergeValues": true,
@@ -1831,27 +2258,157 @@
       }
     },
     {
-      "id": 32,
+      "id": 38,
+      "type": "timeseries",
+      "title": "Roof Controller Voltage (raw)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 93
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_controller_voltage_raw\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "pointSize": 5,
+            "spanNulls": true,
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "voltage_raw"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 39,
+      "type": "timeseries",
+      "title": "Roof Controller Current (raw)",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 93
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_controller_current_raw\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "pointSize": 5,
+            "spanNulls": true,
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "current_raw"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 40,
       "type": "row",
       "title": "Imaging",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 73
+        "y": 101
       },
       "collapsed": false,
       "panels": []
     },
     {
-      "id": 33,
+      "id": 41,
       "type": "stat",
       "title": "Camera Sensor Temp",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 74
+        "y": 102
       },
       "datasource": {
         "type": "influxdb",
@@ -1891,14 +2448,14 @@
       }
     },
     {
-      "id": 34,
+      "id": 42,
       "type": "stat",
       "title": "Cooler Power",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 6,
-        "y": 74
+        "y": 102
       },
       "datasource": {
         "type": "influxdb",
@@ -1938,14 +2495,14 @@
       }
     },
     {
-      "id": 35,
+      "id": 43,
       "type": "stat",
       "title": "Focuser Position",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 12,
-        "y": 74
+        "y": 102
       },
       "datasource": {
         "type": "influxdb",
@@ -1985,14 +2542,14 @@
       }
     },
     {
-      "id": 36,
+      "id": 44,
       "type": "stat",
       "title": "Sun Altitude",
       "gridPos": {
         "h": 6,
         "w": 6,
         "x": 18,
-        "y": 74
+        "y": 102
       },
       "datasource": {
         "type": "influxdb",
@@ -2032,14 +2589,14 @@
       }
     },
     {
-      "id": 37,
+      "id": 45,
       "type": "timeseries",
       "title": "Image HFR Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 80
+        "y": 108
       },
       "datasource": {
         "type": "influxdb",
@@ -2097,14 +2654,14 @@
       }
     },
     {
-      "id": 38,
+      "id": 46,
       "type": "timeseries",
       "title": "Image Star Count Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 80
+        "y": 108
       },
       "datasource": {
         "type": "influxdb",
@@ -2162,14 +2719,14 @@
       }
     },
     {
-      "id": 39,
+      "id": 47,
       "type": "timeseries",
       "title": "Guiding RMS",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 88
+        "y": 116
       },
       "datasource": {
         "type": "influxdb",
@@ -2267,14 +2824,14 @@
       }
     },
     {
-      "id": 40,
+      "id": 48,
       "type": "timeseries",
       "title": "Sun & Moon Altitude",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 88
+        "y": 116
       },
       "datasource": {
         "type": "influxdb",
@@ -2352,14 +2909,14 @@
       }
     },
     {
-      "id": 41,
+      "id": 49,
       "type": "timeseries",
       "title": "Camera Sensor Temp Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 96
+        "y": 124
       },
       "datasource": {
         "type": "influxdb",
@@ -2417,14 +2974,14 @@
       }
     },
     {
-      "id": 42,
+      "id": 50,
       "type": "timeseries",
       "title": "Focuser Temp Trend",
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 96
+        "y": 124
       },
       "datasource": {
         "type": "influxdb",
@@ -2482,14 +3039,14 @@
       }
     },
     {
-      "id": 43,
+      "id": 51,
       "type": "table",
       "title": "Recent Frames (LIGHT only)",
       "gridPos": {
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 104
+        "y": 132
       },
       "datasource": {
         "type": "influxdb",

@@ -43,6 +43,13 @@ services:
       context: ./docker/telegraf
     container_name: telegraf
     privileged: true
+    # Host networking gives the container multicast access to the LAN, which
+    # libnss-mdns (see Dockerfile) needs to resolve the roof controller's
+    # .local hostname. Docker's embedded DNS (bridge networking) can't proxy
+    # mDNS, so this was previously failing dial/DNS lookups for ALPACA_BASE_URL.
+    # Side effect: telegraf can no longer reach other containers by service
+    # name, hence outputs.influxdb_v2 in telegraf.conf uses localhost:8086.
+    network_mode: host
     env_file:
       - .env
     volumes:
