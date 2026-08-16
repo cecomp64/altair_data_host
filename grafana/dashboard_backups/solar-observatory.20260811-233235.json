@@ -29,8 +29,8 @@
         "x": 0,
         "y": 0
       },
-      "id": 57,
-      "title": "Solar Power",
+      "id": 52,
+      "title": "Power",
       "type": "row"
     },
     {
@@ -40,7 +40,6 @@
       },
       "fieldConfig": {
         "defaults": {
-          "displayName": "Battery Charge",
           "max": 100,
           "min": 0,
           "thresholds": {
@@ -64,7 +63,7 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 0,
         "y": 1
@@ -95,7 +94,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true,
         "sizing": "auto",
-        "sparkline": false,
+        "sparkline": true,
         "textMode": "auto"
       },
       "pluginVersion": "13.1.1",
@@ -109,7 +108,7 @@
           "refId": "A"
         }
       ],
-      "title": "",
+      "title": "Battery SOC",
       "type": "gauge"
     },
     {
@@ -151,7 +150,7 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 6,
         "y": 1
@@ -215,7 +214,7 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 12,
         "y": 1
@@ -279,7 +278,7 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 18,
         "y": 1
@@ -406,7 +405,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 5
+        "y": 7
       },
       "id": 8,
       "options": {
@@ -540,7 +539,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 5
+        "y": 7
       },
       "id": 9,
       "options": {
@@ -674,7 +673,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 13
+        "y": 15
       },
       "id": 10,
       "options": {
@@ -808,7 +807,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 15
       },
       "id": 11,
       "options": {
@@ -853,120 +852,14 @@
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb-power"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "showValues": false,
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": 0
-              },
-              {
-                "color": "yellow",
-                "value": 20
-              },
-              {
-                "color": "green",
-                "value": 50
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 21
-      },
-      "id": 56,
-      "options": {
-        "annotations": {
-          "clustering": -1,
-          "multiLane": false
-        },
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "enableFacetedFilter": false,
-          "overflow": "ellipsis",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "13.1.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-power"
-          },
-          "query": "from(bucket: \"power\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"victron_smartshunt\" and r._field == \"soc\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "A"
-        }
-      ],
-      "title": "Battery SOC History",
-      "type": "timeseries"
-    },
-    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 23
       },
-      "id": 58,
+      "id": 53,
       "title": "Weather",
       "type": "row"
     },
@@ -997,10 +890,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 0,
-        "y": 30
+        "y": 24
       },
       "id": 13,
       "options": {
@@ -1042,11 +935,9 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "light-blue",
-            "mode": "fixed"
+            "mode": "thresholds"
           },
-          "displayName": "Wind",
-          "max": 360,
+          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -1054,257 +945,21 @@
               {
                 "color": "green",
                 "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
-          "unit": "none"
+          "unit": "percent"
         }
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 6,
         "x": 6,
-        "y": 30
-      },
-      "id": 17,
-      "options": {
-        "barShape": "flat",
-        "barWidthFactor": 0.5,
-        "effects": {
-          "barGlow": false,
-          "centerGlow": false,
-          "gradient": true
-        },
-        "endpointMarker": "point",
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "segmentCount": 8,
-        "segmentSpacing": 0.3,
-        "shape": "circle",
-        "showThresholdLabels": false,
-        "showThresholdMarkers": false,
-        "sizing": "auto",
-        "sparkline": false,
-        "textMode": "name"
-      },
-      "pluginVersion": "13.1.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-weather"
-          },
-          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"wind_dir_deg\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-weather"
-          },
-          "query": "import \"math\"\n\nspeed = from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"wind_speed_mph\")\n  |> last()\n  |> keep(columns: [\"_time\", \"_value\"])\n  |> rename(columns: {_value: \"speed\"})\n\ndir = from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"wind_dir_deg\")\n  |> last()\n  |> keep(columns: [\"_time\", \"_value\"])\n  |> rename(columns: {_value: \"deg\"})\n\njoin(tables: {speed: speed, dir: dir}, on: [\"_time\"])\n  |> map(fn: (r) => {\n      cardinal = if r.deg >= 337.5 or r.deg < 22.5 then \"N\"\n        else if r.deg < 67.5 then \"NE\"\n        else if r.deg < 112.5 then \"E\"\n        else if r.deg < 157.5 then \"SE\"\n        else if r.deg < 202.5 then \"S\"\n        else if r.deg < 247.5 then \"SW\"\n        else if r.deg < 292.5 then \"W\"\n        else \"NW\"\n      return {_time: r._time, label: string(v: int(v: math.round(x: r.speed))) + \" mph \" + cardinal}\n  })",
-          "refId": "B"
-        }
-      ],
-      "title": "",
-      "transformations": [
-        {
-          "id": "configFromData",
-          "options": {
-            "configRefId": "B",
-            "mappings": [
-              {
-                "fieldName": "label",
-                "handlerKey": "displayName"
-              }
-            ]
-          }
-        }
-      ],
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb-weather"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "blue",
-            "mode": "fixed"
-          },
-          "displayName": "Moon Phase",
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 30
-      },
-      "id": 20,
-      "options": {
-        "barShape": "rounded",
-        "barWidthFactor": 0.25,
-        "effects": {
-          "barGlow": false,
-          "centerGlow": true,
-          "gradient": true
-        },
-        "endpointMarker": "glow",
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "segmentCount": 28,
-        "segmentSpacing": 0.15,
-        "shape": "circle",
-        "showThresholdLabels": false,
-        "showThresholdMarkers": false,
-        "sizing": "auto",
-        "sparkline": false,
-        "textMode": "auto"
-      },
-      "pluginVersion": "13.1.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-weather"
-          },
-          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"moon_illumination_pct\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
-          "refId": "A"
-        }
-      ],
-      "title": "",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb-weather"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 30
-      },
-      "id": 16,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "13.1.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-weather"
-          },
-          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"humidity_in_pct\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
-          "refId": "A"
-        }
-      ],
-      "title": "Indoor Humidity",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb-weather"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percent"
-        }
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 6,
-        "x": 0,
-        "y": 34
+        "y": 24
       },
       "id": 14,
       "options": {
@@ -1365,10 +1020,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
-        "x": 18,
-        "y": 34
+        "x": 12,
+        "y": 24
       },
       "id": 15,
       "options": {
@@ -1412,6 +1067,136 @@
           "color": {
             "mode": "thresholds"
           },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 24
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"humidity_in_pct\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Indoor Humidity",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "velocitymph"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 30
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"wind_speed_mph\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Wind Speed",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1429,10 +1214,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
-        "x": 0,
-        "y": 38
+        "x": 6,
+        "y": 30
       },
       "id": 18,
       "options": {
@@ -1473,7 +1258,6 @@
       },
       "fieldConfig": {
         "defaults": {
-          "displayName": "Sensor Battery",
           "max": 100,
           "min": 0,
           "thresholds": {
@@ -1497,10 +1281,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
-        "x": 18,
-        "y": 38
+        "x": 12,
+        "y": 30
       },
       "id": 19,
       "options": {
@@ -1528,7 +1312,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true,
         "sizing": "auto",
-        "sparkline": false,
+        "sparkline": true,
         "textMode": "auto"
       },
       "pluginVersion": "13.1.1",
@@ -1542,8 +1326,74 @@
           "refId": "A"
         }
       ],
-      "title": "",
+      "title": "Sensor Battery",
       "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 30
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and r._field == \"moon_illumination_pct\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Moon Phase",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -1595,6 +1445,10 @@
               {
                 "color": "green",
                 "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
           },
@@ -1631,7 +1485,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 36
       },
       "id": 21,
       "options": {
@@ -1765,7 +1619,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 36
       },
       "id": 22,
       "options": {
@@ -1899,7 +1753,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 50
+        "y": 44
       },
       "id": 23,
       "options": {
@@ -1998,6 +1852,18 @@
             "properties": [
               {
                 "id": "displayName",
+                "value": "Hourly"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
                 "value": "Daily"
               }
             ]
@@ -2008,7 +1874,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 50
+        "y": 44
       },
       "id": 24,
       "options": {
@@ -2041,8 +1907,16 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "spanNs = int(v: v.timeRangeStop) - int(v: v.timeRangeStart)\nbucket = if spanNs <= 86400000000000 then 1h\n  else if spanNs <= 604800000000000 then 6h\n  else if spanNs <= 2678400000000000 then 1d\n  else if spanNs <= 15552000000000000 then 1w\n  else 1mo\n\nfrom(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))\n  |> aggregateWindow(every: bucket, fn: mean, createEmpty: false)\n  |> keep(columns: [\"_time\", \"_value\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_hourly_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
         }
       ],
       "title": "Rain Accumulation",
@@ -2138,7 +2012,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 58
+        "y": 52
       },
       "id": 25,
       "options": {
@@ -2260,7 +2134,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 58
+        "y": 52
       },
       "id": 26,
       "options": {
@@ -2274,7 +2148,7 @@
           "enableFacetedFilter": false,
           "overflow": "ellipsis",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -2374,7 +2248,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 66
+        "y": 60
       },
       "id": 27,
       "options": {
@@ -2416,9 +2290,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 74
+        "y": 68
       },
-      "id": 59,
+      "id": 54,
       "title": "Observatory",
       "type": "row"
     },
@@ -2476,10 +2350,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 0,
-        "y": 75
+        "y": 69
       },
       "id": 29,
       "options": {
@@ -2567,10 +2441,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 6,
-        "y": 75
+        "y": 69
       },
       "id": 30,
       "options": {
@@ -2653,10 +2527,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 12,
-        "y": 75
+        "y": 69
       },
       "id": 31,
       "options": {
@@ -2739,10 +2613,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 18,
-        "y": 75
+        "y": 69
       },
       "id": 32,
       "options": {
@@ -2825,10 +2699,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 0,
-        "y": 79
+        "y": 75
       },
       "id": 33,
       "options": {
@@ -2911,10 +2785,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 6,
-        "y": 79
+        "y": 75
       },
       "id": 34,
       "options": {
@@ -2962,31 +2836,23 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
+                "color": "green",
                 "value": 0
               },
               {
-                "color": "orange",
-                "value": 10000
-              },
-              {
-                "color": "green",
-                "value": 12000
-              },
-              {
                 "color": "red",
-                "value": 15000
+                "value": 80
               }
             ]
           },
-          "unit": "mvolt"
+          "unit": "none"
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 12,
-        "y": 79
+        "y": 75
       },
       "id": 35,
       "options": {
@@ -3038,23 +2904,19 @@
                 "value": 0
               },
               {
-                "color": "yellow",
-                "value": 30000
-              },
-              {
                 "color": "red",
-                "value": 40000
+                "value": 80
               }
             ]
           },
-          "unit": "mamp"
+          "unit": "none"
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 18,
-        "y": 79
+        "y": 75
       },
       "id": 36,
       "options": {
@@ -3203,7 +3065,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 83
+        "y": 81
       },
       "id": 37,
       "options": {
@@ -3257,8 +3119,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic",
-            "seriesBy": "last"
+            "mode": "palette-classic"
           },
           "custom": {
             "axisBorderShow": false,
@@ -3269,8 +3130,8 @@
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 27,
-            "gradientMode": "opacity",
+            "fillOpacity": 10,
+            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -3278,15 +3139,12 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "showValues": false,
             "spanNulls": true,
             "stacking": {
@@ -3298,23 +3156,19 @@
             }
           },
           "thresholds": {
-            "mode": "percentage",
+            "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": 0
               },
               {
-                "color": "#EAB839",
-                "value": 40
-              },
-              {
                 "color": "red",
-                "value": 60
+                "value": 80
               }
             ]
           },
-          "unit": "mvolt"
+          "unit": "none"
         },
         "overrides": [
           {
@@ -3335,7 +3189,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 89
+        "y": 87
       },
       "id": 38,
       "options": {
@@ -3349,7 +3203,7 @@
           "enableFacetedFilter": false,
           "overflow": "ellipsis",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -3432,7 +3286,7 @@
               }
             ]
           },
-          "unit": "mamp"
+          "unit": "none"
         },
         "overrides": [
           {
@@ -3443,7 +3297,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Current"
+                "value": "Current (mA)"
               }
             ]
           }
@@ -3453,7 +3307,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 89
+        "y": 87
       },
       "id": 39,
       "options": {
@@ -3467,7 +3321,7 @@
           "enableFacetedFilter": false,
           "overflow": "ellipsis",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
@@ -3495,9 +3349,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 97
+        "y": 95
       },
-      "id": 60,
+      "id": 55,
       "title": "Imaging",
       "type": "row"
     },
@@ -3524,10 +3378,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 0,
-        "y": 98
+        "y": 96
       },
       "id": 41,
       "options": {
@@ -3554,7 +3408,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_sensor_temperature\" and r._field == \"value\")\n  |> last()",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: -1d)\n  |> filter(fn: (r) => r._measurement == \"camera_sensor_temperature\" and r._field == \"value\")\n  |> last()",
           "refId": "A"
         }
       ],
@@ -3590,10 +3444,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 6,
-        "y": 98
+        "y": 96
       },
       "id": 42,
       "options": {
@@ -3620,7 +3474,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_cooler_power\" and r._field == \"value\")\n  |> last()",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: -1d)\n  |> filter(fn: (r) => r._measurement == \"camera_cooler_power\" and r._field == \"value\")\n  |> last()",
           "refId": "A"
         }
       ],
@@ -3651,10 +3505,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 12,
-        "y": 98
+        "y": 96
       },
       "id": 43,
       "options": {
@@ -3681,7 +3535,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"focuser_position\" and r._field == \"value\")\n  |> last()",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: -1d)\n  |> filter(fn: (r) => r._measurement == \"focuser_position\" and r._field == \"value\")\n  |> last()",
           "refId": "A"
         }
       ],
@@ -3727,10 +3581,10 @@
         }
       },
       "gridPos": {
-        "h": 4,
+        "h": 6,
         "w": 6,
         "x": 18,
-        "y": 98
+        "y": 96
       },
       "id": 44,
       "options": {
@@ -3757,7 +3611,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"astro_sun_altitude\" and r._field == \"value\")\n  |> last()",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: -1d)\n  |> filter(fn: (r) => r._measurement == \"astro_sun_altitude\" and r._field == \"value\")\n  |> last()",
           "refId": "A"
         }
       ],
@@ -4564,7 +4418,7 @@
             "type": "influxdb",
             "uid": "influxdb-imaging"
           },
-          "query": "frames = from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_hfr\" or r._measurement == \"image_star_count\" or r._measurement == \"image_mean\" or r._measurement == \"image_median\" or r._measurement == \"image_eccentricity\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"_start\", \"_stop\", \"_field\"])\n  |> pivot(rowKey: [\"_time\", \"camera_name\", \"target_name\"], columnKey: [\"_measurement\"], valueColumn: \"_value\")\n  |> group()\n  |> drop(columns: [\"sequence_title\"])\n\nmount = from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"mount_altitude\" or r._measurement == \"mount_azimuth\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"_start\", \"_stop\", \"_field\"])\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_measurement\"], valueColumn: \"_value\")\n  |> group()\n\njoin(tables: {frames: frames, mount: mount}, on: [\"_time\"])\n  |> sort(columns: [\"_time\"], desc: true)",
+          "query": "from(bucket: \"imaging\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => (r._measurement == \"image_hfr\" or r._measurement == \"image_star_count\" or r._measurement == \"image_mean\" or r._measurement == \"image_median\" or r._measurement == \"image_eccentricity\") and r._field == \"value\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"_start\", \"_stop\", \"_field\"])\n  |> pivot(rowKey: [\"_time\", \"camera_name\", \"target_name\"], columnKey: [\"_measurement\"], valueColumn: \"_value\")\n  |> group()\n  |> drop(columns: [\"sequence_title\"])\n  |> sort(columns: [\"_time\"], desc: true)",
           "refId": "A"
         }
       ],
@@ -4577,26 +4431,22 @@
             "indexByName": {
               "_time": 0,
               "camera_name": 1,
-              "image_eccentricity": 9,
-              "image_hfr": 5,
-              "image_mean": 7,
-              "image_median": 8,
-              "image_star_count": 6,
-              "mount_altitude": 3,
-              "mount_azimuth": 4,
-              "target_name": 2
+              "target_name": 2,
+              "image_hfr": 3,
+              "image_star_count": 4,
+              "image_mean": 5,
+              "image_median": 6,
+              "image_eccentricity": 7
             },
             "renameByName": {
               "_time": "Time",
               "camera_name": "Camera",
-              "image_eccentricity": "Eccentricity",
+              "target_name": "Target",
               "image_hfr": "HFR",
+              "image_star_count": "Star Count",
               "image_mean": "Mean",
               "image_median": "Median",
-              "image_star_count": "Star Count",
-              "mount_altitude": "Altitude",
-              "mount_azimuth": "Azimuth",
-              "target_name": "Target"
+              "image_eccentricity": "Eccentricity"
             }
           }
         }
@@ -4634,5 +4484,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 59
+  "version": 27
 }

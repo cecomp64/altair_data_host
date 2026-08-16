@@ -19,13 +19,16 @@ source .env
 set +a
 
 # "name:retention" - retention uses InfluxDB duration syntax, or 0 for infinite.
-# Weather/power telemetry is high-frequency but low-value per-point, so it's
-# capped; observatory/imaging events are low-volume and high-value, so they're
-# kept forever. Adjust freely - this only sets retention at creation time,
-# use `influx bucket update` to change it later.
+# Weather/power/observatory telemetry is capped at 2 years; imaging metadata
+# (frame stats, HFR, guiding, etc.) is comparatively low-volume and stays
+# useful indefinitely for long-term equipment/seeing analysis, so it's kept
+# forever. Adjust freely - this only sets retention at creation time, use
+# `influx bucket update` to change it later. (The "power" bucket itself is
+# created separately, at first-run setup, via docker-compose.yml's
+# DOCKER_INFLUXDB_INIT_BUCKET/DOCKER_INFLUXDB_INIT_RETENTION.)
 BUCKETS=(
   "${INFLUXDB_BUCKET_WEATHER}:730d"
-  "${INFLUXDB_BUCKET_OBSERVATORY}:0"
+  "${INFLUXDB_BUCKET_OBSERVATORY}:730d"
   "${INFLUXDB_BUCKET_IMAGING}:0"
 )
 

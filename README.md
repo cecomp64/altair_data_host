@@ -82,13 +82,13 @@ After that, edit `.env` to point `WEATHER_API_URL` and `ALPACA_BASE_URL` at your
 
 The original design used one bucket (`battery_metrics`) for everything. Extending this to weather, observatory, and imaging data surfaced a few things worth fixing up front:
 
-- **One bucket per domain**, not one shared bucket. Retention needs differ a lot: high-frequency solar/weather telemetry is cheap to sample but not very valuable per-point after a while, while observatory and imaging events are low-volume and worth keeping forever (they're your operational and session history). A shared bucket forces one retention policy on everything. `scripts/init-influx-buckets.sh` creates:
+- **One bucket per domain**, not one shared bucket. Retention needs differ a lot: high-frequency solar/weather/observatory telemetry is cheap to sample but not very valuable per-point after a while, while imaging events are low-volume and worth keeping forever (they're your session log). A shared bucket forces one retention policy on everything. `scripts/init-influx-buckets.sh` creates (and `docker-compose.yml`'s `DOCKER_INFLUXDB_INIT_RETENTION` sets, for `power` specifically, since that bucket is bootstrapped at first-run setup rather than by the script):
 
   | Bucket | Contents | Retention | Why |
   |---|---|---|---|
   | `power` | Victron SmartShunt + Eco-Worthy MPPT (5s interval) | 730d | High-frequency, cheap to resample, not worth infinite storage |
   | `weather` | LAN weather station (60s interval) | 730d | Same reasoning as power |
-  | `observatory` | Roof shutter/slew/home/connected state | infinite | Low volume, valuable for uptime/reliability history |
+  | `observatory` | Roof shutter/slew/home/connected state | 730d | Same reasoning as power |
   | `imaging` | N.I.N.A. equipment + per-frame stats | infinite | Low volume, this *is* your session log |
 
   Retention is only set at creation time - change it later with `influx bucket update --retention <duration>`.
