@@ -14,9 +14,15 @@ import urllib.request
 # "31%"), not the flat {"tempf": ...} schema telegraf.conf originally assumed
 # - hence a script (like read_vedirect.py) instead of inputs.http/json_v2.
 #
-# common_list/piezoRain ids per Ecowitt's local API doc; "0x0F" (rain hour)
-# isn't emitted by this station's rain gauge, so rain_hourly_in is omitted
-# rather than faked.
+# common_list/piezoRain ids per Ecowitt's official "HTTP API interface
+# Protocol (Generic)" PDF (oss.ecowitt.net) - fetched directly and
+# cross-checked against this station's actual response rather than assumed.
+# There is no "rain hour" id in that spec at all - 0x0F is "Rain gain" (a
+# calibration multiplier, not an accumulation period), and this station's
+# response doesn't include it or 0x14 (Rain Totals, lifetime) regardless.
+# The response also includes two undocumented ids (0x7C, 0x7D, both "0.00
+# in") not in the PDF's item table at all - left unmapped rather than
+# guessed at.
 COMMON_LIST_IDS = {
     "0x02": "temp_f",
     "0x07": "humidity_pct",
@@ -27,7 +33,12 @@ COMMON_LIST_IDS = {
     "0x17": "uv_index",
 }
 PIEZO_RAIN_IDS = {
+    "0x0D": "rain_event_in",
+    "0x0E": "rain_rate_inhr",
     "0x10": "rain_daily_in",
+    "0x11": "rain_weekly_in",
+    "0x12": "rain_monthly_in",
+    "0x13": "rain_yearly_in",
 }
 
 # The console's built-in indoor sensor (wh25) and any not-connected channel

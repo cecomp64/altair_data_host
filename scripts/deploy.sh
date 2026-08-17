@@ -44,6 +44,9 @@ GRAFANA_ROOT_URL=http://localhost:3000
 # InfluxDB Exporter plugin is configured separately (see README "Imaging").
 WEATHER_API_URL=http://weather-station.local/v1/current
 WEATHER_STATION_NAME=primary
+LATITUDE=38.0
+LONGITUDE=-121.0
+ELEVATION_M=0
 ALPACA_BASE_URL=http://roof-controller.local:11111/api/v1/dome/0
 ALPACA_DOME_DEVICE_NUMBER=0
 

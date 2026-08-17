@@ -46,6 +46,7 @@ altair_data_host/
 │   ├── read_ping.py                       # runs inside the telegraf container
 │   ├── read_starlink.py                   # runs inside the telegraf container
 │   ├── read_pi_power.py                   # runs inside the telegraf container
+│   ├── read_astro.py                      # runs inside the telegraf container
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
 │   ├── charge_cutoff.py                   # runs on the host (needs GPIO) - see §12
 │   ├── requirements-epaper.txt            # host-side Python deps for the e-paper script
@@ -208,6 +209,8 @@ Runs InfluxDB v2, Grafana, and Telegraf with serial bus access. `influxdb` has a
 
 `grafana` mounts `./grafana/provisioning` read-only, which auto-configures all seven data sources and the dashboard on startup - no manual Grafana UI setup required.
 
+**Editing a `read_*.py` script requires recreating the `telegraf` container, not just saving the file.** Each script is bind-mounted individually (`./scripts/read_x.py:/scripts/read_x.py:ro`), and Docker resolves a *file* bind mount to a specific inode at container creation. An editor/tool that writes atomically (write-temp-then-rename, rather than truncate-and-overwrite-in-place) replaces that inode - the container's mount then keeps serving the old, now-unlinked file, silently, with no error anywhere. Confirmed hitting this directly: edited `read_ecowitt.py`, saw the new fields in a standalone run, but telegraf kept emitting only the old ones until `docker compose up -d --force-recreate telegraf` (a plain `docker compose restart` reuses the existing mount namespace and does **not** fix it - has to be a recreate). `docker exec telegraf stat /scripts/read_x.py` vs. `stat scripts/read_x.py` on the host - matching inode numbers confirm the mount is current.
+
 Bring the stack up directly (bypassing `deploy.sh`) with:
 
 ```bash
@@ -231,7 +234,19 @@ Unchanged from the original design: `inputs.exec` runs `read_vedirect.py` for th
   timeout = "5s"
   data_format = "influx"
 ```
-Like the Victron shunt, this goes through a script rather than `inputs.http`/`json_v2` directly - an Ecowitt GW1000/GW2000-style gateway's local API (`get_livedata_info`) returns nested `id`/`val` arrays with units baked into the value string (e.g. `"0.00 mph"`, `"31%"`), which telegraf's `json_v2` float parser can't strip. `read_ecowitt.py` fetches `$WEATHER_API_URL`, looks up each sensor by its documented id (`COMMON_LIST_IDS`/`PIEZO_RAIN_IDS` at the top of the script), strips the unit suffix, and emits Influx line protocol directly. **Verify against your actual station**: `curl --compressed "$WEATHER_API_URL"` and compare the `id` values in `common_list`/`piezoRain`/`wh25` against the script's id maps, adjusting if your model differs. Note `rain_hourly_in` is intentionally not emitted - this station's rain gauge doesn't report an hourly-total id (only event/day/week/month/year), so Grafana's hourly-rain panel will read "No data" rather than a fabricated value.
+Like the Victron shunt, this goes through a script rather than `inputs.http`/`json_v2` directly - an Ecowitt GW1000/GW2000-style gateway's local API (`get_livedata_info`) returns nested `id`/`val` arrays with units baked into the value string (e.g. `"0.00 mph"`, `"31%"`), which telegraf's `json_v2` float parser can't strip. `read_ecowitt.py` fetches `$WEATHER_API_URL`, looks up each sensor by its documented id (`COMMON_LIST_IDS`/`PIEZO_RAIN_IDS` at the top of the script), strips the unit suffix, and emits Influx line protocol directly. **Verify against your actual station**: `curl --compressed "$WEATHER_API_URL"` and compare the `id` values in `common_list`/`piezoRain`/`wh25` against the script's id maps, adjusting if your model differs.
+
+**Rain fields** (`rain_event_in`, `rain_rate_inhr`, `rain_daily_in`, `rain_weekly_in`, `rain_monthly_in`, `rain_yearly_in`) are confirmed against Ecowitt's own "HTTP API interface Protocol" PDF (fetched directly from `oss.ecowitt.net`, not guessed from the id ordering) - ids `0x0D`/`0x0E`/`0x10`-`0x13`. There is no "rain hour" id in that spec at all; `0x0F` is "Rain gain" (a calibration multiplier, not an accumulation period) and this station's response doesn't include it anyway. The response also has two undocumented ids (`0x7C`, `0x7D`) not in the PDF's item table - left unmapped rather than guessed at. All of these except `rain_rate_inhr` are **running totals that reset at the end of their period** (daily resets at local midnight, etc.), not per-interval deltas - the dashboard's "Rain Accumulation" panel plots them with `aggregateWindow(..., fn: last)` on a `timeseries` (line) panel accordingly. Plotting a cumulative counter like `mean`-aggregated `barchart` bars (the original version of that panel) looks broken - each bar shows the running total *so far*, climbing within a period and dropping to zero at the reset, which reads as meaningless noise on a chart type built for per-bucket amounts, not running totals.
+
+**Sun/moon altitude, via `scripts/read_astro.py`:**
+```toml
+[[inputs.exec]]
+  commands = [["python3", "/scripts/read_astro.py"]]
+  interval = "60s"
+  timeout = "5s"
+  data_format = "influx"
+```
+Computed locally with `python3-ephem` (apt-installed - has a prebuilt `arm64` package, no compiler needed) from `LATITUDE`/`LONGITUDE`/`ELEVATION_M` in `.env`, into a separate `astro` measurement in the same `weather` bucket. This duplicates what N.I.N.A. already reports as `astro_sun_altitude`/`astro_moon_altitude` in the imaging bucket (§8) - deliberately: N.I.N.A. only reports those while a session is actually running, and this repo's own `read_ecowitt.py` already computes moon *phase* locally too but only as part of that station's own API poll, so both existing sources still go dark if imaging isn't running or the weather station is unreachable. `read_astro.py` has no dependency on either - pure math from the system clock, cheap enough that the 60s interval here is just "smooth enough for a chart," not a real constraint. pyephem takes `lat`/`lon` as **strings** (parsed as degrees) - passing floats would silently be interpreted as radians instead, so these stay as the raw `.env` string values rather than being parsed.
 
 ### Observatory: roll-off-roof via ASCOM Alpaca
 Three `[[inputs.http]]` blocks poll the standardized Alpaca dome REST endpoints (`shutterstatus`, `slewing`, `connected`) every 15s. This is a versioned, documented REST spec, so confidence here is high - no verification step needed beyond confirming `ALPACA_BASE_URL` (including the device number) is correct. `shutterstatus` returns the ASCOM enum (0=Open, 1=Closed, 2=Opening, 3=Closing, 4=Error); Grafana maps it to readable labels/colors rather than telegraf doing translation. `athome` is intentionally not polled - AtHome is optional in the ASCOM Dome spec and this driver returns `ErrorNumber 1024 "Not implemented"` for it.
@@ -340,7 +355,7 @@ Metrics the plugin can produce (only for connected equipment / `LIGHT` frames): 
 `grafana/provisioning/dashboards/solar-observatory.json` is provisioned automatically on Grafana startup (`http://<host>:3000`, default admin credentials from `.env`) - no manual data source setup or dashboard import needed. It's organized into seven row sections matching the buckets:
 
 - **Power** - battery SOC gauge, time-to-go, controller temp, consumed Ah, battery voltage, battery/charging current, net vs. solar power, PV voltage/current.
-- **Weather** - current conditions (temp/humidity/wind/pressure) plus trends for temperature, humidity, wind speed/gust, rain accumulation, solar radiation/UV.
+- **Weather** - current conditions (temp/humidity/wind/pressure) plus trends for temperature, humidity, wind speed/gust, rain accumulation (day/week/month/year) and rain rate/current event total, solar radiation/UV, and locally-computed sun/moon altitude.
 - **Observatory** - roof shutter status (color-coded stat + history state-timeline), slewing/at-home/connected indicators.
 - **Imaging** - camera/focuser/cooler status, HFR and star-count trends, guiding RMS, sun/moon altitude, and a recent-frames table.
 - **Network** - packet loss % and latency stat tiles for internet/Tailscale, plus per-host latency and packet-loss-over-time trends.

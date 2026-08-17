@@ -84,6 +84,7 @@ services:
       - ./scripts/read_ping.py:/scripts/read_ping.py:ro
       - ./scripts/read_starlink.py:/scripts/read_starlink.py:ro
       - ./scripts/read_pi_power.py:/scripts/read_pi_power.py:ro
+      - ./scripts/read_astro.py:/scripts/read_astro.py:ro
       - /dev:/dev
       - /:/hostfs:ro
     depends_on:

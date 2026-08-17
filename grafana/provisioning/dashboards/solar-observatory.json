@@ -1951,7 +1951,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "palette-classic",
+            "seriesBy": "last"
           },
           "custom": {
             "axisBorderShow": false,
@@ -1959,16 +1960,32 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "fillOpacity": 10,
-            "gradientMode": "none",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
-            "lineWidth": 2,
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -1980,10 +1997,6 @@
               {
                 "color": "green",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
@@ -1998,7 +2011,43 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Daily"
+                "value": "day"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "week"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "month"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "year"
               }
             ]
           }
@@ -2012,27 +2061,23 @@
       },
       "id": 24,
       "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
         "legend": {
           "calcs": [],
           "displayMode": "list",
+          "enableFacetedFilter": false,
           "overflow": "ellipsis",
           "placement": "bottom",
           "showLegend": true
         },
-        "orientation": "auto",
-        "showValue": "auto",
-        "stacking": "none",
         "tooltip": {
           "hideZeros": false,
           "mode": "multi",
           "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        }
       },
       "pluginVersion": "13.1.1",
       "targets": [
@@ -2041,12 +2086,36 @@
             "type": "influxdb",
             "uid": "influxdb-weather"
           },
-          "query": "spanNs = int(v: v.timeRangeStop) - int(v: v.timeRangeStart)\nbucket = if spanNs <= 86400000000000 then 1h\n  else if spanNs <= 604800000000000 then 6h\n  else if spanNs <= 2678400000000000 then 1d\n  else if spanNs <= 15552000000000000 then 1w\n  else 1mo\n\nfrom(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))\n  |> aggregateWindow(every: bucket, fn: mean, createEmpty: false)\n  |> keep(columns: [\"_time\", \"_value\"])",
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_daily_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_weekly_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_monthly_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_yearly_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "D"
         }
       ],
       "title": "Rain Accumulation",
-      "type": "barchart"
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -2436,7 +2505,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 74
+        "y": 90
       },
       "id": 79,
       "title": "Observatory",
@@ -2499,7 +2568,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 75
+        "y": 91
       },
       "id": 29,
       "options": {
@@ -2590,7 +2659,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 75
+        "y": 91
       },
       "id": 30,
       "options": {
@@ -2676,7 +2745,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 75
+        "y": 91
       },
       "id": 31,
       "options": {
@@ -2762,7 +2831,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 75
+        "y": 91
       },
       "id": 32,
       "options": {
@@ -2848,7 +2917,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 79
+        "y": 95
       },
       "id": 33,
       "options": {
@@ -2934,7 +3003,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 79
+        "y": 95
       },
       "id": 34,
       "options": {
@@ -3006,7 +3075,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 79
+        "y": 95
       },
       "id": 35,
       "options": {
@@ -3074,7 +3143,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 79
+        "y": 95
       },
       "id": 36,
       "options": {
@@ -3223,7 +3292,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 83
+        "y": 99
       },
       "id": 37,
       "options": {
@@ -3355,7 +3424,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 89
+        "y": 105
       },
       "id": 38,
       "options": {
@@ -3473,7 +3542,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 89
+        "y": 105
       },
       "id": 39,
       "options": {
@@ -3515,7 +3584,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 97
+        "y": 113
       },
       "id": 80,
       "title": "Imaging",
@@ -3547,7 +3616,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 98
+        "y": 114
       },
       "id": 41,
       "options": {
@@ -3613,7 +3682,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 98
+        "y": 114
       },
       "id": 42,
       "options": {
@@ -3674,7 +3743,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 98
+        "y": 114
       },
       "id": 43,
       "options": {
@@ -3750,7 +3819,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 98
+        "y": 114
       },
       "id": 44,
       "options": {
@@ -3862,7 +3931,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 102
+        "y": 118
       },
       "id": 45,
       "options": {
@@ -3976,7 +4045,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 102
+        "y": 118
       },
       "id": 46,
       "options": {
@@ -4114,7 +4183,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 110
+        "y": 126
       },
       "id": 47,
       "options": {
@@ -4256,7 +4325,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 110
+        "y": 126
       },
       "id": 48,
       "options": {
@@ -4378,7 +4447,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 118
+        "y": 134
       },
       "id": 49,
       "options": {
@@ -4492,7 +4561,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 118
+        "y": 134
       },
       "id": 50,
       "options": {
@@ -4564,7 +4633,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 126
+        "y": 142
       },
       "id": 51,
       "options": {
@@ -4629,7 +4698,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 136
+        "y": 152
       },
       "id": 81,
       "title": "Network",
@@ -4669,7 +4738,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 137
+        "y": 153
       },
       "id": 62,
       "options": {
@@ -4737,7 +4806,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 137
+        "y": 153
       },
       "id": 63,
       "options": {
@@ -4805,7 +4874,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 137
+        "y": 153
       },
       "id": 64,
       "options": {
@@ -4873,7 +4942,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 137
+        "y": 153
       },
       "id": 65,
       "options": {
@@ -4980,7 +5049,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 141
+        "y": 157
       },
       "id": 66,
       "options": {
@@ -5089,7 +5158,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 141
+        "y": 157
       },
       "id": 67,
       "options": {
@@ -5198,7 +5267,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 149
+        "y": 165
       },
       "id": 68,
       "options": {
@@ -5240,7 +5309,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 157
+        "y": 173
       },
       "id": 82,
       "title": "Starlink",
@@ -5299,7 +5368,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 158
+        "y": 174
       },
       "id": 70,
       "options": {
@@ -5381,7 +5450,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 158
+        "y": 174
       },
       "id": 71,
       "options": {
@@ -5449,7 +5518,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 158
+        "y": 174
       },
       "id": 72,
       "options": {
@@ -5517,7 +5586,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 158
+        "y": 174
       },
       "id": 73,
       "options": {
@@ -5653,7 +5722,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 162
+        "y": 178
       },
       "id": 74,
       "options": {
@@ -5783,7 +5852,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 162
+        "y": 178
       },
       "id": 75,
       "options": {
@@ -6120,7 +6189,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 170
+        "y": 186
       },
       "id": 76,
       "options": {
@@ -6388,7 +6457,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 181
+        "y": 197
       },
       "id": 83,
       "options": {
@@ -6502,7 +6571,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 181
+        "y": 197
       },
       "id": 84,
       "options": {
@@ -6628,7 +6697,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 189
+        "y": 205
       },
       "id": 85,
       "options": {
@@ -6678,7 +6747,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 197
+        "y": 213
       },
       "id": 86,
       "title": "System",
@@ -6719,7 +6788,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 198
+        "y": 214
       },
       "id": 87,
       "options": {
@@ -6788,7 +6857,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 198
+        "y": 214
       },
       "id": 88,
       "options": {
@@ -6857,7 +6926,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 198
+        "y": 214
       },
       "id": 89,
       "options": {
@@ -6926,7 +6995,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 198
+        "y": 214
       },
       "id": 90,
       "options": {
@@ -7062,7 +7131,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 202
+        "y": 218
       },
       "id": 91,
       "options": {
@@ -7204,7 +7273,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 202
+        "y": 218
       },
       "id": 92,
       "options": {
@@ -7338,7 +7407,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 210
+        "y": 226
       },
       "id": 93,
       "options": {
@@ -7484,7 +7553,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 210
+        "y": 226
       },
       "id": 94,
       "options": {
@@ -7571,7 +7640,7 @@
         "h": 4,
         "w": 8,
         "x": 0,
-        "y": 218
+        "y": 234
       },
       "id": 95,
       "options": {
@@ -7632,7 +7701,7 @@
         "h": 4,
         "w": 8,
         "x": 8,
-        "y": 218
+        "y": 234
       },
       "id": 96,
       "options": {
@@ -7714,7 +7783,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 218
+        "y": 234
       },
       "id": 97,
       "options": {
@@ -7846,7 +7915,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 222
+        "y": 238
       },
       "id": 98,
       "options": {
@@ -7999,7 +8068,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 222
+        "y": 238
       },
       "id": 99,
       "options": {
@@ -8060,6 +8129,278 @@
       ],
       "title": "Under-voltage / Throttle Events",
       "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "degree"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "sun altitude"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "moon altitude"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 82
+      },
+      "id": 100,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"astro\" and (r._field == \"sun_altitude_deg\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"astro\" and (r._field == \"moon_altitude_deg\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Sun & Moon Altitude (computed)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "lengthin"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "rate (in/hr)"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "current event total (in)"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 74
+      },
+      "id": 101,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_rate_inhr\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"weather_station\" and (r._field == \"rain_event_in\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Rain Rate & Current Event",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -8095,5 +8436,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 75
+  "version": 78
 }

@@ -29,7 +29,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 57,
+      "id": 77,
       "title": "Solar Power",
       "type": "row"
     },
@@ -966,7 +966,7 @@
         "x": 0,
         "y": 29
       },
-      "id": 58,
+      "id": 78,
       "title": "Weather",
       "type": "row"
     },
@@ -2436,9 +2436,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 74
+        "y": 82
       },
-      "id": 59,
+      "id": 79,
       "title": "Observatory",
       "type": "row"
     },
@@ -2499,7 +2499,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 75
+        "y": 83
       },
       "id": 29,
       "options": {
@@ -2590,7 +2590,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 75
+        "y": 83
       },
       "id": 30,
       "options": {
@@ -2676,7 +2676,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 75
+        "y": 83
       },
       "id": 31,
       "options": {
@@ -2762,7 +2762,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 75
+        "y": 83
       },
       "id": 32,
       "options": {
@@ -2848,7 +2848,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 79
+        "y": 87
       },
       "id": 33,
       "options": {
@@ -2934,7 +2934,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 79
+        "y": 87
       },
       "id": 34,
       "options": {
@@ -3006,7 +3006,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 79
+        "y": 87
       },
       "id": 35,
       "options": {
@@ -3074,7 +3074,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 79
+        "y": 87
       },
       "id": 36,
       "options": {
@@ -3223,7 +3223,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 83
+        "y": 91
       },
       "id": 37,
       "options": {
@@ -3355,7 +3355,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 89
+        "y": 97
       },
       "id": 38,
       "options": {
@@ -3473,7 +3473,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 89
+        "y": 97
       },
       "id": 39,
       "options": {
@@ -3515,9 +3515,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 97
+        "y": 105
       },
-      "id": 60,
+      "id": 80,
       "title": "Imaging",
       "type": "row"
     },
@@ -3547,7 +3547,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 98
+        "y": 106
       },
       "id": 41,
       "options": {
@@ -3613,7 +3613,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 98
+        "y": 106
       },
       "id": 42,
       "options": {
@@ -3674,7 +3674,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 98
+        "y": 106
       },
       "id": 43,
       "options": {
@@ -3750,7 +3750,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 98
+        "y": 106
       },
       "id": 44,
       "options": {
@@ -3862,7 +3862,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 102
+        "y": 110
       },
       "id": 45,
       "options": {
@@ -3976,7 +3976,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 102
+        "y": 110
       },
       "id": 46,
       "options": {
@@ -4114,7 +4114,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 110
+        "y": 118
       },
       "id": 47,
       "options": {
@@ -4256,7 +4256,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 110
+        "y": 118
       },
       "id": 48,
       "options": {
@@ -4378,7 +4378,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 118
+        "y": 126
       },
       "id": 49,
       "options": {
@@ -4492,7 +4492,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 118
+        "y": 126
       },
       "id": 50,
       "options": {
@@ -4564,7 +4564,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 126
+        "y": 134
       },
       "id": 51,
       "options": {
@@ -4629,9 +4629,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 136
+        "y": 144
       },
-      "id": 61,
+      "id": 81,
       "title": "Network",
       "type": "row"
     },
@@ -4645,7 +4645,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -4670,7 +4669,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 137
+        "y": 145
       },
       "id": 62,
       "options": {
@@ -4714,7 +4713,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -4739,7 +4737,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 137
+        "y": 145
       },
       "id": 63,
       "options": {
@@ -4783,7 +4781,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -4808,7 +4805,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 137
+        "y": 145
       },
       "id": 64,
       "options": {
@@ -4852,7 +4849,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -4877,7 +4873,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 137
+        "y": 145
       },
       "id": 65,
       "options": {
@@ -4959,6 +4955,7 @@
               "mode": "off"
             }
           },
+          "displayName": "${__field.labels.url}",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -4976,16 +4973,14 @@
               }
             ]
           },
-          "unit": "ms",
-          "displayName": "${__field.labels.url}"
-        },
-        "overrides": []
+          "unit": "ms"
+        }
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 141
+        "y": 149
       },
       "id": 66,
       "options": {
@@ -5069,6 +5064,7 @@
               "mode": "off"
             }
           },
+          "displayName": "${__field.labels.url}",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -5086,16 +5082,14 @@
               }
             ]
           },
-          "unit": "ms",
-          "displayName": "${__field.labels.url}"
-        },
-        "overrides": []
+          "unit": "ms"
+        }
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 141
+        "y": 149
       },
       "id": 67,
       "options": {
@@ -5179,6 +5173,7 @@
               "mode": "off"
             }
           },
+          "displayName": "${__field.labels.url}",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -5196,16 +5191,14 @@
               }
             ]
           },
-          "unit": "percent",
-          "displayName": "${__field.labels.url}"
-        },
-        "overrides": []
+          "unit": "percent"
+        }
       },
       "gridPos": {
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 149
+        "y": 157
       },
       "id": 68,
       "options": {
@@ -5240,6 +5233,2967 @@
       ],
       "title": "Packet Loss % by Host",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 165
+      },
+      "id": 82,
+      "title": "Starlink",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "BOOTING": {
+                  "color": "yellow",
+                  "text": "Booting"
+                },
+                "CONNECTED": {
+                  "color": "green",
+                  "text": "Connected"
+                },
+                "OFFLINE": {
+                  "color": "red",
+                  "text": "Offline"
+                },
+                "SEARCHING": {
+                  "color": "yellow",
+                  "text": "Searching"
+                },
+                "STOWED": {
+                  "color": "blue",
+                  "text": "Stowed"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 166
+      },
+      "id": 70,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^state$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and r._field == \"state\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Dish State",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "Alert"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 166
+      },
+      "id": 71,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^alert_active$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and r._field == \"alert_active\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Alert Active",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 40
+              },
+              {
+                "color": "red",
+                "value": 75
+              }
+            ]
+          },
+          "unit": "watt"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 166
+      },
+      "id": 72,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and r._field == \"power_latest_w\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Power Draw (latest)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 166
+      },
+      "id": 73,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and r._field == \"fraction_obstructed\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Obstruction %",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "mean"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "min"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "max"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 170
+      },
+      "id": 74,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"power_mean_w\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"power_min_w\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"power_max_w\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "C"
+        }
+      ],
+      "title": "Power Draw Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "ping latency"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 170
+      },
+      "id": 75,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"pop_ping_latency_ms\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Dish-Reported Ping Latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "Alert"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Motors Stuck"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Thermal Throttle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Thermal Shutdown"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Mast Not Near Vertical"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "E"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Unexpected Location"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "F"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Slow Ethernet Speeds"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "G"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Slow Ethernet Speeds 100"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "H"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Roaming"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "I"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Install Pending"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "J"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Is Heating"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "K"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Power Supply Thermal Throttle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "L"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Is Power Save Idle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "M"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Dbf Telem Stale"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "N"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Low Motor Current"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "O"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Lower Signal Than Predicted"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "P"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Obstruction Map Reset"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Q"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Dish Water Detected"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "R"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Router Water Detected"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "S"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Upsu Router Port Slow"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "T"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "No Ethernet Link"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 178
+      },
+      "id": 76,
+      "options": {
+        "alignValue": "left",
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "displayMode": "list",
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_motors_stuck\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_thermal_throttle\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_thermal_shutdown\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_mast_not_near_vertical\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_unexpected_location\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_slow_ethernet_speeds\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_slow_ethernet_speeds_100\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_roaming\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_install_pending\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_is_heating\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_power_supply_thermal_throttle\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "K"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_is_power_save_idle\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "L"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_dbf_telem_stale\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "M"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_low_motor_current\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "N"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_lower_signal_than_predicted\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "O"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_obstruction_map_reset\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "P"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_dish_water_detected\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "Q"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_router_water_detected\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "R"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_upsu_router_port_slow\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "S"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"alert_no_ethernet_link\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "T"
+        }
+      ],
+      "title": "Alert Detail Timeline",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "uptime"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 189
+      },
+      "id": 83,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"uptime_s\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Uptime",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "satellites"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 189
+      },
+      "id": 84,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"gps_sats\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "GPS Satellites",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-starlink"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "bps"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "downlink"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "uplink"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 197
+      },
+      "id": 85,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"downlink_throughput_bps\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-starlink"
+          },
+          "query": "from(bucket: \"starlink\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"starlink\" and (r._field == \"uplink_throughput_bps\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Throughput",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 205
+      },
+      "id": 86,
+      "title": "System",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 206
+      },
+      "id": 87,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"cpu\" and r._field == \"usage_idle\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> map(fn: (r) => ({r with _value: 100.0 - r._value}))",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Usage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 206
+      },
+      "id": 88,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"mem\" and r._field == \"used_percent\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Memory Usage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 95
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 206
+      },
+      "id": 89,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"disk\" and r._field == \"used_percent\" and r.path == \"/\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Disk Usage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 65
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "celsius"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 206
+      },
+      "id": 90,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"temp\" and r._field == \"temp\" and r.sensor == \"cpu_thermal\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Temp",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "user"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "system"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "iowait"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 210
+      },
+      "id": 91,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"cpu\" and r._field == \"usage_user\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"cpu\" and r._field == \"usage_system\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"cpu\" and r._field == \"usage_iowait\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "C"
+        }
+      ],
+      "title": "CPU Usage Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "SoC (cpu_thermal)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "RP1 southbridge"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 210
+      },
+      "id": 92,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"temp\" and r._field == \"temp\" and r.sensor == \"cpu_thermal\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"temp\" and r._field == \"temp\" and r.sensor == \"rp1_adc\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Temperature Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "memory"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "disk (/)"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 218
+      },
+      "id": 93,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"mem\" and r._field == \"used_percent\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"disk\" and r._field == \"used_percent\" and r.path == \"/\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Memory & Disk Usage Over Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "1 min"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "5 min"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "15 min"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 218
+      },
+      "id": 94,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"system\" and r._field == \"load1\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"system\" and r._field == \"load5\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"system\" and r._field == \"load15\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "C"
+        }
+      ],
+      "title": "Load Average",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 4.8
+              },
+              {
+                "color": "green",
+                "value": 4.95
+              }
+            ]
+          },
+          "unit": "volt"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 226
+      },
+      "id": 95,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and r._field == \"ext5v_volts\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "5V Input Voltage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 226
+      },
+      "id": 96,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and r._field == \"total_power_w\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Total Power Draw",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "UNDER-VOLTAGE"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 226
+      },
+      "id": 97,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^undervoltage_now$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and r._field == \"undervoltage_now\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Under-voltage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "volt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "5V input"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "total power (W)"
+              },
+              {
+                "id": "unit",
+                "value": "watt"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 230
+      },
+      "id": 98,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and (r._field == \"ext5v_volts\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and (r._field == \"total_power_w\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Input Voltage & Total Power",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "Active"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Under-voltage (now)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Throttled (now)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Freq capped (now)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Soft temp limit (now)"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 230
+      },
+      "id": 99,
+      "options": {
+        "alignValue": "left",
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "displayMode": "list",
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and (r._field == \"undervoltage_now\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and (r._field == \"throttled_now\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and (r._field == \"freq_capped_now\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and (r._field == \"soft_temp_limit_now\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "D"
+        }
+      ],
+      "title": "Under-voltage / Throttle Events",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-weather"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "degree"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "sun altitude"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "moon altitude"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 74
+      },
+      "id": 100,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"astro\" and (r._field == \"sun_altitude_deg\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-weather"
+          },
+          "query": "from(bucket: \"weather\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"astro\" and (r._field == \"moon_altitude_deg\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Sun & Moon Altitude (computed)",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -5250,7 +8204,9 @@
     "weather",
     "observatory",
     "imaging",
-    "network"
+    "network",
+    "starlink",
+    "system"
   ],
   "time": {
     "from": "now-24h",
@@ -5273,5 +8229,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 67
+  "version": 76
 }

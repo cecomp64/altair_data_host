@@ -5,7 +5,7 @@ FROM telegraf:latest
 # stream. python3-serial (pyserial) is installed via apt so the container
 # has no external network/pip dependency at runtime.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 python3-serial python3-pip \
+    && apt-get install -y --no-install-recommends python3 python3-serial python3-pip python3-ephem \
     && rm -rf /var/lib/apt/lists/*
 
 # Pi power telemetry: scripts/read_pi_power.py shells out to vcgencmd for
