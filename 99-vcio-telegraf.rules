@@ -1,0 +1,13 @@
+# Location: /etc/udev/rules.d/99-vcio-telegraf.rules
+# Installed automatically by scripts/install-udev-rules.sh
+#
+# /dev/vcio (used by vcgencmd - scripts/read_pi_power.py, telegraf.conf
+# "Pi power health") ships root:root 0600 by default - even with the
+# telegraf container's `telegraf` process user added to the `video` group
+# (docker/telegraf/Dockerfile), that only grants access to its sibling
+# /dev/vcio_gencmd (already video:0660 out of the box), not /dev/vcio
+# itself, which vcgencmd insists on opening rather than falling back to
+# vcio_gencmd - confirmed by testing both directly. Loosening this the same
+# way 99-solar-serial.rules loosens the USB-serial devices, rather than
+# running telegraf as root.
+KERNEL=="vcio", GROUP="video", MODE="0660"

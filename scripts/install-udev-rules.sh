@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
-# Installs the persistent serial device symlink rules (99-solar-serial.rules)
-# so /dev/ttyUSB_VICTRON and /dev/ttyUSB_ECOWORTHY survive reboots and USB
-# renumbering. Runs on the Docker host - the telegraf container just bind
-# mounts /dev, so it automatically sees whatever symlinks udev creates here.
+# Installs this repo's udev rules:
+#   99-solar-serial.rules - persistent /dev/ttyUSB_VICTRON/_ECOWORTHY
+#     symlinks so they survive reboots and USB renumbering.
+#   99-vcio-telegraf.rules - loosens /dev/vcio's permissions so the
+#     unprivileged telegraf process user can call vcgencmd (Pi power health).
+# Runs on the Docker host - the telegraf container just bind mounts /dev, so
+# it automatically sees whatever permissions/symlinks udev sets here.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RULES_SRC="${REPO_DIR}/99-solar-serial.rules"
-RULES_DEST="/etc/udev/rules.d/99-solar-serial.rules"
+RULES_FILES=("99-solar-serial.rules" "99-vcio-telegraf.rules")
 
 if [[ "$(uname -s)" != "Linux" ]]; then
   echo "udev rules only apply on Linux hosts; skipping on $(uname -s)." >&2
@@ -19,16 +21,22 @@ if [[ $EUID -ne 0 ]]; then
   exec sudo "$0" "$@"
 fi
 
-if [[ ! -f "$RULES_SRC" ]]; then
-  echo "Cannot find $RULES_SRC" >&2
-  exit 1
-fi
+for rules_file in "${RULES_FILES[@]}"; do
+  src="${REPO_DIR}/${rules_file}"
+  if [[ ! -f "$src" ]]; then
+    echo "Cannot find $src" >&2
+    exit 1
+  fi
+  install -m 0644 "$src" "/etc/udev/rules.d/${rules_file}"
+  echo "Installed /etc/udev/rules.d/${rules_file}"
+done
 
-install -m 0644 "$RULES_SRC" "$RULES_DEST"
 udevadm control --reload-rules
 udevadm trigger
+udevadm settle
 
-echo "Installed $RULES_DEST"
 echo "Verifying symlinks (devices must be plugged in):"
 ls -l /dev/ttyUSB_VICTRON /dev/ttyUSB_ECOWORTHY 2>/dev/null || \
   echo "  (not present yet - plug in the USB adapters and re-run, or check 'udevadm monitor')"
+echo "Verifying /dev/vcio permissions:"
+ls -l /dev/vcio 2>/dev/null || echo "  (not present - not Raspberry Pi hardware?)"

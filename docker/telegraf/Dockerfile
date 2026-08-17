@@ -8,6 +8,35 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends python3 python3-serial python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+# Pi power telemetry: scripts/read_pi_power.py shells out to vcgencmd for
+# under-voltage/throttle status (all Pi models) and PMIC rail voltage/current
+# (Pi 5 only). vcgencmd (libraspberrypi-bin) isn't in Debian's own repos -
+# it's Raspberry Pi OS-specific - so this adds Raspberry Pi Ltd's apt repo
+# (per their own install instructions) rather than trying to vendor a
+# compiled binary. It talks to the VideoCore/RP1 firmware over
+# /dev/vcio_gencmd, which is already visible in this container via the
+# docker-compose.yml /dev:/dev mount - no extra device config needed here.
+# Best-effort: this repo also targets non-Pi "Mini PC" hosts (per the
+# README's own framing) where this package won't exist/apply, so a failed
+# install here doesn't fail the whole image build - read_pi_power.py checks
+# for the binary itself and emits nothing if it's missing.
+RUN curl -fsSL https://archive.raspberrypi.com/debian/raspberrypi.gpg.key | gpg --dearmor -o /usr/share/keyrings/raspberrypi-archive-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] https://archive.raspberrypi.com/debian/ bookworm main" > /etc/apt/sources.list.d/raspi.list \
+    && apt-get update \
+    && (apt-get install -y --no-install-recommends libraspberrypi-bin || echo "libraspberrypi-bin unavailable - not Raspberry Pi hardware, skipping") \
+    && rm -rf /var/lib/apt/lists/*
+
+# telegraf's own process drops from root to the unprivileged `telegraf` user
+# (confirmed: `ps aux` inside the container shows the telegraf process as
+# uid 999, not root) - the official image's entrypoint does this even
+# though docker-compose.yml's privileged:true means an interactive `docker
+# exec` (which defaults to root) doesn't see the same restriction. /dev/vcio_gencmd
+# is root:video 0660, so vcgencmd silently failed ("no usable output") when
+# telegraf itself called it via inputs.exec despite working fine under an
+# interactive root shell - confirmed by testing both. video's gid (44) is
+# already baked into this base Debian image, so this is enough.
+RUN usermod -aG video telegraf
+
 # Starlink: scripts/read_starlink.py talks to the dish's local gRPC API via
 # the vendored starlink_grpc.py (see third_party/starlink_grpc.py for why it's
 # committed rather than fetched at build time) and its grpcio/protobuf/yagrc

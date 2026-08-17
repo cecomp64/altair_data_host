@@ -198,6 +198,16 @@ RULES = [
         "Root filesystem is over 90% full.",
     ),
     rule(
+        "pi-undervoltage", "Pi Under-Voltage",
+        'from(bucket: "system")\n'
+        '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
+        '  |> filter(fn: (r) => r._measurement == "pi_power" and r._field == "undervoltage_now")\n'
+        '  |> last()\n'
+        '  |> map(fn: (r) => ({r with _value: if r._value then 1.0 else 0.0}))',
+        "influxdb-system", "gt", [0.5], "2m", "critical",
+        "Pi's 5V supply is under-voltage right now - failing/inadequate power supply or cable, risk of SD card corruption or brownout.",
+    ),
+    rule(
         "cpu-temp-critical", "CPU Temp Critical",
         'from(bucket: "system")\n'
         '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'

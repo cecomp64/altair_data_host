@@ -13,6 +13,7 @@ altair_data_host/
 ├── docker-compose.yml
 ├── telegraf.conf
 ├── 99-solar-serial.rules
+├── 99-vcio-telegraf.rules
 ├── .env.example
 ├── docker/
 │   └── telegraf/
@@ -44,6 +45,7 @@ altair_data_host/
 │   ├── read_vedirect.py                   # runs inside the telegraf container
 │   ├── read_ping.py                       # runs inside the telegraf container
 │   ├── read_starlink.py                   # runs inside the telegraf container
+│   ├── read_pi_power.py                   # runs inside the telegraf container
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
 │   ├── charge_cutoff.py                   # runs on the host (needs GPIO) - see §12
 │   ├── requirements-epaper.txt            # host-side Python deps for the e-paper script
@@ -148,7 +150,17 @@ Both the Victron cable and the FT232R-based Eco-Worthy adapter use FTDI vendor I
 
 The telegraf container bind-mounts `/dev`, so it automatically sees whatever symlinks udev creates on the host - no container-side configuration needed.
 
-*Apply on the host:* `scripts/install-udev-rules.sh` (installs the rules file to `/etc/udev/rules.d/`, then reloads and triggers udev; re-execs itself with `sudo` if needed).
+*Apply on the host:* `scripts/install-udev-rules.sh` (installs both rules files below to `/etc/udev/rules.d/`, then reloads/triggers/settles udev; re-execs itself with `sudo` if needed).
+
+### Pi Power Telemetry Device Permissions (`99-vcio-telegraf.rules`)
+
+```ini
+KERNEL=="vcio", GROUP="video", MODE="0660"
+```
+
+`scripts/read_pi_power.py` (§7 "System") shells out to `vcgencmd`, which needs `/dev/vcio` - shipped `root:root 0600` by default. The telegraf container's own process runs as the unprivileged `telegraf` user (uid 999, confirmed via `ps aux` inside the container - the official image's entrypoint drops from root even though `docker-compose.yml` sets `privileged: true`), so it can't open a root-only device no matter what the container's own privileges are. `docker/telegraf/Dockerfile` adds that user to the `video` group, which is enough for `/dev/vcio_gencmd` (already shipped `video:0660`) but **not** `/dev/vcio` itself, which `vcgencmd` insists on opening rather than falling back to `vcio_gencmd` - confirmed by testing both directly (`os.open()` on `vcio_gencmd` succeeds as the `telegraf` user, `vcgencmd get_throttled` still fails with "Can't open device file: /dev/vcio" until this rule is applied). Same fix pattern as the serial devices above: loosen the one device permission that's actually in the way, rather than running telegraf as root.
+
+**`udevadm trigger` alone doesn't block until the retriggered device is actually updated** - it just queues the event. Checking permissions immediately after can show the stale (pre-rule) state even though the rule is correctly loaded, which is why the install script also runs `udevadm settle` afterward - confirmed this was a real, reproducible race by checking immediately after `trigger` vs. after `settle` on this exact rule.
 
 ### Eco-Worthy MPPT: RS485 RJ45 Pinout (don't trust a generic cable)
 
@@ -284,6 +296,21 @@ Everything else in `telegraf.conf` monitors something *external* to the host; th
 
 **Requires host-root visibility that a container doesn't have by default.** These plugins read `/proc`, `/sys`, and mounted filesystems - inside a container with no special configuration, that's the *container's* isolated view (its own overlay disk, not the Pi's real SD card), not the host's. `docker-compose.yml`'s `telegraf` service works around this the standard way: a read-only `/:/hostfs:ro` bind mount plus `HOST_PROC=/hostfs/proc`, `HOST_SYS=/hostfs/sys`, `HOST_MOUNT_PREFIX=/hostfs` env vars, which gopsutil honors to report the real host instead. Confirmed correct by testing directly: disk/CPU/temp values from inside the container matched `df`/`vcgencmd`-equivalent reads on the host. Read-only, and this container is already `privileged: true` with `/dev` mounted for the serial devices, so this doesn't meaningfully change its trust boundary.
 
+**Pi power health, via `scripts/read_pi_power.py`:**
+```toml
+[[inputs.exec]]
+  commands = [["python3", "/scripts/read_pi_power.py"]]
+  interval = "30s"
+  timeout = "10s"
+  data_format = "influx"
+```
+Shells out to `vcgencmd` (installed from Raspberry Pi Ltd's own apt repo in `docker/telegraf/Dockerfile` - `libraspberrypi-bin` isn't in Debian's repos) for two things telegraf's built-in plugins don't cover:
+
+- **`get_throttled`**: a bitmask decoded into 8 booleans - under-voltage / ARM frequency capped / throttled / soft temp limit, each in a "right now" and a "has happened since boot" form. The "now" fields are what `Pi Under-Voltage` alerts on (§13); "occurred" is dashboard context only, since e.g. a one-time blip during boot is common and not itself a problem.
+- **`pmic_read_adc`** (Pi 5 only - silently omitted on older models, which have no PMIC to query): per-rail voltage and current for every internal regulator rail, including `EXT5V_V` - the actual 5V input voltage, the closest thing to a single "Pi voltage" reading. There's no equivalent single "total input current" rail, so `total_power_w` sums voltage × current across every rail as an approximation of total board power draw (close enough for a dashboard, not billing-grade).
+
+Needs `/dev/vcio` to be group-readable, which it isn't by default even with the telegraf process user added to the `video` group - see §5's `99-vcio-telegraf.rules`. Silently emits nothing (exits 0) if `vcgencmd` isn't present at all, so this degrades cleanly on the non-Pi "Mini PC" hosts this repo also targets.
+
 ### Imaging: nothing in telegraf
 N.I.N.A.'s own plugin writes to InfluxDB directly - see §8.
 
@@ -318,7 +345,7 @@ Metrics the plugin can produce (only for connected equipment / `LIGHT` frames): 
 - **Imaging** - camera/focuser/cooler status, HFR and star-count trends, guiding RMS, sun/moon altitude, and a recent-frames table.
 - **Network** - packet loss % and latency stat tiles for internet/Tailscale, plus per-host latency and packet-loss-over-time trends.
 - **Starlink** - dish state, alert status, power draw, and obstruction % stat tiles, power-over-time and dish-reported latency trends, uptime/GPS satellites/throughput charts, and a per-alert-flag timeline.
-- **System** - CPU/memory/disk usage and CPU temperature stat tiles, plus CPU breakdown, temperature (both sensors), memory & disk, and load average trends.
+- **System** - CPU/memory/disk usage and CPU temperature stat tiles, plus CPU breakdown, temperature (both sensors), memory & disk, and load average trends; 5V input voltage, total power draw, and under-voltage status tiles, plus a voltage/power trend and an under-voltage/throttle event timeline.
 
 `solar-observatory.json` is hand-edited directly - there's no generator. An earlier version of this dashboard was built by a `grafana/generate_dashboard.py` script (grid math, ids, and fieldConfig boilerplate via small panel helpers), but that made the JSON file a derived artifact, at odds with also allowing UI edits (below): regenerating and recommitting would silently discard anything changed in the UI since the last run.
 
@@ -458,7 +485,7 @@ Both are already wired into `scripts/deploy.sh` (steps 10-11), so once the relay
 
 ## 13. Grafana Alerting (Discord)
 
-Discord notifications for five conditions: `Battery SOC Critical` (soc < 15%), `Starlink Alert Active` (any of the ~20 dish alert flags true), `Internet Fully Down` (every `PING_TARGETS_INTERNET` host at 100% packet loss), `Disk Usage Critical` (root filesystem > 90%), `CPU Temp Critical` (Pi SoC > 80°C). Each rule is a 3-node pipeline (Flux query -> `reduce` last -> `threshold`), evaluated every 1 minute, with a `for:` pending duration (2-10 minutes depending on the rule) so one noisy sample doesn't page you. Thresholds are a starting point, not tuned to your specific battery bank/hardware - see `scripts/init_grafana_alerting.py`'s `RULES` list to change them.
+Discord notifications for six conditions: `Battery SOC Critical` (soc < 15%), `Starlink Alert Active` (any of the ~20 dish alert flags true), `Internet Fully Down` (every `PING_TARGETS_INTERNET` host at 100% packet loss), `Disk Usage Critical` (root filesystem > 90%), `Pi Under-Voltage` (vcgencmd's under-voltage-now flag), `CPU Temp Critical` (Pi SoC > 80°C). Each rule is a 3-node pipeline (Flux query -> `reduce` last -> `threshold`), evaluated every 1 minute, with a `for:` pending duration (2-10 minutes depending on the rule) so one noisy sample doesn't page you. Thresholds are a starting point, not tuned to your specific battery bank/hardware - see `scripts/init_grafana_alerting.py`'s `RULES` list to change them.
 
 ### Why a script, not committed YAML
 
