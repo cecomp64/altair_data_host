@@ -16,7 +16,10 @@ altair_data_host/
 ├── .env.example
 ├── docker/
 │   └── telegraf/
-│       └── Dockerfile          # telegraf:latest + python3/pyserial for read_vedirect.py
+│       ├── Dockerfile                   # telegraf:latest + python3/pyserial/grpcio deps
+│       ├── requirements-starlink.txt    # pip deps for read_starlink.py, see §7
+│       └── third_party/
+│           └── starlink_grpc.py         # vendored client lib, see §7
 ├── grafana/
 │   ├── snapshot_dashboard.sh               # pulls the live dashboard (incl. UI edits) before you hand-edit it, see §9
 │   ├── dashboard_backups/                  # timestamped snapshots kept by the script above (last 5)
@@ -33,10 +36,12 @@ altair_data_host/
 │   ├── install-epaper-service.sh          # host: systemd unit for the e-paper display
 │   ├── install-charge-cutoff-deps.sh      # host: venv + gpio-group membership for the charge-cutoff relay
 │   ├── install-charge-cutoff-service.sh   # host: systemd unit for the charge-cutoff relay
-│   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging buckets
+│   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging/network/starlink buckets
 │   ├── epaper-dashboard.service.template  # systemd unit template used above
 │   ├── charge-cutoff.service.template     # systemd unit template used above
 │   ├── read_vedirect.py                   # runs inside the telegraf container
+│   ├── read_ping.py                       # runs inside the telegraf container
+│   ├── read_starlink.py                   # runs inside the telegraf container
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
 │   ├── charge_cutoff.py                   # runs on the host (needs GPIO) - see §12
 │   ├── requirements-epaper.txt            # host-side Python deps for the e-paper script
@@ -74,7 +79,7 @@ If step 7 enabled SPI for the first time, reboot the Pi before the e-paper displ
 
 Each of these steps is also runnable standalone (e.g. to re-apply udev rules after editing them, or to add a bucket after changing the list in `init-influx-buckets.sh`).
 
-After that, edit `.env` to point `WEATHER_API_URL` and `ALPACA_BASE_URL` at your real devices (see §6/§7), and configure N.I.N.A.'s InfluxDB Exporter plugin per §8. Grafana at `http://<host>:3000` will already have all four data sources and the full dashboard provisioned - no manual data-source setup or dashboard import needed.
+After that, edit `.env` to point `WEATHER_API_URL` and `ALPACA_BASE_URL` at your real devices (see §6/§7), and configure N.I.N.A.'s InfluxDB Exporter plugin per §8. Grafana at `http://<host>:3000` will already have all six data sources and the full dashboard provisioned - no manual data-source setup or dashboard import needed.
 
 ---
 
@@ -90,10 +95,12 @@ The original design used one bucket (`battery_metrics`) for everything. Extendin
   | `weather` | LAN weather station (60s interval) | 730d | Same reasoning as power |
   | `observatory` | Roof shutter/slew/home/connected state | 730d | Same reasoning as power |
   | `imaging` | N.I.N.A. equipment + per-frame stats | infinite | Low volume, this *is* your session log |
+  | `network` | Ping health (internet + Tailscale reachability/latency) | 90d | Operational signal you care about recently, not a dataset worth 2 years of storage |
+  | `starlink` | Dish power draw + alerts via its local gRPC API | 180d | Worth a longer look-back than raw ping health for spotting power/alert trends, but still not a session log |
 
   Retention is only set at creation time - change it later with `influx bucket update --retention <duration>`.
 
-- **One telegraf agent, four outputs.** Rather than running separate telegraf containers per domain, `telegraf.conf` has one `[[outputs.influxdb_v2]]` block per bucket, each scoped with `namepass` to the measurements that belong there. This keeps the "one collector" mental model while still getting bucket-level retention isolation.
+- **One telegraf agent, six outputs.** Rather than running separate telegraf containers per domain, `telegraf.conf` has one `[[outputs.influxdb_v2]]` block per bucket, each scoped with `namepass` to the measurements that belong there. This keeps the "one collector" mental model while still getting bucket-level retention isolation.
 
 - **Shared admin token.** All four outputs (and the Grafana data sources) currently use the same all-access `INFLUXDB_ADMIN_TOKEN`. That's fine for a single-host hobby system; if you ever expose InfluxDB beyond your LAN, consider `influx auth create` with per-bucket read/write scopes instead.
 
@@ -184,7 +191,7 @@ Runs InfluxDB v2, Grafana, and Telegraf with serial bus access. `influxdb` has a
 
 `telegraf` is built from `docker/telegraf/Dockerfile` rather than using the stock `telegraf:latest` image directly: the stock image is Debian-based and has no Python interpreter, but `inputs.exec` needs `python3` to run `read_vedirect.py`. The Dockerfile installs `python3` and `python3-serial` (pyserial) via `apt`, so no internet/pip access is needed inside the container at runtime.
 
-`grafana` mounts `./grafana/provisioning` read-only, which auto-configures all four data sources and the dashboard on startup - no manual Grafana UI setup required.
+`grafana` mounts `./grafana/provisioning` read-only, which auto-configures all six data sources and the dashboard on startup - no manual Grafana UI setup required.
 
 Bring the stack up directly (bypassing `deploy.sh`) with:
 
@@ -197,7 +204,7 @@ docker compose up -d
 
 ## 7. Telegraf Configuration (`telegraf.conf`)
 
-One telegraf agent, four `[[outputs.influxdb_v2]]` blocks (one per bucket, each restricted via `namepass` - see §3), and inputs grouped by domain.
+One telegraf agent, six `[[outputs.influxdb_v2]]` blocks (one per bucket, each restricted via `namepass` - see §3), and inputs grouped by domain.
 
 ### Power: Victron SmartShunt (VE.Direct) + Eco-Worthy MPPT (Modbus RTU)
 Unchanged from the original design: `inputs.exec` runs `read_vedirect.py` for the Victron shunt's text protocol, `inputs.modbus` polls the Eco-Worthy controller's holding registers directly (no custom script needed there - telegraf's modbus plugin is enough).
@@ -217,6 +224,38 @@ Three `[[inputs.http]]` blocks poll the standardized Alpaca dome REST endpoints 
 **`shutterstatus` reports Error (4) whenever the roof is stopped partway open, not just on a real fault** - ASCOM's `ShutterState` enum has no value for "partially open", so this driver (Dark Dragons Astronomy's DragonLAIR) falls back to `Error`. A fourth `[[inputs.http]]` block polls the controller's own non-Alpaca `$DRAGONLAIR_STATUS_URL` (`/status`) for a `roof_state` string field (`open`/`closed`/`opening`/`closing`/`partially_open`) plus `safety_monitor_safe`/`weather_locked`/voltage/current, so Grafana can tell a genuinely stuck/errored roof apart from one that's simply half open. This endpoint is vendor-specific and undocumented (reverse-engineered from the controller's own web UI), unlike the versioned Alpaca spec above, so if you're running a different roof/dome controller this block won't apply and can be deleted. `roof_controller_voltage_raw`/`_current_raw` units are unconfirmed (named `_raw` rather than assuming volts/amps) - verify against a multimeter before trusting them in an alert.
 
 Since `ALPACA_BASE_URL` (and `DRAGONLAIR_STATUS_URL`, same host) is typically a `.local` mDNS hostname and telegraf's static Go binary can't resolve those via NSS, the telegraf container runs with `network_mode: host` and a small background script (`docker/telegraf/refresh-mdns-hosts.sh`) keeps `/etc/hosts` updated via active mDNS queries - see comments in `docker/telegraf/Dockerfile` for the full rationale.
+
+### Network: periodic ping health check, via `scripts/read_ping.py`
+```toml
+[[inputs.exec]]
+  commands = [["python3", "/scripts/read_ping.py"]]
+  interval = "60s"
+  timeout = "20s"
+  data_format = "influx"
+```
+Pings a comma-separated, user-configurable host list from `.env` (`PING_TARGETS_INTERNET`, `PING_TARGETS_TAILSCALE` - e.g. `1.1.1.1,8.8.8.8,google.com` and `octopi`), 3 packets per host every 60s, and emits Influx line protocol shaped like telegraf's own `inputs.ping` plugin (same field names, and `result_code` matching the ping subprocess's own exit code: 0 = replies received, 1 = no reply, 2 = local error such as an unresolvable host). Each host is tagged `network="internet"` or `network="tailscale"` so a downed Tailscale peer doesn't read as "the internet is down" on the dashboard.
+
+This goes through a script rather than `inputs.ping` directly because the host list is variable-length and lives in `.env` - telegraf can substitute an env var *inside* a quoted TOML array element (`urls = ["$HOST"]`, confirmed via `telegraf --test`), but under the strict environment-variable handling that's been the default since telegraf 1.38, it can't expand a single variable into a variable *number* of array elements. Turning that off (`--non-strict-env-handling`) would apply to telegraf's entire config, silently weakening typo-checking everywhere else in `telegraf.conf` - not worth it for one input. Pings run in parallel (one thread per host), so wall-clock time stays roughly one ping-count's worth regardless of how many hosts are configured, and total traffic is a handful of ICMP packets a minute.
+
+### Starlink: dish power/alerts via its local gRPC API, via `scripts/read_starlink.py`
+```toml
+[[inputs.exec]]
+  commands = [["python3", "/scripts/read_starlink.py"]]
+  interval = "60s"
+  timeout = "15s"
+  data_format = "influx"
+```
+The dish exposes a local gRPC API at `192.168.100.1:9200` (override with `STARLINK_DISH_ADDR` in `.env`) - the same one the Starlink mobile app talks to. `read_starlink.py` wraps the vendored `docker/telegraf/third_party/starlink_grpc.py` (from [sparky8512/starlink-grpc-tools](https://github.com/sparky8512/starlink-grpc-tools), public domain) to pull:
+
+- **Status**: link state, uptime, pop ping latency, downlink/uplink throughput, obstruction fraction, GPS satellite count.
+- **Alerts** (the "events"): all ~20 boolean alert flags the dish reports (thermal throttle, roaming, mast not vertical, water detected, etc.), plus a derived `alert_active` field that's true if any of them are, so Grafana doesn't need to OR twenty booleans together for a single "something's wrong" tile.
+- **Power**: latest/mean/min/max watts and energy (Wh) over the last `STARLINK_POLL_INTERVAL_S` seconds (default 60, should match this block's `interval`) - the dish keeps a rolling buffer of 1-second power samples internally; this is the same data source as the app's own Power tab. Also pulls download/upload bytes over that same window as a low-cost bonus field.
+
+**Why vendored rather than pip-installed**: `starlink_grpc.py` isn't on PyPI. It's committed as a file (`docker/telegraf/third_party/starlink_grpc.py`) rather than fetched from GitHub at Docker build time, so a build never depends on GitHub being reachable or unchanged - same reasoning as vendoring `waveshare_epd` for the e-paper display (§10), just via a straight file commit instead of a install-time git clone, since this is one file rather than a whole driver repo. It talks to the dish via gRPC server reflection (the `yagrc` package) rather than pregenerated SpaceX protobuf stubs, so no `.proto` files are needed either.
+
+`grpcio`/`grpcio-reflection`/`protobuf`/`yagrc` are installed via pip in the Dockerfile (`docker/telegraf/requirements-starlink.txt`), not apt like `python3-serial` above - confirmed by testing both paths against a real dish: Debian bookworm's `python3-grpcio` (1.51.1) is old enough that `yagrc` pulls in a newer `grpcio`/`protobuf` to satisfy its own version constraints anyway, so apt's copies end up unused regardless. All four have prebuilt `aarch64` wheels, so this doesn't need a compiler in the image.
+
+**Only reachable if the Pi is on the dish's own LAN** (plugged into the Starlink router/dish, not some other router downstream) - `read_starlink.py` will just time out and telegraf will log an exec error otherwise.
 
 ### Imaging: nothing in telegraf
 N.I.N.A.'s own plugin writes to InfluxDB directly - see §8.
@@ -244,12 +283,14 @@ Metrics the plugin can produce (only for connected equipment / `LIGHT` frames): 
 
 ## 9. Grafana Dashboard
 
-`grafana/provisioning/dashboards/solar-observatory.json` is provisioned automatically on Grafana startup (`http://<host>:3000`, default admin credentials from `.env`) - no manual data source setup or dashboard import needed. It's organized into four row sections matching the buckets:
+`grafana/provisioning/dashboards/solar-observatory.json` is provisioned automatically on Grafana startup (`http://<host>:3000`, default admin credentials from `.env`) - no manual data source setup or dashboard import needed. It's organized into six row sections matching the buckets:
 
 - **Power** - battery SOC gauge, time-to-go, controller temp, consumed Ah, battery voltage, battery/charging current, net vs. solar power, PV voltage/current.
 - **Weather** - current conditions (temp/humidity/wind/pressure) plus trends for temperature, humidity, wind speed/gust, rain accumulation, solar radiation/UV.
 - **Observatory** - roof shutter status (color-coded stat + history state-timeline), slewing/at-home/connected indicators.
 - **Imaging** - camera/focuser/cooler status, HFR and star-count trends, guiding RMS, sun/moon altitude, and a recent-frames table.
+- **Network** - packet loss % and latency stat tiles for internet/Tailscale, plus per-host latency and packet-loss-over-time trends.
+- **Starlink** - dish state, alert status, power draw, and obstruction % stat tiles, power-over-time and dish-reported latency trends, and a per-alert-flag timeline.
 
 `solar-observatory.json` is hand-edited directly - there's no generator. An earlier version of this dashboard was built by a `grafana/generate_dashboard.py` script (grid math, ids, and fieldConfig boilerplate via small panel helpers), but that made the JSON file a derived artifact, at odds with also allowing UI edits (below): regenerating and recommitting would silently discard anything changed in the UI since the last run.
 

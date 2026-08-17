@@ -5,8 +5,19 @@ FROM telegraf:latest
 # stream. python3-serial (pyserial) is installed via apt so the container
 # has no external network/pip dependency at runtime.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 python3-serial \
+    && apt-get install -y --no-install-recommends python3 python3-serial python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+# Starlink: scripts/read_starlink.py talks to the dish's local gRPC API via
+# the vendored starlink_grpc.py (see third_party/starlink_grpc.py for why it's
+# committed rather than fetched at build time) and its grpcio/protobuf/yagrc
+# deps (requirements-starlink.txt) - pip rather than apt, see that file for
+# why. --break-system-packages overrides Debian's PEP 668 guard against
+# pip writes to the system interpreter; fine here since this container runs
+# nothing else Python-based that pip could conflict with.
+COPY third_party/starlink_grpc.py requirements-starlink.txt /opt/starlink/
+ENV PYTHONPATH=/opt/starlink
+RUN pip3 install --no-cache-dir --break-system-packages -r /opt/starlink/requirements-starlink.txt
 
 # ALPACA_BASE_URL (roof controller) is a .local mDNS hostname, not a static
 # IP, since it's a safety-relevant reading (roof/shutter state) and a

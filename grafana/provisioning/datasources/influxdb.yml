@@ -52,3 +52,27 @@ datasources:
       defaultBucket: $INFLUXDB_BUCKET_IMAGING
     secureJsonData:
       token: $INFLUXDB_ADMIN_TOKEN
+
+  - name: Network
+    uid: influxdb-network
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: $INFLUXDB_ORG
+      defaultBucket: $INFLUXDB_BUCKET_NETWORK
+    secureJsonData:
+      token: $INFLUXDB_ADMIN_TOKEN
+
+  - name: Starlink
+    uid: influxdb-starlink
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    jsonData:
+      version: Flux
+      organization: $INFLUXDB_ORG
+      defaultBucket: $INFLUXDB_BUCKET_STARLINK
+    secureJsonData:
+      token: $INFLUXDB_ADMIN_TOKEN

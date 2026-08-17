@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # End-to-end deployment: installs Docker itself, generates secrets, installs
 # host-level udev rules, builds/starts the Docker stack, waits for InfluxDB
-# to be healthy, creates the weather/observatory/imaging buckets, installs
+# to be healthy, creates the weather/observatory/imaging/network/starlink buckets, installs
 # the host-level e-paper Python deps (SPI + venv + waveshare_epd driver) and
 # systemd service, then installs the host-level charge-cutoff relay's Python
 # deps and (once CHARGE_CUTOFF_GPIO_PIN is set in .env) its systemd service.
@@ -29,6 +29,8 @@ INFLUXDB_BUCKET_POWER=power
 INFLUXDB_BUCKET_WEATHER=weather
 INFLUXDB_BUCKET_OBSERVATORY=observatory
 INFLUXDB_BUCKET_IMAGING=imaging
+INFLUXDB_BUCKET_NETWORK=network
+INFLUXDB_BUCKET_STARLINK=starlink
 
 GRAFANA_ADMIN_USER=admin
 GRAFANA_ADMIN_PASSWORD=$(openssl rand -base64 24)
@@ -40,6 +42,11 @@ WEATHER_API_URL=http://weather-station.local/v1/current
 WEATHER_STATION_NAME=primary
 ALPACA_BASE_URL=http://roof-controller.local:11111/api/v1/dome/0
 ALPACA_DOME_DEVICE_NUMBER=0
+
+# EDIT to your own ping targets (comma-separated) - see .env.example for
+# details. Left at these defaults, network health still works out of the box.
+PING_TARGETS_INTERNET=1.1.1.1,8.8.8.8,google.com
+PING_TARGETS_TAILSCALE=
 EOF
   chmod 600 .env
   echo "Review ${REPO_DIR}/.env - in particular, fill in the real WEATHER_API_URL and ALPACA_BASE_URL."
@@ -65,7 +72,7 @@ if [[ "$status" != "healthy" ]]; then
   exit 1
 fi
 
-# 6. Create the weather/observatory/imaging buckets (idempotent)
+# 6. Create the weather/observatory/imaging/network/starlink buckets (idempotent)
 "${REPO_DIR}/scripts/init-influx-buckets.sh"
 
 # 7. Host-level e-paper Python deps (SPI, venv, waveshare_epd driver)

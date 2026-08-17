@@ -1,0 +1,10 @@
+# Deps for vendor/starlink_grpc.py (scripts/read_starlink.py). Installed via
+# pip, not apt, because Debian's python3-grpcio (1.51.1) is old enough that
+# yagrc pulls in a newer grpcio/protobuf anyway to satisfy its own version
+# constraints - confirmed by testing both paths against the real dish, apt
+# then pip ends up re-downloading its own copies regardless. All four have
+# prebuilt aarch64 wheels, so this doesn't need a compiler in the image.
+grpcio>=1.83
+grpcio-reflection>=1.83
+protobuf>=7.35
+yagrc>=1.1.3
