@@ -7678,24 +7678,24 @@
           },
           "mappings": [
             {
-              "type": "special",
               "options": {
                 "match": "true",
                 "result": {
                   "color": "red",
                   "text": "UNDER-VOLTAGE"
                 }
-              }
+              },
+              "type": "special"
             },
             {
-              "type": "special",
               "options": {
                 "match": "false",
                 "result": {
                   "color": "green",
                   "text": "OK"
                 }
-              }
+              },
+              "type": "special"
             }
           ],
           "thresholds": {
@@ -7829,6 +7829,14 @@
               {
                 "id": "displayName",
                 "value": "total power (W)"
+              },
+              {
+                "id": "unit",
+                "value": "watt"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
               }
             ]
           }
@@ -7906,24 +7914,24 @@
           },
           "mappings": [
             {
-              "type": "special",
               "options": {
                 "match": "true",
                 "result": {
                   "color": "red",
                   "text": "Active"
                 }
-              }
+              },
+              "type": "special"
             },
             {
-              "type": "special",
               "options": {
                 "match": "false",
                 "result": {
                   "color": "green",
                   "text": "OK"
                 }
-              }
+              },
+              "type": "special"
             }
           ],
           "thresholds": {
@@ -8087,5 +8095,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 74
+  "version": 75
 }
