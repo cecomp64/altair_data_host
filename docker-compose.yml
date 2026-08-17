@@ -29,6 +29,13 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      # Without this, Grafana defaults to "localhost" for any link it
+      # generates (alert notification "Source"/"Silence" links, share
+      # links, etc.) - fine from the Pi itself, useless from a phone
+      # opening those links from a Discord notification. GRAFANA_ROOT_URL
+      # in .env is host-specific (Tailscale hostname, LAN IP, whatever's
+      # actually reachable from where you'll be reading notifications).
+      - GF_SERVER_ROOT_URL=${GRAFANA_ROOT_URL}
     env_file:
       - .env
     volumes:
@@ -53,6 +60,23 @@ services:
     network_mode: host
     env_file:
       - .env
+    # SYSTEM row (telegraf.conf): inputs.cpu/mem/disk/temp/system read via
+    # gopsutil, which reports the *container's* view of /proc, /sys, and
+    # mounted filesystems by default - meaningless for host health under
+    # Docker (a container has its own overlay disk, and without cgroup
+    # limits set here its cpu/mem numbers happen to approximate the host,
+    # but that's incidental, not guaranteed). The standard telegraf fix is
+    # this read-only host-root bind mount plus HOST_PROC/HOST_SYS/
+    # HOST_MOUNT_PREFIX, which gopsutil honors to report the real host
+    # instead - confirmed against `df`/`vcgencmd`-equivalent host values
+    # during setup. Read-only, and this container is already
+    # privileged:true with /dev mounted, so this doesn't meaningfully
+    # change its trust boundary.
+    environment:
+      - HOST_PROC=/hostfs/proc
+      - HOST_SYS=/hostfs/sys
+      - HOST_ETC=/hostfs/etc
+      - HOST_MOUNT_PREFIX=/hostfs
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - ./scripts/read_vedirect.py:/scripts/read_vedirect.py:ro
@@ -60,6 +84,7 @@ services:
       - ./scripts/read_ping.py:/scripts/read_ping.py:ro
       - ./scripts/read_starlink.py:/scripts/read_starlink.py:ro
       - /dev:/dev
+      - /:/hostfs:ro
     depends_on:
       influxdb:
         condition: service_healthy

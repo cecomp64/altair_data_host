@@ -36,7 +36,9 @@ altair_data_host/
 │   ├── install-epaper-service.sh          # host: systemd unit for the e-paper display
 │   ├── install-charge-cutoff-deps.sh      # host: venv + gpio-group membership for the charge-cutoff relay
 │   ├── install-charge-cutoff-service.sh   # host: systemd unit for the charge-cutoff relay
-│   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging/network/starlink buckets
+│   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging/network/starlink/system buckets
+│   ├── init-grafana-alerting.sh           # docker-aware: provisions Discord alerting, see §13
+│   ├── init_grafana_alerting.py           # the actual alerting setup logic, called by the script above
 │   ├── epaper-dashboard.service.template  # systemd unit template used above
 │   ├── charge-cutoff.service.template     # systemd unit template used above
 │   ├── read_vedirect.py                   # runs inside the telegraf container
@@ -67,19 +69,20 @@ scripts/deploy.sh
 3. Installs the persistent serial device udev rules on the host (`scripts/install-udev-rules.sh`).
 4. Builds the custom Telegraf image and brings up `influxdb`, `grafana`, and `telegraf` with `docker compose` - InfluxDB's first-run setup creates the `power` bucket at this point (`DOCKER_INFLUXDB_INIT_BUCKET` in `docker-compose.yml`).
 5. Waits for InfluxDB's healthcheck before continuing.
-6. Creates the remaining `weather`, `observatory`, and `imaging` buckets (`scripts/init-influx-buckets.sh`) - a separate step because InfluxDB's first-run setup only creates one bucket.
-7. Installs the e-paper display's host-side Python dependencies (`scripts/install-epaper-deps.sh`): enables SPI, creates a `.venv/`, and vendors + installs Waveshare's `waveshare_epd` driver (see [§10](#10-python-scripts)).
-8. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
-9. Installs the charge-cutoff relay's host-side Python dependencies (`scripts/install-charge-cutoff-deps.sh`): creates a `.venv-charge-cutoff/` and adds the invoking user to the `gpio` group (see [§12](#12-charge-cutoff-relay)).
-10. Installs and starts the `charge-cutoff` systemd service (`scripts/install-charge-cutoff-service.sh`) - **skipped** until `CHARGE_CUTOFF_GPIO_PIN` is set in `.env`, since that depends on hardware you may not have wired yet. Re-run `scripts/deploy.sh` (or just this script) once it is.
+6. Creates the remaining `weather`, `observatory`, `imaging`, `network`, `starlink`, and `system` buckets (`scripts/init-influx-buckets.sh`) - a separate step because InfluxDB's first-run setup only creates one bucket.
+7. Provisions Discord alerting (`scripts/init-grafana-alerting.sh`) - **skipped** (doesn't fail) until `DISCORD_WEBHOOK_URL` is set in `.env`, since that requires a webhook you create yourself (see [§13](#13-grafana-alerting-discord)).
+8. Installs the e-paper display's host-side Python dependencies (`scripts/install-epaper-deps.sh`): enables SPI, creates a `.venv/`, and vendors + installs Waveshare's `waveshare_epd` driver (see [§10](#10-python-scripts)).
+9. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
+10. Installs the charge-cutoff relay's host-side Python dependencies (`scripts/install-charge-cutoff-deps.sh`): creates a `.venv-charge-cutoff/` and adds the invoking user to the `gpio` group (see [§12](#12-charge-cutoff-relay)).
+11. Installs and starts the `charge-cutoff` systemd service (`scripts/install-charge-cutoff-service.sh`) - **skipped** until `CHARGE_CUTOFF_GPIO_PIN` is set in `.env`, since that depends on hardware you may not have wired yet. Re-run `scripts/deploy.sh` (or just this script) once it is.
 
 **On a genuinely fresh machine, step 1 will exit with instructions to log out and back in** (or reboot) before re-running `scripts/deploy.sh` - Linux group membership changes (needed so `docker compose` works without `sudo`) only take effect in a new login session, and there's no way around that being a one-time speed bump. Every later re-run is a no-op if Docker's already installed and usable.
 
-If step 7 enabled SPI for the first time, reboot the Pi before the e-paper display will actually work - the service will otherwise start and fail to talk to the panel until the SPI overlay is loaded.
+If step 8 enabled SPI for the first time, reboot the Pi before the e-paper display will actually work - the service will otherwise start and fail to talk to the panel until the SPI overlay is loaded.
 
 Each of these steps is also runnable standalone (e.g. to re-apply udev rules after editing them, or to add a bucket after changing the list in `init-influx-buckets.sh`).
 
-After that, edit `.env` to point `WEATHER_API_URL` and `ALPACA_BASE_URL` at your real devices (see §6/§7), and configure N.I.N.A.'s InfluxDB Exporter plugin per §8. Grafana at `http://<host>:3000` will already have all six data sources and the full dashboard provisioned - no manual data-source setup or dashboard import needed.
+After that, edit `.env` to point `WEATHER_API_URL` and `ALPACA_BASE_URL` at your real devices (see §6/§7), and configure N.I.N.A.'s InfluxDB Exporter plugin per §8. Grafana at `http://<host>:3000` will already have all seven data sources and the full dashboard provisioned - no manual data-source setup or dashboard import needed.
 
 ---
 
@@ -102,7 +105,7 @@ The original design used one bucket (`battery_metrics`) for everything. Extendin
 
 - **One telegraf agent, six outputs.** Rather than running separate telegraf containers per domain, `telegraf.conf` has one `[[outputs.influxdb_v2]]` block per bucket, each scoped with `namepass` to the measurements that belong there. This keeps the "one collector" mental model while still getting bucket-level retention isolation.
 
-- **Shared admin token.** All four outputs (and the Grafana data sources) currently use the same all-access `INFLUXDB_ADMIN_TOKEN`. That's fine for a single-host hobby system; if you ever expose InfluxDB beyond your LAN, consider `influx auth create` with per-bucket read/write scopes instead.
+- **Shared admin token.** All outputs (and the Grafana data sources) currently use the same all-access `INFLUXDB_ADMIN_TOKEN`. That's fine for a single-host hobby system; if you ever expose InfluxDB beyond your LAN, consider `influx auth create` with per-bucket read/write scopes instead.
 
 - **Cardinality stays low.** Tags are only added where there's a real identity to distinguish (`station`, `device_number`, camera/focuser/mount names from N.I.N.A., image target/filter). The solar measurements still carry no tags, which is correct for a single-shunt, single-controller system - if you ever add a second shunt, tag it (e.g. `device="house_bank"`) rather than encoding it in the measurement name.
 
@@ -112,7 +115,7 @@ The original design used one bucket (`battery_metrics`) for everything. Extendin
 
 ## 4. Secrets
 
-Credentials (InfluxDB admin user/password/token, Grafana admin user/password, all four bucket names) live in a git-ignored `.env` file at the repo root, not hardcoded in `docker-compose.yml` or `telegraf.conf`. `docker-compose.yml` interpolates them via `${VAR}`, and the `telegraf` and `grafana` services load the whole file via `env_file` so `telegraf.conf` and Grafana's datasource provisioning can reference `${INFLUXDB_ADMIN_TOKEN}` etc. directly.
+Credentials (InfluxDB admin user/password/token, Grafana admin user/password, all six bucket names, `DISCORD_WEBHOOK_URL`) live in a git-ignored `.env` file at the repo root, not hardcoded in `docker-compose.yml` or `telegraf.conf`. `docker-compose.yml` interpolates them via `${VAR}`, and the `telegraf` and `grafana` services load the whole file via `env_file` so `telegraf.conf` and Grafana's datasource provisioning can reference `${INFLUXDB_ADMIN_TOKEN}` etc. directly. `DISCORD_WEBHOOK_URL` is the one exception to that last part - Grafana's own alerting provisioner can't read it via `${VAR}` interpolation the way datasources can (see §13), so it's picked up by a setup script instead.
 
 `scripts/deploy.sh` generates a `.env` with random secrets (and placeholder device URLs you must edit) on first run. To set your own instead, copy `.env.example` to `.env` and edit it before running `deploy.sh`:
 
@@ -191,7 +194,7 @@ Runs InfluxDB v2, Grafana, and Telegraf with serial bus access. `influxdb` has a
 
 `telegraf` is built from `docker/telegraf/Dockerfile` rather than using the stock `telegraf:latest` image directly: the stock image is Debian-based and has no Python interpreter, but `inputs.exec` needs `python3` to run `read_vedirect.py`. The Dockerfile installs `python3` and `python3-serial` (pyserial) via `apt`, so no internet/pip access is needed inside the container at runtime.
 
-`grafana` mounts `./grafana/provisioning` read-only, which auto-configures all six data sources and the dashboard on startup - no manual Grafana UI setup required.
+`grafana` mounts `./grafana/provisioning` read-only, which auto-configures all seven data sources and the dashboard on startup - no manual Grafana UI setup required.
 
 Bring the stack up directly (bypassing `deploy.sh`) with:
 
@@ -257,6 +260,30 @@ The dish exposes a local gRPC API at `192.168.100.1:9200` (override with `STARLI
 
 **Only reachable if the Pi is on the dish's own LAN** (plugged into the Starlink router/dish, not some other router downstream) - `read_starlink.py` will just time out and telegraf will log an exec error otherwise.
 
+### System: the Pi's own health, via telegraf's built-in system plugins
+```toml
+[[inputs.cpu]]
+  interval = "30s"
+  percpu = false
+  totalcpu = true
+
+[[inputs.mem]]
+  interval = "30s"
+
+[[inputs.disk]]
+  interval = "30s"
+  mount_points = ["/"]
+
+[[inputs.temp]]
+  interval = "30s"
+
+[[inputs.system]]
+  interval = "30s"
+```
+Everything else in `telegraf.conf` monitors something *external* to the host; this is the one section that watches the host itself - CPU usage, memory, root filesystem usage, temperature (both the SoC's `cpu_thermal` sensor and, on a Pi 5, the RP1 southbridge's `rp1_adc` sensor - both throttle-relevant), and load average. Unlike every other section here, this uses telegraf's own built-in plugins (gopsutil-backed) rather than a custom script - there's no oddly-shaped API to work around, this is exactly what they're for.
+
+**Requires host-root visibility that a container doesn't have by default.** These plugins read `/proc`, `/sys`, and mounted filesystems - inside a container with no special configuration, that's the *container's* isolated view (its own overlay disk, not the Pi's real SD card), not the host's. `docker-compose.yml`'s `telegraf` service works around this the standard way: a read-only `/:/hostfs:ro` bind mount plus `HOST_PROC=/hostfs/proc`, `HOST_SYS=/hostfs/sys`, `HOST_MOUNT_PREFIX=/hostfs` env vars, which gopsutil honors to report the real host instead. Confirmed correct by testing directly: disk/CPU/temp values from inside the container matched `df`/`vcgencmd`-equivalent reads on the host. Read-only, and this container is already `privileged: true` with `/dev` mounted for the serial devices, so this doesn't meaningfully change its trust boundary.
+
 ### Imaging: nothing in telegraf
 N.I.N.A.'s own plugin writes to InfluxDB directly - see §8.
 
@@ -283,14 +310,15 @@ Metrics the plugin can produce (only for connected equipment / `LIGHT` frames): 
 
 ## 9. Grafana Dashboard
 
-`grafana/provisioning/dashboards/solar-observatory.json` is provisioned automatically on Grafana startup (`http://<host>:3000`, default admin credentials from `.env`) - no manual data source setup or dashboard import needed. It's organized into six row sections matching the buckets:
+`grafana/provisioning/dashboards/solar-observatory.json` is provisioned automatically on Grafana startup (`http://<host>:3000`, default admin credentials from `.env`) - no manual data source setup or dashboard import needed. It's organized into seven row sections matching the buckets:
 
 - **Power** - battery SOC gauge, time-to-go, controller temp, consumed Ah, battery voltage, battery/charging current, net vs. solar power, PV voltage/current.
 - **Weather** - current conditions (temp/humidity/wind/pressure) plus trends for temperature, humidity, wind speed/gust, rain accumulation, solar radiation/UV.
 - **Observatory** - roof shutter status (color-coded stat + history state-timeline), slewing/at-home/connected indicators.
 - **Imaging** - camera/focuser/cooler status, HFR and star-count trends, guiding RMS, sun/moon altitude, and a recent-frames table.
 - **Network** - packet loss % and latency stat tiles for internet/Tailscale, plus per-host latency and packet-loss-over-time trends.
-- **Starlink** - dish state, alert status, power draw, and obstruction % stat tiles, power-over-time and dish-reported latency trends, and a per-alert-flag timeline.
+- **Starlink** - dish state, alert status, power draw, and obstruction % stat tiles, power-over-time and dish-reported latency trends, uptime/GPS satellites/throughput charts, and a per-alert-flag timeline.
+- **System** - CPU/memory/disk usage and CPU temperature stat tiles, plus CPU breakdown, temperature (both sensors), memory & disk, and load average trends.
 
 `solar-observatory.json` is hand-edited directly - there's no generator. An earlier version of this dashboard was built by a `grafana/generate_dashboard.py` script (grid math, ids, and fieldConfig boilerplate via small panel helpers), but that made the JSON file a derived artifact, at odds with also allowing UI edits (below): regenerating and recommitting would silently discard anything changed in the UI since the last run.
 
@@ -424,4 +452,31 @@ Systemd service - **skips** (doesn't fail) until `CHARGE_CUTOFF_GPIO_PIN` is set
 scripts/install-charge-cutoff-service.sh
 ```
 
-Both are already wired into `scripts/deploy.sh` (steps 8-9), so once the relay is built and `CHARGE_CUTOFF_GPIO_PIN` is set, re-running `scripts/deploy.sh` picks it up automatically.
+Both are already wired into `scripts/deploy.sh` (steps 10-11), so once the relay is built and `CHARGE_CUTOFF_GPIO_PIN` is set, re-running `scripts/deploy.sh` picks it up automatically.
+
+---
+
+## 13. Grafana Alerting (Discord)
+
+Discord notifications for five conditions: `Battery SOC Critical` (soc < 15%), `Starlink Alert Active` (any of the ~20 dish alert flags true), `Internet Fully Down` (every `PING_TARGETS_INTERNET` host at 100% packet loss), `Disk Usage Critical` (root filesystem > 90%), `CPU Temp Critical` (Pi SoC > 80°C). Each rule is a 3-node pipeline (Flux query -> `reduce` last -> `threshold`), evaluated every 1 minute, with a `for:` pending duration (2-10 minutes depending on the rule) so one noisy sample doesn't page you. Thresholds are a starting point, not tuned to your specific battery bank/hardware - see `scripts/init_grafana_alerting.py`'s `RULES` list to change them.
+
+### Why a script, not committed YAML
+
+Every other piece of Grafana config in this repo (datasources, the dashboard) is a file mounted read-only under `grafana/provisioning/`, with `$ENV_VAR` interpolated in by Grafana itself on load. Alerting resources (contact points, notification policies, alert rules) support the same `provisioning/alerting/*.yaml` file format - but Grafana has a confirmed, still-open bug where `$ENV_VAR` expansion silently doesn't happen for them ([grafana/grafana#54984](https://github.com/grafana/grafana/issues/54984), [#56437](https://github.com/grafana/grafana/issues/56437)). This isn't hypothetical: committing a `contactpoints.yaml` with `url: $DISCORD_WEBHOOK_URL` was tried first, and it didn't just fail to interpolate - Grafana **crash-looped on startup** ("could not find webhook url property in settings"), taking the whole dashboard down with it until the file was pulled back out. Confirmed against this exact deployment (Grafana 13.1.1).
+
+So instead, `scripts/init-grafana-alerting.sh` (thin bash wrapper, same shape as `init-influx-buckets.sh`: checks `.env` exists, sources it, requires `DISCORD_WEBHOOK_URL` to be set or skips without failing) calls `scripts/init_grafana_alerting.py`, which provisions the same three resources - contact point, default notification policy, alert rules - via Grafana's REST API instead. It's idempotent (GET-then-POST-or-PUT for everything, keyed by fixed `uid`s), so re-running it after changing a threshold or rotating the webhook URL is safe and is how you apply changes:
+
+```bash
+scripts/init-grafana-alerting.sh
+```
+
+**Tradeoff worth knowing**: because these are API-created rather than file-mounted, they show up as editable in the Grafana UI without this script silently overwriting UI changes the way `dashboards.yml`'s `allowUiUpdates` does for the dashboard - but they also don't self-heal from git if the `grafana_data` docker volume is ever wiped. Re-run the script after any fresh volume, the same way `init-influx-buckets.sh` needs a re-run for InfluxDB.
+
+### Setup
+
+1. Create a webhook in Discord: **Server Settings -> Integrations -> Webhooks -> New Webhook**, pick a channel, **Copy Webhook URL**.
+2. Set `DISCORD_WEBHOOK_URL` in `.env` to that URL.
+3. Set `GRAFANA_ROOT_URL` in `.env` (see [§4](#4-secrets)) to whatever's actually reachable from wherever you'll be reading notifications - a Tailscale hostname works from anywhere on your tailnet, a LAN IP only works at home. Without this, the "Source"/"Silence" links Grafana puts in each Discord notification default to `localhost`, which is useless from a phone. Confirmed by testing: unset, the links were dead; set to this deployment's Tailscale hostname (`altair-metrics-host.tail48bec.ts.net`), they resolve correctly from a phone off the home network.
+4. Run `scripts/init-grafana-alerting.sh` (or just re-run `scripts/deploy.sh`, which calls it as step 7 and skips it cleanly if `DISCORD_WEBHOOK_URL` is still unset).
+
+Validated end-to-end against the real Discord webhook during setup: created the contact point, pointed the default policy at it, and force-fired a real alert rule (`CPU Temp Critical`, by temporarily changing its threshold to `> 0` so it evaluates true) to confirm actual delivery - not just that Grafana accepted the config - then reverted the threshold back. `/api/v1/provisioning/*` proved considerably more reliable for this than Grafana 13's newer `/apis/notifications.alerting.grafana.app/v1beta1/.../test` endpoint, which returned a generic `unknown integration type` error regardless of request body shape; a real firing rule sidesteps it entirely and is arguably better proof anyway.
