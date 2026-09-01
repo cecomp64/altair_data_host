@@ -220,19 +220,26 @@ RULES = [
         "camera-offline", "Camera Offline",
         'from(bucket: "observatory")\n'
         '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
-        '  |> filter(fn: (r) => r._measurement == "camera_snapshot" and r._field == "success")\n'
-        # last() per camera first - otherwise a camera that's been failing
-        # for a while (but still has an older success=1 point inside the
-        # window) would pull min() up to 1 and mask the failure.
+        '  |> filter(fn: (r) => r._measurement == "camera_health" and r._field == "online")\n'
+        # Deliberately NOT collapsed into one series (no group()|>min() down
+        # to a single value, unlike internet-fully-down above) - keeping
+        # "camera" as a group key means Grafana evaluates and fires this
+        # rule per camera, each as its own alert instance carrying its own
+        # `camera` label, so the Discord message names which camera(s) are
+        # actually down instead of a generic "something's offline". last()
+        # per camera still matters here even though there's no min() to
+        # protect from anymore: without it, an older online=1 point earlier
+        # in the window would leave the reduce node averaging/picking
+        # ambiguously instead of evaluating the camera's actual current
+        # state.
         '  |> group(columns: ["camera"])\n'
         '  |> last()\n'
-        '  |> group()\n'
-        '  |> min()\n'
-        '  |> keep(columns: ["_time", "_value"])',
-        "influxdb-observatory", "lt", [0.5], "10m", "warning",
-        "At least one camera's last snapshot poll failed (see the Cameras row's per-camera "
-        "\"Last Snapshot Age\" tiles for which one) - read_cameras.py polls every 300s, so "
-        "this has been failing for at least two consecutive polls, not a single blip.",
+        '  |> keep(columns: ["_time", "_value", "camera"])',
+        "influxdb-observatory", "lt", [0.5], "5m", "warning",
+        "{{ $labels.camera }} failed its liveness check - read_camera_health.py polls every "
+        "60s, so this has been failing for at least several consecutive checks, not a single "
+        "blip. Keyed off camera_health (device-level liveness, not the 300s image poll) so "
+        "an outage is caught in minutes, not up to a full snapshot cycle.",
     ),
 ]
 

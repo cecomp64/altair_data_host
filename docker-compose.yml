@@ -86,6 +86,8 @@ services:
       - ./scripts/read_pi_power.py:/scripts/read_pi_power.py:ro
       - ./scripts/read_astro.py:/scripts/read_astro.py:ro
       - ./scripts/read_cameras.py:/scripts/read_cameras.py:ro
+      - ./scripts/read_camera_health.py:/scripts/read_camera_health.py:ro
+      - ./scripts/read_camera_ai.py:/scripts/read_camera_ai.py:ro
       - camera_snapshots:/snapshots
       - /dev:/dev
       - /:/hostfs:ro
