@@ -85,6 +85,8 @@ services:
       - ./scripts/read_starlink.py:/scripts/read_starlink.py:ro
       - ./scripts/read_pi_power.py:/scripts/read_pi_power.py:ro
       - ./scripts/read_astro.py:/scripts/read_astro.py:ro
+      - ./scripts/read_cameras.py:/scripts/read_cameras.py:ro
+      - camera_snapshots:/snapshots
       - /dev:/dev
       - /:/hostfs:ro
     depends_on:
@@ -92,6 +94,23 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # Serves the snapshots read_cameras.py (run inside the telegraf container
+  # above, on the same camera_snapshots volume) writes every poll, as plain
+  # static files for Grafana's "Cameras" row to <img src="..."> directly -
+  # see docker/camera-web/nginx.conf for why caching is disabled. Exposed on
+  # its own port rather than reused behind Grafana's, since the browser
+  # loads it directly, not through Grafana's server.
+  camera-web:
+    image: nginx:alpine
+    container_name: camera-web
+    ports:
+      - "${CAMERA_WEB_PORT:-8089}:80"
+    volumes:
+      - camera_snapshots:/usr/share/nginx/html:ro
+      - ./docker/camera-web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+
 volumes:
   influxdb_data:
   grafana_data:
+  camera_snapshots:

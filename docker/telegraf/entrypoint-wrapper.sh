@@ -5,6 +5,23 @@
 # normal entrypoint. See Dockerfile for why this exists.
 set -eu
 
+# The camera_snapshots volume (docker-compose.yml) is also mounted into the
+# camera-web (nginx) container at /usr/share/nginx/html - on a brand-new
+# volume, Docker seeds it from whichever image's directory content is
+# mounted there *first*, which race-wise can be nginx's default
+# index.html/50x.html rather than this container's empty /snapshots. They're
+# harmless (camera-web just serves them alongside the real *.jpg files) but
+# not real snapshots, so clear them if present. More importantly: a
+# fresh/root-seeded volume is root:root, but read_cameras.py runs as the
+# unprivileged `telegraf` user (same gosu drop the base image's own
+# entrypoint.sh does for the telegraf process itself - confirmed via `ps
+# aux` inside the container, same as the /dev/vcio_gencmd permission issue
+# in the Dockerfile above) - without this chown, every write to /snapshots
+# fails with EACCES.
+mkdir -p /snapshots
+rm -f /snapshots/index.html /snapshots/50x.html
+chown telegraf:telegraf /snapshots
+
 if [ -n "${ALPACA_BASE_URL:-}" ]; then
     ALPACA_HOST="$(python3 -c "import os,urllib.parse as u; print(u.urlparse(os.environ['ALPACA_BASE_URL']).hostname or '')")"
 else

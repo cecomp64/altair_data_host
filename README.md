@@ -16,11 +16,13 @@ altair_data_host/
 ├── 99-vcio-telegraf.rules
 ├── .env.example
 ├── docker/
-│   └── telegraf/
-│       ├── Dockerfile                   # telegraf:latest + python3/pyserial/grpcio deps
-│       ├── requirements-starlink.txt    # pip deps for read_starlink.py, see §7
-│       └── third_party/
-│           └── starlink_grpc.py         # vendored client lib, see §7
+│   ├── telegraf/
+│   │   ├── Dockerfile                   # telegraf:latest + python3/pyserial/grpcio deps
+│   │   ├── requirements-starlink.txt    # pip deps for read_starlink.py, see §7
+│   │   └── third_party/
+│   │       └── starlink_grpc.py         # vendored client lib, see §7
+│   └── camera-web/
+│       └── nginx.conf                   # serves camera_snapshots volume to Grafana's Cameras row, see §7/§9
 ├── grafana/
 │   ├── snapshot_dashboard.sh               # pulls the live dashboard (incl. UI edits) before you hand-edit it, see §9
 │   ├── dashboard_backups/                  # timestamped snapshots kept by the script above (last 5)
@@ -47,6 +49,7 @@ altair_data_host/
 │   ├── read_starlink.py                   # runs inside the telegraf container
 │   ├── read_pi_power.py                   # runs inside the telegraf container
 │   ├── read_astro.py                      # runs inside the telegraf container
+│   ├── read_cameras.py                    # runs inside the telegraf container
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
 │   ├── charge_cutoff.py                   # runs on the host (needs GPIO) - see §12
 │   ├── requirements-epaper.txt            # host-side Python deps for the e-paper script
@@ -118,7 +121,7 @@ The original design used one bucket (`battery_metrics`) for everything. Extendin
 
 ## 4. Secrets
 
-Credentials (InfluxDB admin user/password/token, Grafana admin user/password, all six bucket names, `DISCORD_WEBHOOK_URL`) live in a git-ignored `.env` file at the repo root, not hardcoded in `docker-compose.yml` or `telegraf.conf`. `docker-compose.yml` interpolates them via `${VAR}`, and the `telegraf` and `grafana` services load the whole file via `env_file` so `telegraf.conf` and Grafana's datasource provisioning can reference `${INFLUXDB_ADMIN_TOKEN}` etc. directly. `DISCORD_WEBHOOK_URL` is the one exception to that last part - Grafana's own alerting provisioner can't read it via `${VAR}` interpolation the way datasources can (see §13), so it's picked up by a setup script instead.
+Credentials (InfluxDB admin user/password/token, Grafana admin user/password, all six bucket names, `DISCORD_WEBHOOK_URL`, `REOLINK_USERNAME`/`REOLINK_PASSWORD`) live in a git-ignored `.env` file at the repo root, not hardcoded in `docker-compose.yml` or `telegraf.conf`. `docker-compose.yml` interpolates them via `${VAR}`, and the `telegraf` and `grafana` services load the whole file via `env_file` so `telegraf.conf` and Grafana's datasource provisioning can reference `${INFLUXDB_ADMIN_TOKEN}` etc. directly. `DISCORD_WEBHOOK_URL` is the one exception to that last part - Grafana's own alerting provisioner can't read it via `${VAR}` interpolation the way datasources can (see §13), so it's picked up by a setup script instead.
 
 `scripts/deploy.sh` generates a `.env` with random secrets (and placeholder device URLs you must edit) on first run. To set your own instead, copy `.env.example` to `.env` and edit it before running `deploy.sh`:
 
@@ -203,13 +206,15 @@ scripts/install-docker.sh
 On a genuinely fresh machine this will install Docker, add you to the `docker` group, then **exit 1 with instructions to log out and back in** - group membership changes don't apply to the current login session, only new ones, and there's no scriptable way around that. Re-run `scripts/deploy.sh` (or this script) after logging back in and it'll pick up cleanly.
 
 ### Docker Compose (`docker-compose.yml`)
-Runs InfluxDB v2, Grafana, and Telegraf with serial bus access. `influxdb` has a healthcheck that `grafana` and `telegraf` wait on via `depends_on: condition: service_healthy`, so neither starts hammering InfluxDB before it's actually ready to accept writes.
+Runs InfluxDB v2, Grafana, Telegraf (with serial bus access), and `camera-web`. `influxdb` has a healthcheck that `grafana` and `telegraf` wait on via `depends_on: condition: service_healthy`, so neither starts hammering InfluxDB before it's actually ready to accept writes.
 
 `telegraf` is built from `docker/telegraf/Dockerfile` rather than using the stock `telegraf:latest` image directly: the stock image is Debian-based and has no Python interpreter, but `inputs.exec` needs `python3` to run `read_vedirect.py`. The Dockerfile installs `python3` and `python3-serial` (pyserial) via `apt`, so no internet/pip access is needed inside the container at runtime.
 
 `grafana` mounts `./grafana/provisioning` read-only, which auto-configures all seven data sources and the dashboard on startup - no manual Grafana UI setup required.
 
 **Editing a `read_*.py` script requires recreating the `telegraf` container, not just saving the file.** Each script is bind-mounted individually (`./scripts/read_x.py:/scripts/read_x.py:ro`), and Docker resolves a *file* bind mount to a specific inode at container creation. An editor/tool that writes atomically (write-temp-then-rename, rather than truncate-and-overwrite-in-place) replaces that inode - the container's mount then keeps serving the old, now-unlinked file, silently, with no error anywhere. Confirmed hitting this directly: edited `read_ecowitt.py`, saw the new fields in a standalone run, but telegraf kept emitting only the old ones until `docker compose up -d --force-recreate telegraf` (a plain `docker compose restart` reuses the existing mount namespace and does **not** fix it - has to be a recreate). `docker exec telegraf stat /scripts/read_x.py` vs. `stat scripts/read_x.py` on the host - matching inode numbers confirm the mount is current.
+
+`camera-web` is a plain `nginx:alpine` container (no custom build) that serves the `camera_snapshots` named volume as static files, read-only, with caching disabled (`docker/camera-web/nginx.conf`) - see §7's Observatory section for what writes into that volume and §9 for how Grafana displays it. It's exposed on its own port (`CAMERA_WEB_PORT`, default `8089`) rather than proxied through Grafana, since the dashboard's `<img>` tags are fetched directly by the viewer's browser, not routed through Grafana's server.
 
 Bring the stack up directly (bypassing `deploy.sh`) with:
 
@@ -254,6 +259,22 @@ Three `[[inputs.http]]` blocks poll the standardized Alpaca dome REST endpoints 
 **`shutterstatus` reports Error (4) whenever the roof is stopped partway open, not just on a real fault** - ASCOM's `ShutterState` enum has no value for "partially open", so this driver (Dark Dragons Astronomy's DragonLAIR) falls back to `Error`. A fourth `[[inputs.http]]` block polls the controller's own non-Alpaca `$DRAGONLAIR_STATUS_URL` (`/status`) for a `roof_state` string field (`open`/`closed`/`opening`/`closing`/`partially_open`) plus `safety_monitor_safe`/`weather_locked`/voltage/current, so Grafana can tell a genuinely stuck/errored roof apart from one that's simply half open. This endpoint is vendor-specific and undocumented (reverse-engineered from the controller's own web UI), unlike the versioned Alpaca spec above, so if you're running a different roof/dome controller this block won't apply and can be deleted. `roof_controller_voltage_raw`/`_current_raw` units are unconfirmed (named `_raw` rather than assuming volts/amps) - verify against a multimeter before trusting them in an alert.
 
 Since `ALPACA_BASE_URL` (and `DRAGONLAIR_STATUS_URL`, same host) is typically a `.local` mDNS hostname and telegraf's static Go binary can't resolve those via NSS, the telegraf container runs with `network_mode: host` and a small background script (`docker/telegraf/refresh-mdns-hosts.sh`) keeps `/etc/hosts` updated via active mDNS queries - see comments in `docker/telegraf/Dockerfile` for the full rationale.
+
+**Camera snapshots, via `scripts/read_cameras.py`:**
+```toml
+[[inputs.exec]]
+  commands = [["python3", "/scripts/read_cameras.py"]]
+  interval = "300s"
+  timeout = "30s"
+  data_format = "influx"
+```
+Polls three Reolink cameras' local HTTPS API (`CAMERA_POLE_SOUTH`, `CAMERA_OBS_WEST`, `CAMERA_OBS_EAST` in `.env`, authenticated via `REOLINK_USERNAME`/`REOLINK_PASSWORD`) for a JPEG still via Reolink's `Snap` CGI command - the same call each camera's own web UI makes for its live preview. `CAMERA_POLE_SOUTH` is a dual-lens camera (one IP, two channels), so it contributes two frames, `pole_south_ptz` and `pole_south_pano`; which channel is which isn't discoverable from the API, so it's configurable (`CAMERA_POLE_SOUTH_PTZ_CHANNEL`/`_PANO_CHANNEL`, default `1`/`0` - confirmed against this repo's own camera by comparing the two saved frames, flip them if yours come out swapped).
+
+Each frame is written atomically to the `camera_snapshots` docker volume (shared with the `camera-web` container, §6) as `<name>.jpg`, overwritten in place every poll. The line protocol emitted here is deliberately *not* the image itself - InfluxDB is a time-series store, not a blob store - just `camera_snapshot,camera=<name> success=<0|1>i,bytes=<n>i,fetch_ms=<n>i` per camera, enough for the "Last Snapshot Age" stat tiles and a Discord alert on a camera going offline (§13) without touching the images at all. All three cameras use self-signed certs (no CA chain), so TLS verification is disabled the same way `curl -k`/each camera's own mobile app would - there's no cert to pin without hardcoding a fingerprint that would break the moment a camera's firmware regenerates it.
+
+One camera timing out doesn't blank the others: `read_cameras.py` still emits `success=0` lines for the failed camera(s) and exits 0 (so telegraf doesn't drop the whole batch) as long as at least one camera succeeded.
+
+**Why 300s, not 60s - measured, not guessed.** A one-off `curl -w '%{size_download} %{time_total}'` against each camera's real `Snap` endpoint gave `pole_south_ptz` 834KB/0.63s, `pole_south_pano` 1139KB/0.65s, `obs_west` 572KB/1.03s, `obs_east` 523KB/0.93s - ~3.07MB total per poll. `ip route`/`ping` (single hop, `ttl=64`, sub-millisecond to the wired two) confirmed this never leaves the LAN - it doesn't touch the Starlink WAN link or Tailscale - so it's not competing with anything metered. But `CAMERA_POLE_SOUTH`'s `GetLocalLink` API (`cmd=GetLocalLink`) reports `"activeLink": "Wifi"`, while `CAMERA_OBS_WEST`/`_EAST` both report `"LAN"` (wired) - `CAMERA_POLE_SOUTH` is the solar/battery pole camera, so its two frames (~1.97MB of the ~3.07MB total) are also a WiFi radio TX burst on a power-constrained device every poll, not just bytes on a switch. At 60s that's ~4.4GB/day; at 300s, ~885MB/day and a fifth as many WiFi bursts - a dashboard still-frame doesn't need 1-minute currency, so this trades imperceptible staleness for a real reduction on the one camera where polling has a power cost, not just a bandwidth one.
 
 ### Network: periodic ping health check, via `scripts/read_ping.py`
 ```toml
@@ -361,6 +382,7 @@ Metrics the plugin can produce (only for connected equipment / `LIGHT` frames): 
 - **Network** - packet loss % and latency stat tiles for internet/Tailscale, plus per-host latency and packet-loss-over-time trends.
 - **Starlink** - dish state, alert status, power draw, and obstruction % stat tiles, power-over-time and dish-reported latency trends, uptime/GPS satellites/throughput charts, and a per-alert-flag timeline.
 - **System** - CPU/memory/disk usage and CPU temperature stat tiles, plus CPU breakdown, temperature (both sensors), memory & disk, and load average trends; 5V input voltage, total power draw, and under-voltage status tiles, plus a voltage/power trend and an under-voltage/throttle event timeline.
+- **Cameras** - a live still from each of the four camera feeds (`pole_south_ptz`/`pole_south_pano`, `obs_west`, `obs_east`), plus a "Last Snapshot Age" stat tile per camera (green under 10 minutes, red at 15+ - two missed 300s polls; thresholds are multiples of the polling interval, §7, so keep them in sync if that changes). Unlike every other row, these panels don't query InfluxDB for the images themselves (§7 covers why) - they're built-in `text` panels in HTML mode, `<img src="${camera_web_url}/<name>.jpg">` pointed at the `camera-web` container. `camera_web_url` is a dashboard variable (Dashboard settings > Variables) rather than hardcoded per panel, defaulting to `GRAFANA_ROOT_URL`'s host on `CAMERA_WEB_PORT` - edit it there if either changes. Only the age tiles' queries hit InfluxDB (`camera_snapshot` measurement, `observatory` bucket).
 
 `solar-observatory.json` is hand-edited directly - there's no generator. An earlier version of this dashboard was built by a `grafana/generate_dashboard.py` script (grid math, ids, and fieldConfig boilerplate via small panel helpers), but that made the JSON file a derived artifact, at odds with also allowing UI edits (below): regenerating and recommitting would silently discard anything changed in the UI since the last run.
 
@@ -500,7 +522,7 @@ Both are already wired into `scripts/deploy.sh` (steps 10-11), so once the relay
 
 ## 13. Grafana Alerting (Discord)
 
-Discord notifications for six conditions: `Battery SOC Critical` (soc < 15%), `Starlink Alert Active` (any of the ~20 dish alert flags true), `Internet Fully Down` (every `PING_TARGETS_INTERNET` host at 100% packet loss), `Disk Usage Critical` (root filesystem > 90%), `Pi Under-Voltage` (vcgencmd's under-voltage-now flag), `CPU Temp Critical` (Pi SoC > 80°C). Each rule is a 3-node pipeline (Flux query -> `reduce` last -> `threshold`), evaluated every 1 minute, with a `for:` pending duration (2-10 minutes depending on the rule) so one noisy sample doesn't page you. Thresholds are a starting point, not tuned to your specific battery bank/hardware - see `scripts/init_grafana_alerting.py`'s `RULES` list to change them.
+Discord notifications for seven conditions: `Battery SOC Critical` (soc < 15%), `Starlink Alert Active` (any of the ~20 dish alert flags true), `Internet Fully Down` (every `PING_TARGETS_INTERNET` host at 100% packet loss), `Disk Usage Critical` (root filesystem > 90%), `Pi Under-Voltage` (vcgencmd's under-voltage-now flag), `CPU Temp Critical` (Pi SoC > 80°C), `Camera Offline` (any camera's last snapshot poll failed). Each rule is a 3-node pipeline (Flux query -> `reduce` last -> `threshold`), evaluated every 1 minute, with a `for:` pending duration (2-10 minutes depending on the rule) so one noisy sample doesn't page you. `Camera Offline` groups by `camera` and takes the min of each camera's last `success` value before reducing, rather than the plain `last()` every other rule uses - see the comment in `scripts/init_grafana_alerting.py`'s `RULES` list for why (a stale success=1 point still inside the query window would otherwise mask a currently-failing camera). Thresholds are a starting point, not tuned to your specific battery bank/hardware - see `scripts/init_grafana_alerting.py`'s `RULES` list to change them.
 
 ### Why a script, not committed YAML
 

@@ -8694,6 +8694,379 @@
       ],
       "title": "Under-voltage / Throttle Events",
       "type": "state-timeline"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 254
+      },
+      "id": 112,
+      "panels": [],
+      "title": "Cameras",
+      "type": "row"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 255
+      },
+      "id": 113,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/pole_south_ptz.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Pole South - PTZ",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 6,
+        "y": 255
+      },
+      "id": 114,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/pole_south_pano.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Pole South - Panoramic",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 12,
+        "y": 255
+      },
+      "id": 115,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/obs_west.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Observatory West",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 18,
+        "y": 255
+      },
+      "id": 116,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/obs_east.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Observatory East",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 265
+      },
+      "id": 117,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"pole_south_ptz\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Pole South - PTZ - Last Snapshot Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 265
+      },
+      "id": 118,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"pole_south_pano\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Pole South - Panoramic - Last Snapshot Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 265
+      },
+      "id": 119,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"obs_west\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Observatory West - Last Snapshot Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 265
+      },
+      "id": 120,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"obs_east\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Observatory East - Last Snapshot Age",
+      "type": "stat"
     }
   ],
   "preload": false,
@@ -8708,6 +9081,22 @@
     "starlink",
     "system"
   ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "http://altair-metrics-host.tail48bec.ts.net:8089",
+          "value": "http://altair-metrics-host.tail48bec.ts.net:8089"
+        },
+        "description": "Base URL camera-web (docker-compose.yml) serves snapshots on - same host as GRAFANA_ROOT_URL, CAMERA_WEB_PORT instead of 3000. Edit here (dashboard settings > Variables) rather than per-panel if it ever changes.",
+        "label": "Camera snapshot server",
+        "name": "camera_web_url",
+        "options": [],
+        "query": "http://altair-metrics-host.tail48bec.ts.net:8089",
+        "type": "textbox"
+      }
+    ]
+  },
   "time": {
     "from": "now-24h",
     "to": "now"
@@ -8729,5 +9118,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 91
+  "version": 93
 }

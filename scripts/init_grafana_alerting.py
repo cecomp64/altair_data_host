@@ -216,6 +216,24 @@ RULES = [
         "influxdb-system", "gt", [80], "5m", "warning",
         "Pi SoC temperature is above 80C - approaching thermal throttling.",
     ),
+    rule(
+        "camera-offline", "Camera Offline",
+        'from(bucket: "observatory")\n'
+        '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
+        '  |> filter(fn: (r) => r._measurement == "camera_snapshot" and r._field == "success")\n'
+        # last() per camera first - otherwise a camera that's been failing
+        # for a while (but still has an older success=1 point inside the
+        # window) would pull min() up to 1 and mask the failure.
+        '  |> group(columns: ["camera"])\n'
+        '  |> last()\n'
+        '  |> group()\n'
+        '  |> min()\n'
+        '  |> keep(columns: ["_time", "_value"])',
+        "influxdb-observatory", "lt", [0.5], "10m", "warning",
+        "At least one camera's last snapshot poll failed (see the Cameras row's per-camera "
+        "\"Last Snapshot Age\" tiles for which one) - read_cameras.py polls every 300s, so "
+        "this has been failing for at least two consecutive polls, not a single blip.",
+    ),
 ]
 
 
