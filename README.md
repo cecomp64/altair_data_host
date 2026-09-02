@@ -39,11 +39,14 @@ altair_data_host/
 │   ├── install-epaper-service.sh          # host: systemd unit for the e-paper display
 │   ├── install-charge-cutoff-deps.sh      # host: venv + gpio-group membership for the charge-cutoff relay
 │   ├── install-charge-cutoff-service.sh   # host: systemd unit for the charge-cutoff relay
+│   ├── install-fan-control-deps.sh        # host: venv + gpio-group membership for the fan controller
+│   ├── install-fan-control-service.sh     # host: systemd unit for the fan controller
 │   ├── init-influx-buckets.sh             # docker-aware: creates weather/observatory/imaging/network/starlink/system buckets
 │   ├── init-grafana-alerting.sh           # docker-aware: provisions Discord alerting, see §13
 │   ├── init_grafana_alerting.py           # the actual alerting setup logic, called by the script above
 │   ├── epaper-dashboard.service.template  # systemd unit template used above
 │   ├── charge-cutoff.service.template     # systemd unit template used above
+│   ├── fan-control.service.template       # systemd unit template used above
 │   ├── read_vedirect.py                   # runs inside the telegraf container
 │   ├── read_ping.py                       # runs inside the telegraf container
 │   ├── read_starlink.py                   # runs inside the telegraf container
@@ -54,8 +57,10 @@ altair_data_host/
 │   ├── read_camera_ai.py                  # runs inside the telegraf container
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
 │   ├── charge_cutoff.py                   # runs on the host (needs GPIO) - see §12
+│   ├── fan_control.py                     # runs on the host (needs GPIO) - see §14
 │   ├── requirements-epaper.txt            # host-side Python deps for the e-paper script
-│   └── requirements-charge-cutoff.txt     # host-side Python deps for the charge-cutoff script
+│   ├── requirements-charge-cutoff.txt     # host-side Python deps for the charge-cutoff script
+│   └── requirements-fan-control.txt       # host-side Python deps for the fan controller
 ├── vendor/                                # gitignored - waveshare-epaper cloned here by install-epaper-deps.sh
 └── README.md
 ```
@@ -83,6 +88,8 @@ scripts/deploy.sh
 9. Installs and starts the `epaper-dashboard` systemd service on the host (`scripts/install-epaper-service.sh`).
 10. Installs the charge-cutoff relay's host-side Python dependencies (`scripts/install-charge-cutoff-deps.sh`): creates a `.venv-charge-cutoff/` and adds the invoking user to the `gpio` group (see [§12](#12-charge-cutoff-relay)).
 11. Installs and starts the `charge-cutoff` systemd service (`scripts/install-charge-cutoff-service.sh`) - **skipped** until `CHARGE_CUTOFF_GPIO_PIN` is set in `.env`, since that depends on hardware you may not have wired yet. Re-run `scripts/deploy.sh` (or just this script) once it is.
+12. Installs the fan controller's host-side Python dependencies (`scripts/install-fan-control-deps.sh`): creates a `.venv-fan-control/` and adds the invoking user to the `gpio` group (see [§14](#14-fan-control)).
+13. Installs and starts the `fan-control` systemd service (`scripts/install-fan-control-service.sh`) - **skipped** until `FAN_CONTROL_GPIO_PIN` is set in `.env`, since that depends on hardware you may not have wired yet. Re-run `scripts/deploy.sh` (or just this script) once it is.
 
 **On a genuinely fresh machine, step 1 will exit with instructions to log out and back in** (or reboot) before re-running `scripts/deploy.sh` - Linux group membership changes (needed so `docker compose` works without `sudo`) only take effect in a new login session, and there's no way around that being a one-time speed bump. Every later re-run is a no-op if Docker's already installed and usable.
 
@@ -568,3 +575,57 @@ scripts/init-grafana-alerting.sh
 4. Run `scripts/init-grafana-alerting.sh` (or just re-run `scripts/deploy.sh`, which calls it as step 7 and skips it cleanly if `DISCORD_WEBHOOK_URL` is still unset).
 
 Validated end-to-end against the real Discord webhook during setup: created the contact point, pointed the default policy at it, and force-fired a real alert rule (`CPU Temp Critical`, by temporarily changing its threshold to `> 0` so it evaluates true) to confirm actual delivery - not just that Grafana accepted the config - then reverted the threshold back. `/api/v1/provisioning/*` proved considerably more reliable for this than Grafana 13's newer `/apis/notifications.alerting.grafana.app/v1beta1/.../test` endpoint, which returned a generic `unknown integration type` error regardless of request body shape; a real firing rule sidesteps it entirely and is arguably better proof anyway.
+
+---
+
+## 14. Fan Control
+
+Staged PWM cooling fan, driven off the weather station's own indoor/enclosure ambient sensor (`weather_station.temp_in_f`, §7 - the same reading the dashboard's indoor temp stat tile uses) rather than a new sensor. The fan's PWM/Trigger input is wired through a MOSFET to a GPIO pin - `scripts/fan_control.py` drives that pin's duty cycle in three steps instead of a single on/off threshold, so the fan ramps proportionally to how hot the enclosure actually is instead of jumping straight to full speed (and full noise) the moment it's needed at all.
+
+### Software (`scripts/fan_control.py`)
+
+Runs on the host OS, not in Docker, since it needs direct GPIO access. Polls `temp_in_f` from the `weather` bucket's `weather_station` measurement and drives one GPIO pin as software PWM via `gpiozero`'s `lgpio` backend - same library choice as `charge_cutoff.py` (§12), so it works unmodified on a Raspberry Pi 5's RP1 GPIO chip as well as older models.
+
+- Steps up a stage (off -> low -> medium -> high) once temp reaches that stage's threshold (`FAN_CONTROL_TEMP_LOW`/`_MEDIUM`/`_HIGH`, default 80/90/100°F).
+- Steps back down only once temp drops `FAN_CONTROL_HYSTERESIS_F` (default 5°F) below that same stage's threshold, so the fan doesn't chatter between stages as temp hovers right at one.
+- Sets the PWM duty cycle for each stage (`FAN_CONTROL_DUTY_LOW`/`_MEDIUM`/`_HIGH`, default 0.4/0.7/1.0) - raise `FAN_CONTROL_DUTY_LOW` if your fan stalls rather than spinning at 40%.
+- Holds the current stage (rather than guessing) on any InfluxDB read failure, logging a warning instead.
+- Writes a `fan_control` point back to the `system` bucket on every poll (default every 30s) *and* immediately on any stage change within that same poll - both a record of fan behavior and a heartbeat, the same pattern as `charge_cutoff.py`'s heartbeat write. Fields: `stage` (0-3), `stage_name` (`off`/`low`/`medium`/`high`), `fan_on` (bool), `duty_cycle` (0.0-1.0), `voltage_v`, `speed_rpm_est`, `power_w`, and `temp_at_eval` (the indoor temp it was evaluated against, omitted if that poll's read failed).
+
+**`voltage_v`/`speed_rpm_est`/`power_w` are computed, not measured.** This circuit has no voltage/current sensor or tachometer wire - `voltage_v` is `duty_cycle * FAN_CONTROL_SUPPLY_VOLTAGE_V` (the average effective voltage a PWM-chopped supply produces), `speed_rpm_est` is `duty_cycle * FAN_CONTROL_RATED_RPM`, and `power_w` is `duty_cycle * (FAN_CONTROL_SUPPLY_VOLTAGE_V * FAN_CONTROL_RATED_CURRENT_A)` - all three assume a linear duty-to-output relationship, which real DC fans only approximate, especially near stall. Defaults (12V, 3000 RPM, 1.2A) match this repo's own fan - change any of them if yours differs. Add a real sensor (e.g. an INA219 on the MOSFET's output, or a fan with a tach wire into a spare GPIO) if you need actual measured values instead of an estimate.
+
+**Software PWM, not hardware.** GPIO26 (or whichever pin you wire to) has no dedicated PWM peripheral on a Raspberry Pi - timing comes from `lgpio` toggling the pin in software, not from dedicated silicon. `FAN_CONTROL_PWM_FREQUENCY_HZ` defaults to 1000Hz, a conservative frequency that should stay glitch-free under normal CPU load; if you push it higher, verify the fan actually sounds/behaves consistently at each duty cycle rather than assuming a higher number is fine.
+
+**Depends on the weather station being reachable.** Unlike `charge_cutoff.py` (which reads a locally-attached shunt), this reads a reading that itself depends on `WEATHER_API_URL` (§7) resolving and `read_ecowitt.py` succeeding - if the station goes offline, the fan holds its last stage (logging a warning) rather than guessing, same fail-safe behavior as a stale SOC reading in `charge_cutoff.py`.
+
+Configuration, all via `.env`:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `FAN_CONTROL_GPIO_PIN` | *(required, no default)* | BCM pin driving the fan's PWM/Trigger MOSFET |
+| `FAN_CONTROL_TEMP_LOW` | `80.0` | Indoor ambient temp (°F) to step up to low |
+| `FAN_CONTROL_TEMP_MEDIUM` | `90.0` | Indoor ambient temp (°F) to step up to medium |
+| `FAN_CONTROL_TEMP_HIGH` | `100.0` | Indoor ambient temp (°F) to step up to high |
+| `FAN_CONTROL_HYSTERESIS_F` | `5.0` | Degrees below a stage's threshold before stepping back down |
+| `FAN_CONTROL_DUTY_LOW` | `0.4` | PWM duty cycle (0.0-1.0) at low |
+| `FAN_CONTROL_DUTY_MEDIUM` | `0.7` | PWM duty cycle at medium |
+| `FAN_CONTROL_DUTY_HIGH` | `1.0` | PWM duty cycle at high |
+| `FAN_CONTROL_PWM_FREQUENCY_HZ` | `1000` | Software PWM switching frequency |
+| `FAN_CONTROL_POLL_INTERVAL` | `30` | Seconds between temp polls - `read_ecowitt.py` itself updates every 5s (telegraf's global agent interval), so this is plenty responsive without over-polling InfluxDB |
+| `FAN_CONTROL_SUPPLY_VOLTAGE_V` | `12.0` | Fan's DC supply rail - used only to compute `voltage_v` |
+| `FAN_CONTROL_RATED_RPM` | `3000` | Fan's datasheet-rated free-air speed at 100% duty - used only to compute `speed_rpm_est` |
+| `FAN_CONTROL_RATED_CURRENT_A` | `1.2` | Fan's rated max current draw at 100% duty - used only to compute `power_w` |
+
+### Install
+
+Host-side deps (venv + `gpio`-group membership):
+```bash
+scripts/install-fan-control-deps.sh
+```
+
+Systemd service - **skips** (doesn't fail) until `FAN_CONTROL_GPIO_PIN` is set in `.env`, since it's specific to hardware you may not have wired yet:
+```bash
+scripts/install-fan-control-service.sh
+```
+
+Both are already wired into `scripts/deploy.sh` (steps 12-13), so once the fan/MOSFET is wired and `FAN_CONTROL_GPIO_PIN` is set, re-running `scripts/deploy.sh` picks it up automatically.

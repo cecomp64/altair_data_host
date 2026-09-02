@@ -1,0 +1,12 @@
+# Host-side dependencies for scripts/fan_control.py (runs outside Docker,
+# needs direct GPIO access to drive the fan's PWM/Trigger MOSFET). Installed
+# automatically by scripts/install-fan-control-deps.sh into .venv-fan-control/.
+influxdb-client>=1.36
+
+# gpiozero and its lgpio backend (needed on a Raspberry Pi 5's RP1 GPIO chip,
+# unlike RPi.GPIO) come from apt (python3-gpiozero, python3-lgpio), not pip -
+# the lgpio PyPI package ships no prebuilt wheels and fails to build from
+# source without the native liblgpio C library, which apt's python3-lgpio
+# already bundles precompiled. The venv is created with
+# --system-site-packages so it can see them - see
+# scripts/install-fan-control-deps.sh.

@@ -7036,7 +7036,7 @@
       "options": {
         "colorMode": "background",
         "graphMode": "area",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
@@ -7047,7 +7047,7 @@
           "values": false
         },
         "showPercentChange": false,
-        "textMode": "auto",
+        "textMode": "value",
         "wideLayout": true
       },
       "pluginVersion": "13.1.1",
@@ -8694,6 +8694,1035 @@
       ],
       "title": "Under-voltage / Throttle Events",
       "type": "state-timeline"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 254
+      },
+      "id": 112,
+      "panels": [],
+      "title": "Cameras",
+      "type": "row"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 255
+      },
+      "id": 113,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/pole_south_ptz.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Pole South - PTZ",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 6,
+        "y": 255
+      },
+      "id": 114,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/pole_south_pano.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Pole South - Panoramic",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 12,
+        "y": 255
+      },
+      "id": 115,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/obs_west.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Observatory West",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 18,
+        "y": 255
+      },
+      "id": 116,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/obs_east.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "title": "Observatory East",
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 265
+      },
+      "id": 117,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"pole_south_ptz\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Pole South - PTZ - Last Snapshot Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 265
+      },
+      "id": 118,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"pole_south_pano\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Pole South - Panoramic - Last Snapshot Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 265
+      },
+      "id": 119,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"obs_west\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Observatory West - Last Snapshot Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 600
+              },
+              {
+                "color": "red",
+                "value": 900
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 265
+      },
+      "id": 120,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_snapshot\" and r.camera == \"obs_east\" and r._field == \"success\")\n  |> last()\n  |> map(fn: (r) => ({ r with _value: (int(v: now()) - int(v: r._time)) / 1000000000 }))\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Observatory East - Last Snapshot Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "1": {
+                  "color": "green",
+                  "text": "Online"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "text": "Offline"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 269
+      },
+      "id": 121,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_health\" and r.camera == \"pole_south\" and r._field == \"online\")\n  |> last()\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Pole South - Liveness (60s check)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "1": {
+                  "color": "green",
+                  "text": "Online"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "text": "Offline"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 269
+      },
+      "id": 122,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_health\" and r.camera == \"obs_west\" and r._field == \"online\")\n  |> last()\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Observatory West - Liveness (60s check)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "1": {
+                  "color": "green",
+                  "text": "Online"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "text": "Offline"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 269
+      },
+      "id": 123,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r._measurement == \"camera_health\" and r.camera == \"obs_east\" and r._field == \"online\")\n  |> last()\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Observatory East - Liveness (60s check)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 1,
+            "pointSize": 5,
+            "showPoints": "auto",
+            "spanNulls": true
+          },
+          "mappings": [],
+          "max": 4,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 2
+              },
+              {
+                "color": "green",
+                "value": 3
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 273
+      },
+      "id": 124,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_health\" and r.camera == \"pole_south\" and r._field == \"wifi_signal_bars\")\n  |> drop(columns: [\"host\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Pole South - WiFi Signal (0-4 bars)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisPlacement": "auto",
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "1": {
+                  "color": "red",
+                  "text": "Detected"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "Clear"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pole South PTZ - Person"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pole South PTZ - Vehicle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pole South PTZ - Animal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pole South Pano - Person"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "E"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pole South Pano - Vehicle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "F"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pole South Pano - Animal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "G"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Observatory West - Person"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "H"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Observatory West - Vehicle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "I"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Observatory West - Animal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "J"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Observatory East - Person"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "K"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Observatory East - Vehicle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "L"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Observatory East - Animal"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 279
+      },
+      "id": 125,
+      "options": {
+        "alignValue": "left",
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "displayMode": "list",
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"pole_south_ptz\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"pole_south_ptz\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"pole_south_ptz\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"pole_south_pano\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"pole_south_pano\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"pole_south_pano\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"obs_west\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "G"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"obs_west\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"obs_west\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"obs_east\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"obs_east\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "K"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"obs_east\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "L"
+        }
+      ],
+      "title": "AI Detection History (Person / Vehicle / Animal)",
+      "type": "state-timeline"
     }
   ],
   "preload": false,
@@ -8708,6 +9737,22 @@
     "starlink",
     "system"
   ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "http://altair-metrics-host.tail48bec.ts.net:8089",
+          "value": "http://altair-metrics-host.tail48bec.ts.net:8089"
+        },
+        "description": "Base URL camera-web (docker-compose.yml) serves snapshots on - same host as GRAFANA_ROOT_URL, CAMERA_WEB_PORT instead of 3000. Edit here (dashboard settings > Variables) rather than per-panel if it ever changes.",
+        "label": "Camera snapshot server",
+        "name": "camera_web_url",
+        "options": [],
+        "query": "http://altair-metrics-host.tail48bec.ts.net:8089",
+        "type": "textbox"
+      }
+    ]
+  },
   "time": {
     "from": "now-24h",
     "to": "now"
@@ -8729,5 +9774,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 89
+  "version": 95
 }

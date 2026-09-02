@@ -4,7 +4,9 @@
 # to be healthy, creates the weather/observatory/imaging/network/starlink/system buckets, installs
 # the host-level e-paper Python deps (SPI + venv + waveshare_epd driver) and
 # systemd service, then installs the host-level charge-cutoff relay's Python
-# deps and (once CHARGE_CUTOFF_GPIO_PIN is set in .env) its systemd service.
+# deps and (once CHARGE_CUTOFF_GPIO_PIN is set in .env) its systemd service,
+# and finally the staged fan-control Python deps and (once
+# FAN_CONTROL_GPIO_PIN is set in .env) its systemd service.
 # Safe to re-run.
 set -euo pipefail
 
@@ -99,6 +101,13 @@ fi
 # 11. Host-level charge-cutoff systemd service - skips (doesn't fail) until
 # CHARGE_CUTOFF_GPIO_PIN is set in .env, since that's hardware-wiring specific
 "${REPO_DIR}/scripts/install-charge-cutoff-service.sh"
+
+# 12. Host-level fan-control Python deps (venv, gpiozero/lgpio)
+"${REPO_DIR}/scripts/install-fan-control-deps.sh"
+
+# 13. Host-level fan-control systemd service - skips (doesn't fail) until
+# FAN_CONTROL_GPIO_PIN is set in .env, since that's hardware-wiring specific
+"${REPO_DIR}/scripts/install-fan-control-service.sh"
 
 echo
 echo "Deployment complete."

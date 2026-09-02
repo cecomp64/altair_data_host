@@ -29,7 +29,7 @@
         "x": 0,
         "y": 0
       },
-      "id": 104,
+      "id": 126,
       "title": "Solar Power",
       "type": "row"
     },
@@ -968,14 +968,435 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "high": {
+                  "color": "red",
+                  "text": "High"
+                },
+                "low": {
+                  "color": "green",
+                  "text": "Low"
+                },
+                "medium": {
+                  "color": "orange",
+                  "text": "Medium"
+                },
+                "off": {
+                  "color": "blue",
+                  "text": "Off"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 29
+      },
+      "id": 134,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^stage_name$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"fan_control\" and r._field == \"stage_name\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Fan Status",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 0.01
+              },
+              {
+                "color": "orange",
+                "value": 0.6
+              },
+              {
+                "color": "red",
+                "value": 0.9
+              }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 29
+      },
+      "id": 135,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"fan_control\" and r._field == \"duty_cycle\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Fan Duty Cycle",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 29
+      },
+      "id": 136,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"fan_control\" and r._field == \"speed_rpm_est\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Fan Speed (RPM, est.)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 29
+      },
+      "id": 138,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -5m)\n  |> filter(fn: (r) => r._measurement == \"fan_control\" and r._field == \"power_w\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Fan Power (est.)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "duty cycle"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "indoor temp (\u00b0F)"
+              },
+              {
+                "id": "unit",
+                "value": "fahrenheit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 33
+      },
+      "id": 137,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"fan_control\" and (r._field == \"duty_cycle\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"fan_control\" and (r._field == \"temp_at_eval\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "refId": "B"
+        }
+      ],
+      "title": "Fan Duty Cycle vs Indoor Temp",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 41
       },
-      "id": 105,
+      "id": 127,
       "title": "Weather",
       "type": "row"
     },
@@ -1009,7 +1430,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 30
+        "y": 42
       },
       "id": 13,
       "options": {
@@ -1073,7 +1494,7 @@
         "h": 8,
         "w": 6,
         "x": 6,
-        "y": 30
+        "y": 42
       },
       "id": 17,
       "options": {
@@ -1170,7 +1591,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 30
+        "y": 42
       },
       "id": 20,
       "options": {
@@ -1247,7 +1668,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 30
+        "y": 42
       },
       "id": 16,
       "options": {
@@ -1313,7 +1734,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 34
+        "y": 46
       },
       "id": 14,
       "options": {
@@ -1377,7 +1798,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 34
+        "y": 46
       },
       "id": 15,
       "options": {
@@ -1441,7 +1862,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 38
+        "y": 50
       },
       "id": 18,
       "options": {
@@ -1527,7 +1948,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 38
+        "y": 50
       },
       "id": 26,
       "options": {
@@ -1596,7 +2017,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 38
+        "y": 50
       },
       "id": 19,
       "options": {
@@ -1727,7 +2148,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 54
       },
       "id": 21,
       "options": {
@@ -1864,7 +2285,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 54
       },
       "id": 22,
       "options": {
@@ -2001,7 +2422,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 50
+        "y": 62
       },
       "id": 23,
       "options": {
@@ -2162,7 +2583,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 50
+        "y": 62
       },
       "id": 24,
       "options": {
@@ -2332,7 +2753,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 58
+        "y": 70
       },
       "id": 25,
       "options": {
@@ -2433,14 +2854,13 @@
             ]
           },
           "unit": "pressurehg"
-        },
-        "overrides": []
+        }
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 58
+        "y": 70
       },
       "id": 111,
       "options": {
@@ -2557,7 +2977,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 66
+        "y": 78
       },
       "id": 27,
       "options": {
@@ -2687,7 +3107,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 74
+        "y": 86
       },
       "id": 101,
       "options": {
@@ -2837,7 +3257,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 82
+        "y": 94
       },
       "id": 100,
       "options": {
@@ -2959,7 +3379,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 90
+        "y": 102
       },
       "id": 102,
       "options": {
@@ -3080,7 +3500,7 @@
         "h": 8,
         "w": 18,
         "x": 6,
-        "y": 90
+        "y": 102
       },
       "id": 103,
       "options": {
@@ -3122,9 +3542,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 98
+        "y": 110
       },
-      "id": 106,
+      "id": 128,
       "title": "Observatory",
       "type": "row"
     },
@@ -3185,7 +3605,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 99
+        "y": 111
       },
       "id": 29,
       "options": {
@@ -3276,7 +3696,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 99
+        "y": 111
       },
       "id": 30,
       "options": {
@@ -3362,7 +3782,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 99
+        "y": 111
       },
       "id": 31,
       "options": {
@@ -3448,7 +3868,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 99
+        "y": 111
       },
       "id": 32,
       "options": {
@@ -3534,7 +3954,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 103
+        "y": 115
       },
       "id": 33,
       "options": {
@@ -3620,7 +4040,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 103
+        "y": 115
       },
       "id": 34,
       "options": {
@@ -3692,7 +4112,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 103
+        "y": 115
       },
       "id": 35,
       "options": {
@@ -3760,7 +4180,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 103
+        "y": 115
       },
       "id": 36,
       "options": {
@@ -3909,7 +4329,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 107
+        "y": 119
       },
       "id": 37,
       "options": {
@@ -4041,7 +4461,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 113
+        "y": 125
       },
       "id": 38,
       "options": {
@@ -4159,7 +4579,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 113
+        "y": 125
       },
       "id": 39,
       "options": {
@@ -4201,9 +4621,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 121
+        "y": 133
       },
-      "id": 107,
+      "id": 129,
       "title": "Imaging",
       "type": "row"
     },
@@ -4233,7 +4653,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 122
+        "y": 134
       },
       "id": 41,
       "options": {
@@ -4299,7 +4719,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 122
+        "y": 134
       },
       "id": 42,
       "options": {
@@ -4360,7 +4780,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 122
+        "y": 134
       },
       "id": 43,
       "options": {
@@ -4436,7 +4856,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 122
+        "y": 134
       },
       "id": 44,
       "options": {
@@ -4548,7 +4968,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 126
+        "y": 138
       },
       "id": 45,
       "options": {
@@ -4662,7 +5082,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 126
+        "y": 138
       },
       "id": 46,
       "options": {
@@ -4800,7 +5220,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 134
+        "y": 146
       },
       "id": 47,
       "options": {
@@ -4942,7 +5362,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 134
+        "y": 146
       },
       "id": 48,
       "options": {
@@ -5064,7 +5484,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 142
+        "y": 154
       },
       "id": 49,
       "options": {
@@ -5178,7 +5598,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 142
+        "y": 154
       },
       "id": 50,
       "options": {
@@ -5250,7 +5670,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 150
+        "y": 162
       },
       "id": 51,
       "options": {
@@ -5315,9 +5735,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 160
+        "y": 172
       },
-      "id": 108,
+      "id": 130,
       "title": "Network",
       "type": "row"
     },
@@ -5355,7 +5775,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 161
+        "y": 173
       },
       "id": 62,
       "options": {
@@ -5423,7 +5843,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 161
+        "y": 173
       },
       "id": 63,
       "options": {
@@ -5491,7 +5911,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 161
+        "y": 173
       },
       "id": 64,
       "options": {
@@ -5559,7 +5979,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 161
+        "y": 173
       },
       "id": 65,
       "options": {
@@ -5666,7 +6086,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 165
+        "y": 177
       },
       "id": 66,
       "options": {
@@ -5775,7 +6195,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 165
+        "y": 177
       },
       "id": 67,
       "options": {
@@ -5884,7 +6304,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 173
+        "y": 185
       },
       "id": 68,
       "options": {
@@ -5926,9 +6346,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 181
+        "y": 193
       },
-      "id": 109,
+      "id": 131,
       "title": "Starlink",
       "type": "row"
     },
@@ -5985,7 +6405,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 182
+        "y": 194
       },
       "id": 70,
       "options": {
@@ -6067,7 +6487,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 182
+        "y": 194
       },
       "id": 71,
       "options": {
@@ -6135,7 +6555,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 182
+        "y": 194
       },
       "id": 72,
       "options": {
@@ -6203,7 +6623,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 182
+        "y": 194
       },
       "id": 73,
       "options": {
@@ -6339,7 +6759,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 186
+        "y": 198
       },
       "id": 74,
       "options": {
@@ -6469,7 +6889,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 186
+        "y": 198
       },
       "id": 75,
       "options": {
@@ -6806,7 +7226,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 194
+        "y": 206
       },
       "id": 76,
       "options": {
@@ -7030,7 +7450,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 205
+        "y": 217
       },
       "id": 83,
       "options": {
@@ -7142,7 +7562,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 205
+        "y": 217
       },
       "id": 84,
       "options": {
@@ -7268,7 +7688,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 213
+        "y": 225
       },
       "id": 85,
       "options": {
@@ -7318,9 +7738,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 221
+        "y": 233
       },
-      "id": 110,
+      "id": 132,
       "title": "System",
       "type": "row"
     },
@@ -7358,7 +7778,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 222
+        "y": 234
       },
       "id": 87,
       "options": {
@@ -7426,7 +7846,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 222
+        "y": 234
       },
       "id": 88,
       "options": {
@@ -7494,7 +7914,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 222
+        "y": 234
       },
       "id": 89,
       "options": {
@@ -7562,7 +7982,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 222
+        "y": 234
       },
       "id": 90,
       "options": {
@@ -7698,7 +8118,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 226
+        "y": 238
       },
       "id": 91,
       "options": {
@@ -7840,7 +8260,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 226
+        "y": 238
       },
       "id": 92,
       "options": {
@@ -7974,7 +8394,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 234
+        "y": 246
       },
       "id": 93,
       "options": {
@@ -8120,7 +8540,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 234
+        "y": 246
       },
       "id": 94,
       "options": {
@@ -8206,7 +8626,7 @@
         "h": 4,
         "w": 8,
         "x": 0,
-        "y": 242
+        "y": 254
       },
       "id": 95,
       "options": {
@@ -8266,7 +8686,7 @@
         "h": 4,
         "w": 8,
         "x": 8,
-        "y": 242
+        "y": 254
       },
       "id": 96,
       "options": {
@@ -8348,7 +8768,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 242
+        "y": 254
       },
       "id": 97,
       "options": {
@@ -8480,7 +8900,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 246
+        "y": 258
       },
       "id": 98,
       "options": {
@@ -8633,7 +9053,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 246
+        "y": 258
       },
       "id": 99,
       "options": {
@@ -8701,40 +9121,18 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 254
+        "y": 266
       },
-      "id": 112,
-      "panels": [],
+      "id": 133,
       "title": "Cameras",
       "type": "row"
     },
     {
       "gridPos": {
-        "h": 10,
-        "w": 6,
+        "h": 13,
+        "w": 24,
         "x": 0,
-        "y": 255
-      },
-      "id": 113,
-      "options": {
-        "code": {
-          "language": "plaintext",
-          "showLineNumbers": false,
-          "showMiniMap": false
-        },
-        "content": "<img src=\"${camera_web_url}/pole_south_ptz.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
-        "mode": "html"
-      },
-      "pluginVersion": "13.1.1",
-      "title": "Pole South - PTZ",
-      "type": "text"
-    },
-    {
-      "gridPos": {
-        "h": 10,
-        "w": 6,
-        "x": 6,
-        "y": 255
+        "y": 267
       },
       "id": 114,
       "options": {
@@ -8747,15 +9145,38 @@
         "mode": "html"
       },
       "pluginVersion": "13.1.1",
+      "targets": [],
       "title": "Pole South - Panoramic",
       "type": "text"
     },
     {
       "gridPos": {
         "h": 10,
-        "w": 6,
-        "x": 12,
-        "y": 255
+        "w": 8,
+        "x": 0,
+        "y": 280
+      },
+      "id": 113,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<img src=\"${camera_web_url}/pole_south_ptz.jpg?t=${__from}\" style=\"width:100%;height:100%;object-fit:cover;border-radius:4px;\" />",
+        "mode": "html"
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [],
+      "title": "Pole South - PTZ",
+      "type": "text"
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 8,
+        "y": 280
       },
       "id": 115,
       "options": {
@@ -8768,15 +9189,16 @@
         "mode": "html"
       },
       "pluginVersion": "13.1.1",
+      "targets": [],
       "title": "Observatory West",
       "type": "text"
     },
     {
       "gridPos": {
         "h": 10,
-        "w": 6,
-        "x": 18,
-        "y": 255
+        "w": 8,
+        "x": 16,
+        "y": 280
       },
       "id": 116,
       "options": {
@@ -8789,6 +9211,7 @@
         "mode": "html"
       },
       "pluginVersion": "13.1.1",
+      "targets": [],
       "title": "Observatory East",
       "type": "text"
     },
@@ -8802,7 +9225,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -8827,7 +9249,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 265
+        "y": 290
       },
       "id": 117,
       "options": {
@@ -8871,7 +9293,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -8896,7 +9317,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 265
+        "y": 290
       },
       "id": 118,
       "options": {
@@ -8940,7 +9361,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -8965,7 +9385,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 265
+        "y": 290
       },
       "id": 119,
       "options": {
@@ -9009,7 +9429,6 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -9034,7 +9453,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 265
+        "y": 290
       },
       "id": 120,
       "options": {
@@ -9118,7 +9537,7 @@
         "h": 4,
         "w": 8,
         "x": 0,
-        "y": 269
+        "y": 294
       },
       "id": 121,
       "options": {
@@ -9202,7 +9621,7 @@
         "h": 4,
         "w": 8,
         "x": 8,
-        "y": 269
+        "y": 294
       },
       "id": 122,
       "options": {
@@ -9286,7 +9705,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 269
+        "y": 294
       },
       "id": 123,
       "options": {
@@ -9331,15 +9750,39 @@
             "mode": "thresholds"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
             "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
             "showPoints": "auto",
-            "spanNulls": true
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
-          "mappings": [],
           "max": 4,
           "min": 0,
           "thresholds": {
@@ -9366,17 +9809,24 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 273
+        "y": 298
       },
       "id": 124,
       "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
         "legend": {
           "calcs": [],
           "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
           "placement": "bottom",
           "showLegend": false
         },
         "tooltip": {
+          "hideZeros": false,
           "mode": "single",
           "sort": "none"
         }
@@ -9598,7 +10048,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 279
+        "y": 304
       },
       "id": 125,
       "options": {
@@ -9745,10 +10195,11 @@
           "value": "http://altair-metrics-host.tail48bec.ts.net:8089"
         },
         "description": "Base URL camera-web (docker-compose.yml) serves snapshots on - same host as GRAFANA_ROOT_URL, CAMERA_WEB_PORT instead of 3000. Edit here (dashboard settings > Variables) rather than per-panel if it ever changes.",
+        "hide": 0,
         "label": "Camera snapshot server",
         "name": "camera_web_url",
-        "options": [],
         "query": "http://altair-metrics-host.tail48bec.ts.net:8089",
+        "skipUrlSync": false,
         "type": "textbox"
       }
     ]
@@ -9774,5 +10225,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 95
+  "version": 100
 }
