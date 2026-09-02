@@ -1,0 +1,51 @@
+Designator,Component Name,Manufacturer,Description,Footprint
+U1,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U2,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U3,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U4,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U5,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U6,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U7,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U8,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U9,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U10,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U11,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U12,INA226AIDGSR,Texas Instruments,16-Bit I2C Power Monitor (VSSOP-10),VSSOP-10
+U13,ISO1540DR,Texas Instruments,I2C Digital Isolator (SOIC-8),SOIC-8
+F1,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F2,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F3,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F4,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F5,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F6,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F7,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F8,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F9,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F10,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F11,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+F12,Keystone 3557,Keystone Electronics,PCB Mini Automotive Fuse Holder Clip,Keystone_3557
+R_SH1,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH2,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH3,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH4,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH5,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH6,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH7,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH8,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH9,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH10,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH11,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+R_SH12,WSLP25122L000FEA,Vishay Dale,0.002 Ohm 1% 5W 2512 Shunt Resistor,2512_Surface_Mount
+J1,JST-XH 4-Pin,JST,Microcontroller Interface Header,4-Pin_2.54mm
+TERM1,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM2,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM3,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM4,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM5,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM6,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM7,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM8,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM9,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM10,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM11,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
+TERM12,1715721,Phoenix Contact,2-Pin 5.08mm High Current Terminal Block,Phoenix_5.08mm
