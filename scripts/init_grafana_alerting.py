@@ -236,10 +236,7 @@ RULES = [
         '  |> last()\n'
         '  |> keep(columns: ["_time", "_value", "camera"])',
         "influxdb-observatory", "lt", [0.5], "5m", "warning",
-        "{{ $labels.camera }} failed its liveness check - read_camera_health.py polls every "
-        "60s, so this has been failing for at least several consecutive checks, not a single "
-        "blip. Keyed off camera_health (device-level liveness, not the 300s image poll) so "
-        "an outage is caught in minutes, not up to a full snapshot cycle.",
+        "{{ $labels.camera }} failed its liveness check - offline for at least 5 minutes.",
     ),
 ]
 
