@@ -48,6 +48,7 @@ altair_data_host/
 │   ├── charge-cutoff.service.template     # systemd unit template used above
 │   ├── fan-control.service.template       # systemd unit template used above
 │   ├── read_vedirect.py                   # runs inside the telegraf container
+│   ├── read_ecoworthy_mppt.py             # runs inside the telegraf container
 │   ├── read_ping.py                       # runs inside the telegraf container
 │   ├── read_starlink.py                   # runs inside the telegraf container
 │   ├── read_pi_power.py                   # runs inside the telegraf container
@@ -187,7 +188,7 @@ The controller's RJ45 communication port, per Eco-Worthy's own manual:
 | 5–6 | GND (isolated) |
 | 7–8 | +5V (isolated) |
 
-This is **not** the pinout most off-the-shelf "USB to RS485 RJ45" cables use - most (including cables sold for Seplos/PUSUNG/SUTEN and other server-rack BMS packs) put RS485-A/B on pins 7/8 instead. Plugging one of those in doesn't just fail to communicate - it lands the adapter's A/B lines on this controller's +5V pins. Symptom: telegraf's `inputs.modbus` gets a clean `serial: timeout` (port opens fine, slave never responds) under every baud rate/slave ID/function code, because the query never reaches the controller's actual RS485 transceiver.
+This is **not** the pinout most off-the-shelf "USB to RS485 RJ45" cables use - most (including cables sold for Seplos/PUSUNG/SUTEN and other server-rack BMS packs) put RS485-A/B on pins 7/8 instead. Plugging one of those in doesn't just fail to communicate - it lands the adapter's A/B lines on this controller's +5V pins. Symptom: a clean `serial: timeout` (port opens fine, slave never responds) under every baud rate/slave ID/function code, because the query never reaches the controller's actual RS485 transceiver.
 
 **Fix: use a generic USB-RS485 adapter with bare screw terminals and wire it to this controller's pinout yourself**, rather than trusting a pre-wired RJ45 cable's convention:
 
@@ -198,7 +199,11 @@ This is **not** the pinout most off-the-shelf "USB to RS485 RJ45" cables use - m
 | 5 or 6 | GND | adapter's `GND` terminal |
 | 3–4, 7–8 | dry contact / +5V | leave disconnected |
 
-Identify which physical wire in the patch cable corresponds to pins 1/2/5 with a multimeter's continuity function rather than trusting color coding - cheap/off-brand Cat5 cables don't reliably follow T568A/T568B. No `telegraf.conf` changes are needed once wired correctly; the existing `inputs.modbus` block (9600 baud, 8N1, slave 1) already matches the controller's defaults.
+Identify which physical wire in the patch cable corresponds to pins 1/2/5 with a multimeter's continuity function rather than trusting color coding - cheap/off-brand Cat5 cables don't reliably follow T568A/T568B. Confirmed against real hardware: A on 1 / B on 2 / GND on 5 is correct as documented above.
+
+**A flaky USB/power path will masquerade as a wiring problem - rule it out first.** While bringing this up, a chronic Pi under-voltage condition (`vcgencmd get_throttled`, `dmesg | grep Undervoltage`) caused both FTDI serial adapters to intermittently fail to apply their baud/parity/stop-bit configuration at the USB control-transfer level (`dmesg`: `ftdi_sio ttyUSBx: ftdi_set_termios FAILED to set databits/stopbits/parity`, `urb failed to set baudrate`). The port still opens fine and the plugin still reports a clean timeout, so this looks identical to a genuine wiring/pinout mistake - several correct-wiring attempts were misdiagnosed as wrong before this was caught. If timeouts persist after double-checking wiring against the table above, check `dmesg` for these specific lines before re-wiring anything; the fix is clean power (a powered USB hub and/or a proper 5V/5A-class supply), not more pin-swapping.
+
+Once wiring and power are both confirmed good, see §7 for why this controller is polled via a custom script rather than telegraf's native `inputs.modbus` plugin.
 
 ---
 
@@ -239,7 +244,11 @@ docker compose up -d
 One telegraf agent, six `[[outputs.influxdb_v2]]` blocks (one per bucket, each restricted via `namepass` - see §3), and inputs grouped by domain.
 
 ### Power: Victron SmartShunt (VE.Direct) + Eco-Worthy MPPT (Modbus RTU)
-Unchanged from the original design: `inputs.exec` runs `read_vedirect.py` for the Victron shunt's text protocol, `inputs.modbus` polls the Eco-Worthy controller's holding registers directly (no custom script needed there - telegraf's modbus plugin is enough).
+`inputs.exec` runs a custom script for both: `read_vedirect.py` for the Victron shunt's text protocol, and `read_ecoworthy_mppt.py` for the Eco-Worthy controller's Modbus RTU holding registers.
+
+The Eco-Worthy side originally used telegraf's native `inputs.modbus` plugin directly (no custom script needed, in theory - it's a standard Modbus RTU device). That plugin turned out to hang indefinitely against this specific controller/adapter combination once the wiring and USB power path (see §5) were both confirmed correct - collection would start, then produce neither data nor an error, silently, forever, even past its own configured `timeout`. A plain `pyserial` request/response against the exact same port, baud rate, and register map got a clean, CRC-valid reply every time, which is what `read_ecoworthy_mppt.py` does: build a single Modbus RTU "read holding registers" frame (function code `0x03`, slave 1, registers `0x0100`-`0x0105`), send it, read back a length-aware response (header first, then exactly as many bytes as the header's byte count says - not a fixed-size read, which is what made the hang hard to distinguish from a real timeout during debugging), verify the CRC, and print Influx Line Protocol. Root cause of the native plugin's hang was never isolated further; this sidesteps it the same way `read_vedirect.py` already sidesteps VE.Direct not fitting a stock telegraf input.
+
+One register's scaling was also corrected in the rewrite: `controller_temp` is a signed, tenths-scaled value like every other register on this controller, not a whole-degree one - the original `inputs.modbus` config used `scale=1.0` for it, which decoded a real reading of raw `144` as an implausible `144°C` instead of a plausible `14.4°C`. `pv_voltage` reading implausibly high (e.g. `539.5V` against a 150V-rated input) at night is a separate, real controller quirk, not a decoding bug - the ADC reads a floating/disconnected panel input as garbage when it isn't producing; re-check it in daylight with the panel under load before trusting it.
 
 ### Weather: LAN station, via `scripts/read_ecowitt.py`
 ```toml

@@ -9116,12 +9116,340 @@
       "type": "state-timeline"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "EVENT SINCE BOOT"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 266
+      },
+      "id": 139,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^undervoltage_occurred$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -30d)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and r._field == \"undervoltage_occurred\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Under-voltage (since boot)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "EVENT SINCE BOOT"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 266
+      },
+      "id": 140,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^throttled_occurred$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -30d)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and r._field == \"throttled_occurred\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Throttled (since boot)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "EVENT SINCE BOOT"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 266
+      },
+      "id": 141,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^freq_capped_occurred$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -30d)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and r._field == \"freq_capped_occurred\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Freq capped (since boot)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-system"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "mappings": [
+            {
+              "options": {
+                "match": "true",
+                "result": {
+                  "color": "red",
+                  "text": "EVENT SINCE BOOT"
+                }
+              },
+              "type": "special"
+            },
+            {
+              "options": {
+                "match": "false",
+                "result": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 266
+      },
+      "id": 142,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^soft_temp_limit_occurred$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-system"
+          },
+          "query": "from(bucket: \"system\")\n  |> range(start: -30d)\n  |> filter(fn: (r) => r._measurement == \"pi_power\" and r._field == \"soft_temp_limit_occurred\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()",
+          "refId": "A"
+        }
+      ],
+      "title": "Soft temp limit (since boot)",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 266
+        "y": 270
       },
       "id": 133,
       "title": "Cameras",
@@ -9132,7 +9460,7 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 267
+        "y": 271
       },
       "id": 114,
       "options": {
@@ -9154,7 +9482,7 @@
         "h": 10,
         "w": 8,
         "x": 0,
-        "y": 280
+        "y": 284
       },
       "id": 113,
       "options": {
@@ -9176,7 +9504,7 @@
         "h": 10,
         "w": 8,
         "x": 8,
-        "y": 280
+        "y": 284
       },
       "id": 115,
       "options": {
@@ -9198,7 +9526,7 @@
         "h": 10,
         "w": 8,
         "x": 16,
-        "y": 280
+        "y": 284
       },
       "id": 116,
       "options": {
@@ -9249,7 +9577,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 290
+        "y": 294
       },
       "id": 117,
       "options": {
@@ -9317,7 +9645,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 290
+        "y": 294
       },
       "id": 118,
       "options": {
@@ -9385,7 +9713,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 290
+        "y": 294
       },
       "id": 119,
       "options": {
@@ -9453,7 +9781,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 290
+        "y": 294
       },
       "id": 120,
       "options": {
@@ -9537,7 +9865,7 @@
         "h": 4,
         "w": 8,
         "x": 0,
-        "y": 294
+        "y": 298
       },
       "id": 121,
       "options": {
@@ -9621,7 +9949,7 @@
         "h": 4,
         "w": 8,
         "x": 8,
-        "y": 294
+        "y": 298
       },
       "id": 122,
       "options": {
@@ -9705,7 +10033,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 294
+        "y": 298
       },
       "id": 123,
       "options": {
@@ -9809,7 +10137,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 298
+        "y": 302
       },
       "id": 124,
       "options": {
@@ -10048,7 +10376,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 304
+        "y": 308
       },
       "id": 125,
       "options": {

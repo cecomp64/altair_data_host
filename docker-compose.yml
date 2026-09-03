@@ -80,6 +80,7 @@ services:
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - ./scripts/read_vedirect.py:/scripts/read_vedirect.py:ro
+      - ./scripts/read_ecoworthy_mppt.py:/scripts/read_ecoworthy_mppt.py:ro
       - ./scripts/read_ecowitt.py:/scripts/read_ecowitt.py:ro
       - ./scripts/read_ping.py:/scripts/read_ping.py:ro
       - ./scripts/read_starlink.py:/scripts/read_starlink.py:ro

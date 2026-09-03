@@ -69,6 +69,13 @@ def ensure_folder():
     print(f"Folder '{ALERTS_FOLDER_TITLE}' ready.")
 
 
+DISCORD_MESSAGE_TEMPLATE = (
+    "{{ range .Alerts }}{{ .Annotations.summary }}\n"
+    "[Source]({{ .GeneratorURL }}) | [Silence]({{ .SilenceURL }})\n"
+    "{{ end }}"
+)
+
+
 def ensure_contact_point():
     status, points = request("GET", "/api/v1/provisioning/contact-points")
     if status != 200:
@@ -79,7 +86,11 @@ def ensure_contact_point():
         "uid": CONTACT_POINT_UID,
         "name": CONTACT_POINT_NAME,
         "type": "discord",
-        "settings": {"url": DISCORD_WEBHOOK_URL, "use_discord_username": False},
+        "settings": {
+            "url": DISCORD_WEBHOOK_URL,
+            "use_discord_username": False,
+            "message": DISCORD_MESSAGE_TEMPLATE,
+        },
         "disableResolveMessage": False,
     }
     if exists:
@@ -206,6 +217,16 @@ RULES = [
         '  |> map(fn: (r) => ({r with _value: if r._value then 1.0 else 0.0}))',
         "influxdb-system", "gt", [0.5], "2m", "critical",
         "Pi's 5V supply is under-voltage right now - failing/inadequate power supply or cable, risk of SD card corruption or brownout.",
+    ),
+    rule(
+        "pi-undervoltage-since-boot", "Pi Under-Voltage Since Boot",
+        'from(bucket: "system")\n'
+        '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
+        '  |> filter(fn: (r) => r._measurement == "pi_power" and r._field == "undervoltage_occurred")\n'
+        '  |> last()\n'
+        '  |> map(fn: (r) => ({r with _value: if r._value then 1.0 else 0.0}))',
+        "influxdb-system", "gt", [0.5], "1m", "warning",
+        "Pi's 5V supply under-volted since last boot - may not be active now.",
     ),
     rule(
         "cpu-temp-critical", "CPU Temp Critical",
