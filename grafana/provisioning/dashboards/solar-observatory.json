@@ -4616,12 +4616,514 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Last State Change Reason"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Safety Monitor Reason"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "C"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Weather Sensor Tripped"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "D"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Sun Altitude Safe"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "E"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Voltage Monitor Safe"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "F"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Manually Opened"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "G"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Roof Moving"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 133
+      },
+      "id": 143,
+      "options": {
+        "alignValue": "left",
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "displayMode": "list",
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_last_state_change_reason\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_safety_monitor_reason\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_weather_sensor_tripped\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_sun_altitude_safe\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_voltage_monitor_safe\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_manually_opened\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_moving\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "G"
+        }
+      ],
+      "title": "Roof Event Log (last state-change / safety-monitor reason)",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 149
+      },
+      "id": 144,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"roof_seconds_to_open\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Seconds To Open",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 149
+      },
+      "id": 145,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"roof_seconds_to_close\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Seconds To Close",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 149
+      },
+      "id": 146,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and r._field == \"roof_controller_uptime_raw\")\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> last()\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Controller Uptime (raw)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-observatory"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 27,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "#EAB839",
+                "value": 40
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
+            ]
+          },
+          "unit": "celsius"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "cpu_temperature"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 153
+      },
+      "id": 147,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-observatory"
+          },
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"observatory_roof\" and (r._field == \"roof_controller_cpu_temperature_c\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])\n  |> drop(columns: [\"device_number\", \"url\"])",
+          "refId": "A"
+        }
+      ],
+      "title": "Roof Controller CPU Temperature",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 133
+        "y": 161
       },
       "id": 129,
       "title": "Imaging",
@@ -4653,7 +5155,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 134
+        "y": 162
       },
       "id": 41,
       "options": {
@@ -4719,7 +5221,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 134
+        "y": 162
       },
       "id": 42,
       "options": {
@@ -4780,7 +5282,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 134
+        "y": 162
       },
       "id": 43,
       "options": {
@@ -4856,7 +5358,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 134
+        "y": 162
       },
       "id": 44,
       "options": {
@@ -4968,7 +5470,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 138
+        "y": 166
       },
       "id": 45,
       "options": {
@@ -5082,7 +5584,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 138
+        "y": 166
       },
       "id": 46,
       "options": {
@@ -5220,7 +5722,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 146
+        "y": 174
       },
       "id": 47,
       "options": {
@@ -5362,7 +5864,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 146
+        "y": 174
       },
       "id": 48,
       "options": {
@@ -5484,7 +5986,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 154
+        "y": 182
       },
       "id": 49,
       "options": {
@@ -5598,7 +6100,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 154
+        "y": 182
       },
       "id": 50,
       "options": {
@@ -5670,7 +6172,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 162
+        "y": 190
       },
       "id": 51,
       "options": {
@@ -5735,7 +6237,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 172
+        "y": 200
       },
       "id": 130,
       "title": "Network",
@@ -5775,7 +6277,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 173
+        "y": 201
       },
       "id": 62,
       "options": {
@@ -5843,7 +6345,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 173
+        "y": 201
       },
       "id": 63,
       "options": {
@@ -5911,7 +6413,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 173
+        "y": 201
       },
       "id": 64,
       "options": {
@@ -5979,7 +6481,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 173
+        "y": 201
       },
       "id": 65,
       "options": {
@@ -6086,7 +6588,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 177
+        "y": 205
       },
       "id": 66,
       "options": {
@@ -6195,7 +6697,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 177
+        "y": 205
       },
       "id": 67,
       "options": {
@@ -6304,7 +6806,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 185
+        "y": 213
       },
       "id": 68,
       "options": {
@@ -6346,7 +6848,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 193
+        "y": 221
       },
       "id": 131,
       "title": "Starlink",
@@ -6405,7 +6907,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 194
+        "y": 222
       },
       "id": 70,
       "options": {
@@ -6487,7 +6989,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 194
+        "y": 222
       },
       "id": 71,
       "options": {
@@ -6555,7 +7057,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 194
+        "y": 222
       },
       "id": 72,
       "options": {
@@ -6623,7 +7125,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 194
+        "y": 222
       },
       "id": 73,
       "options": {
@@ -6759,7 +7261,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 198
+        "y": 226
       },
       "id": 74,
       "options": {
@@ -6889,7 +7391,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 198
+        "y": 226
       },
       "id": 75,
       "options": {
@@ -7226,7 +7728,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 206
+        "y": 234
       },
       "id": 76,
       "options": {
@@ -7450,7 +7952,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 217
+        "y": 245
       },
       "id": 83,
       "options": {
@@ -7562,7 +8064,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 217
+        "y": 245
       },
       "id": 84,
       "options": {
@@ -7688,7 +8190,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 225
+        "y": 253
       },
       "id": 85,
       "options": {
@@ -7738,7 +8240,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 233
+        "y": 261
       },
       "id": 132,
       "title": "System",
@@ -7778,7 +8280,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 234
+        "y": 262
       },
       "id": 87,
       "options": {
@@ -7846,7 +8348,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 234
+        "y": 262
       },
       "id": 88,
       "options": {
@@ -7914,7 +8416,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 234
+        "y": 262
       },
       "id": 89,
       "options": {
@@ -7982,7 +8484,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 234
+        "y": 262
       },
       "id": 90,
       "options": {
@@ -8118,7 +8620,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 238
+        "y": 266
       },
       "id": 91,
       "options": {
@@ -8260,7 +8762,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 238
+        "y": 266
       },
       "id": 92,
       "options": {
@@ -8394,7 +8896,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 246
+        "y": 274
       },
       "id": 93,
       "options": {
@@ -8540,7 +9042,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 246
+        "y": 274
       },
       "id": 94,
       "options": {
@@ -8626,7 +9128,7 @@
         "h": 4,
         "w": 8,
         "x": 0,
-        "y": 254
+        "y": 282
       },
       "id": 95,
       "options": {
@@ -8686,7 +9188,7 @@
         "h": 4,
         "w": 8,
         "x": 8,
-        "y": 254
+        "y": 282
       },
       "id": 96,
       "options": {
@@ -8768,7 +9270,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 254
+        "y": 282
       },
       "id": 97,
       "options": {
@@ -8900,7 +9402,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 258
+        "y": 286
       },
       "id": 98,
       "options": {
@@ -9053,7 +9555,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 258
+        "y": 286
       },
       "id": 99,
       "options": {
@@ -9163,7 +9665,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 266
+        "y": 294
       },
       "id": 139,
       "options": {
@@ -9245,7 +9747,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 266
+        "y": 294
       },
       "id": 140,
       "options": {
@@ -9327,7 +9829,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 266
+        "y": 294
       },
       "id": 141,
       "options": {
@@ -9409,7 +9911,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 266
+        "y": 294
       },
       "id": 142,
       "options": {
@@ -9449,7 +9951,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 270
+        "y": 298
       },
       "id": 133,
       "title": "Cameras",
@@ -9460,7 +9962,7 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 271
+        "y": 299
       },
       "id": 114,
       "options": {
@@ -9482,7 +9984,7 @@
         "h": 10,
         "w": 8,
         "x": 0,
-        "y": 284
+        "y": 312
       },
       "id": 113,
       "options": {
@@ -9504,7 +10006,7 @@
         "h": 10,
         "w": 8,
         "x": 8,
-        "y": 284
+        "y": 312
       },
       "id": 115,
       "options": {
@@ -9526,7 +10028,7 @@
         "h": 10,
         "w": 8,
         "x": 16,
-        "y": 284
+        "y": 312
       },
       "id": 116,
       "options": {
@@ -9577,7 +10079,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 294
+        "y": 322
       },
       "id": 117,
       "options": {
@@ -9645,7 +10147,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 294
+        "y": 322
       },
       "id": 118,
       "options": {
@@ -9713,7 +10215,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 294
+        "y": 322
       },
       "id": 119,
       "options": {
@@ -9781,7 +10283,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 294
+        "y": 322
       },
       "id": 120,
       "options": {
@@ -9865,7 +10367,7 @@
         "h": 4,
         "w": 8,
         "x": 0,
-        "y": 298
+        "y": 326
       },
       "id": 121,
       "options": {
@@ -9949,7 +10451,7 @@
         "h": 4,
         "w": 8,
         "x": 8,
-        "y": 298
+        "y": 326
       },
       "id": 122,
       "options": {
@@ -10033,7 +10535,7 @@
         "h": 4,
         "w": 8,
         "x": 16,
-        "y": 298
+        "y": 326
       },
       "id": 123,
       "options": {
@@ -10137,7 +10639,7 @@
         "h": 6,
         "w": 24,
         "x": 0,
-        "y": 302
+        "y": 330
       },
       "id": 124,
       "options": {
@@ -10198,18 +10700,21 @@
           "mappings": [
             {
               "options": {
-                "1": {
-                  "color": "red",
-                  "text": "Detected"
-                }
-              },
-              "type": "value"
-            },
-            {
-              "options": {
-                "0": {
+                "clear": {
                   "color": "green",
                   "text": "Clear"
+                },
+                "person": {
+                  "color": "red",
+                  "text": "Person"
+                },
+                "vehicle": {
+                  "color": "orange",
+                  "text": "Vehicle"
+                },
+                "animal": {
+                  "color": "purple",
+                  "text": "Animal"
                 }
               },
               "type": "value"
@@ -10234,7 +10739,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pole South PTZ - Person"
+                "value": "Pole South PTZ"
               }
             ]
           },
@@ -10246,7 +10751,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pole South PTZ - Vehicle"
+                "value": "Pole South Pano"
               }
             ]
           },
@@ -10258,7 +10763,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pole South PTZ - Animal"
+                "value": "Observatory West"
               }
             ]
           },
@@ -10270,103 +10775,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pole South Pano - Person"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "E"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Pole South Pano - Vehicle"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "F"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Pole South Pano - Animal"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "G"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Observatory West - Person"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "H"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Observatory West - Vehicle"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "I"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Observatory West - Animal"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "J"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Observatory East - Person"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "K"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Observatory East - Vehicle"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byFrameRefID",
-              "options": "L"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Observatory East - Animal"
+                "value": "Observatory East"
               }
             ]
           }
@@ -10376,7 +10785,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 308
+        "y": 336
       },
       "id": 125,
       "options": {
@@ -10407,7 +10816,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"pole_south_ptz\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r.camera == \"pole_south_ptz\" and (r._field == \"people\" or r._field == \"vehicle\" or r._field == \"dog_cat\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _measurement: r._measurement,\n      _field: \"detection\",\n      _value:\n        if exists r.dog_cat and r.dog_cat > 0 then \"animal\"\n        else if exists r.people and r.people > 0 then \"person\"\n        else if exists r.vehicle and r.vehicle > 0 then \"vehicle\"\n        else \"clear\"\n    }))\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "A"
         },
         {
@@ -10415,7 +10824,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"pole_south_ptz\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r.camera == \"pole_south_pano\" and (r._field == \"people\" or r._field == \"vehicle\" or r._field == \"dog_cat\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _measurement: r._measurement,\n      _field: \"detection\",\n      _value:\n        if exists r.dog_cat and r.dog_cat > 0 then \"animal\"\n        else if exists r.people and r.people > 0 then \"person\"\n        else if exists r.vehicle and r.vehicle > 0 then \"vehicle\"\n        else \"clear\"\n    }))\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "B"
         },
         {
@@ -10423,7 +10832,7 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"pole_south_ptz\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r.camera == \"obs_west\" and (r._field == \"people\" or r._field == \"vehicle\" or r._field == \"dog_cat\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _measurement: r._measurement,\n      _field: \"detection\",\n      _value:\n        if exists r.dog_cat and r.dog_cat > 0 then \"animal\"\n        else if exists r.people and r.people > 0 then \"person\"\n        else if exists r.vehicle and r.vehicle > 0 then \"vehicle\"\n        else \"clear\"\n    }))\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "C"
         },
         {
@@ -10431,72 +10840,8 @@
             "type": "influxdb",
             "uid": "influxdb-observatory"
           },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"pole_south_pano\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
+          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r.camera == \"obs_east\" and (r._field == \"people\" or r._field == \"vehicle\" or r._field == \"dog_cat\"))\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> map(fn: (r) => ({\n      _time: r._time,\n      _measurement: r._measurement,\n      _field: \"detection\",\n      _value:\n        if exists r.dog_cat and r.dog_cat > 0 then \"animal\"\n        else if exists r.people and r.people > 0 then \"person\"\n        else if exists r.vehicle and r.vehicle > 0 then \"vehicle\"\n        else \"clear\"\n    }))\n  |> group(columns: [\"_measurement\", \"_field\"])",
           "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"pole_south_pano\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"pole_south_pano\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"obs_west\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "G"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"obs_west\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "H"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"obs_west\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "I"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"people\" and r.camera == \"obs_east\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "J"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"vehicle\" and r.camera == \"obs_east\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "K"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "influxdb-observatory"
-          },
-          "query": "from(bucket: \"observatory\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"camera_ai\" and r._field == \"dog_cat\" and r.camera == \"obs_east\")\n  |> aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |> drop(columns: [\"host\", \"_start\", \"_stop\"])\n  |> group(columns: [\"_measurement\", \"_field\"])",
-          "refId": "L"
         }
       ],
       "title": "AI Detection History (Person / Vehicle / Animal)",
@@ -10553,5 +10898,5 @@
   "timezone": "browser",
   "title": "Solar / Weather / Observatory / Imaging",
   "uid": "solar-observatory",
-  "version": 100
+  "version": 102
 }

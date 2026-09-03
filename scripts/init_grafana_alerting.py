@@ -179,13 +179,22 @@ RULES = [
     ),
     rule(
         "starlink-alert-active", "Starlink Alert Active",
+        # Same per-instance trick as camera-offline below: instead of collapsing
+        # to the single alert_active OR-of-everything field, group by _field
+        # over the ~20 individual alert_* booleans so each one that's currently
+        # true fires as its own alert instance carrying its own `alert` label -
+        # the Discord message then names which specific condition(s) (thermal
+        # throttle, mast not vertical, roaming, etc.) are actually triggering.
         'from(bucket: "starlink")\n'
         '  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n'
-        '  |> filter(fn: (r) => r._measurement == "starlink" and r._field == "alert_active")\n'
+        '  |> filter(fn: (r) => r._measurement == "starlink" and r._field =~ /^alert_/ and r._field != "alert_active")\n'
+        '  |> group(columns: ["_field"])\n'
         '  |> last()\n'
-        '  |> map(fn: (r) => ({r with _value: if r._value then 1.0 else 0.0}))',
+        '  |> map(fn: (r) => ({r with _value: if r._value then 1.0 else 0.0}))\n'
+        '  |> rename(columns: {_field: "alert"})\n'
+        '  |> keep(columns: ["_time", "_value", "alert"])',
         "influxdb-starlink", "gt", [0.5], "2m", "warning",
-        "Starlink dish reports an active alert (see the Alert Detail Timeline panel for which one).",
+        "Starlink dish alert active: {{ $labels.alert }}.",
     ),
     rule(
         "internet-fully-down", "Internet Fully Down",
