@@ -109,6 +109,9 @@ fi
 # FAN_CONTROL_GPIO_PIN is set in .env, since that's hardware-wiring specific
 "${REPO_DIR}/scripts/install-fan-control-service.sh"
 
+# 14. CWOP weather publisher systemd unit - skips until CWOP_ID is set in .env
+"${REPO_DIR}/scripts/install-cwop-service.sh"
+
 echo
 echo "Deployment complete."
 docker compose ps

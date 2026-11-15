@@ -59,6 +59,7 @@ altair_data_host/
 │   ├── epaper_dashboard.py                # runs on the host (needs GPIO/SPI)
 │   ├── charge_cutoff.py                   # runs on the host (needs GPIO) - see §12
 │   ├── fan_control.py                     # runs on the host (needs GPIO) - see §14
+│   ├── cwop_publisher.py                  # runs on the host - see §15
 │   ├── requirements-epaper.txt            # host-side Python deps for the e-paper script
 │   ├── requirements-charge-cutoff.txt     # host-side Python deps for the charge-cutoff script
 │   └── requirements-fan-control.txt       # host-side Python deps for the fan controller
@@ -582,7 +583,7 @@ Both are already wired into `scripts/deploy.sh` (steps 10-11), so once the relay
 
 ## 13. Grafana Alerting (Discord)
 
-Discord notifications for seven conditions: `Battery SOC Critical` (soc < 15%), `Starlink Alert Active` (any of the ~20 dish alert flags true), `Internet Fully Down` (every `PING_TARGETS_INTERNET` host at 100% packet loss), `Disk Usage Critical` (root filesystem > 90%), `Pi Under-Voltage` (vcgencmd's under-voltage-now flag), `CPU Temp Critical` (Pi SoC > 80°C), `Camera Offline` (any camera failed its liveness check). Each rule is a 3-node pipeline (Flux query -> `reduce` last -> `threshold`), evaluated every 1 minute, with a `for:` pending duration (2-10 minutes depending on the rule) so one noisy sample doesn't page you. `Starlink Alert Active` and `Camera Offline` are the two rules here that don't collapse to a single value: every other rule's query reduces down to one series (`internet-fully-down` explicitly `min()`s across ping targets so *all* of them have to be down), but these two keep a Flux group key (`alert` - the individual `alert_*` field name - for Starlink, `camera` for cameras) all the way through, so Grafana evaluates and fires a separate alert instance per group, each carrying its own label - and the Discord message names exactly which dish condition(s) (`{{ $labels.alert }}`, e.g. `alert_thermal_throttle`) or camera(s) (`{{ $labels.camera }}`) are actually triggering, instead of a generic "something's wrong". Camera Offline reads `online` from `camera_health` (§7's cheap 60s liveness check, not `camera_snapshot`), so an outage is caught in minutes rather than waiting up to a full 300s image-poll cycle. Thresholds are a starting point, not tuned to your specific battery bank/hardware - see `scripts/init_grafana_alerting.py`'s `RULES` list to change them.
+Discord notifications for eight conditions: `Battery SOC Critical` (soc < 15%), `Starlink Alert Active` (any of the ~20 dish alert flags true), `Internet Fully Down` (every `PING_TARGETS_INTERNET` host at 100% packet loss), `Disk Usage Critical` (root filesystem > 90%), `Pi Under-Voltage` (vcgencmd's under-voltage-now flag), `CPU Temp Critical` (Pi SoC > 80°C), `Camera Offline` (any camera failed its liveness check), `CWOP Upload Silent` (no successful CWOP publish in 25 min - §15's `cwop` heartbeat; unlike the others this one treats *no data* as alerting, since a dead publisher service writes nothing). Each rule is a 3-node pipeline (Flux query -> `reduce` last -> `threshold`), evaluated every 1 minute, with a `for:` pending duration (2-10 minutes depending on the rule) so one noisy sample doesn't page you. `Starlink Alert Active` and `Camera Offline` are the two rules here that don't collapse to a single value: every other rule's query reduces down to one series (`internet-fully-down` explicitly `min()`s across ping targets so *all* of them have to be down), but these two keep a Flux group key (`alert` - the individual `alert_*` field name - for Starlink, `camera` for cameras) all the way through, so Grafana evaluates and fires a separate alert instance per group, each carrying its own label - and the Discord message names exactly which dish condition(s) (`{{ $labels.alert }}`, e.g. `alert_thermal_throttle`) or camera(s) (`{{ $labels.camera }}`) are actually triggering, instead of a generic "something's wrong". Camera Offline reads `online` from `camera_health` (§7's cheap 60s liveness check, not `camera_snapshot`), so an outage is caught in minutes rather than waiting up to a full 300s image-poll cycle. Thresholds are a starting point, not tuned to your specific battery bank/hardware - see `scripts/init_grafana_alerting.py`'s `RULES` list to change them.
 
 ### Why a script, not committed YAML
 
@@ -658,3 +659,24 @@ scripts/install-fan-control-service.sh
 ```
 
 Both are already wired into `scripts/deploy.sh` (steps 12-13), so once the fan/MOSFET is wired and `FAN_CONTROL_GPIO_PIN` is set, re-running `scripts/deploy.sh` picks it up automatically.
+
+---
+
+## 15. CWOP / findU Publishing
+
+`scripts/cwop_publisher.py` posts this station's weather to the [Citizen Weather Observing Program](https://www.wxqa.com/) every `CWOP_INTERVAL` seconds (default 600, minimum 300). findU, MADIS and NOAA all read CWOP's APRS-IS network, so there's no separate findU upload - once packets arrive at `cwop.aprs.net:14580`, the station appears on findU (`http://www.findu.com/cgi-bin/wx.cgi?call=<CWOP_ID>`) within a few minutes.
+
+Runs on the host as a stdlib-only systemd service (`cwop-publisher.service`, no venv). Reads the `weather_station` measurement from InfluxDB, not the station directly, so it shares `read_ecowitt.py`'s single poll. Per cycle it:
+
+- Skips (logging an error) if the newest reading is older than `CWOP_MAX_AGE` (600s) rather than publish stale data under a fresh timestamp.
+- Averages wind speed over 2 min, with a vector-mean direction; gust is the 5-min peak.
+- Derives rain over the last hour/24h from `rain_daily_in` via Flux `increase()` (the station only gives since-midnight, and `increase()` handles the midnight reset). `P` is since-midnight as-is.
+- **Reduces pressure to sea level** using `ELEVATION_M` and outdoor temp. This station's "relative" pressure equals its absolute pressure (27.19 inHg at ~884 m), and CWOP requires sea-level. Set `CWOP_PRESSURE_IS_SEA_LEVEL=1` if you later calibrate the console.
+- Logs in with passcode `-1` (unverified, valid for CW IDs), falls back to `cwop5.aprs.net`, and writes a `cwop` heartbeat point (`ok`, `detail`) to the `system` bucket on every attempt.
+
+Setup: set `CWOP_ID` in `.env` (LATITUDE/LONGITUDE/ELEVATION_M must match your CWOP registration), then:
+```bash
+set -a; . ./.env; set +a; python3 scripts/cwop_publisher.py --dry-run   # print the packet
+scripts/install-cwop-service.sh                                         # install + start
+journalctl -u cwop-publisher -f
+```

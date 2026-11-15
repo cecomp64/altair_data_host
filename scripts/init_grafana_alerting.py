@@ -146,7 +146,8 @@ def threshold_node(ref_id, expression, evaluator_type, params):
     }
 
 
-def rule(uid, title, query, datasource_uid, evaluator_type, params, for_duration, severity, summary):
+def rule(uid, title, query, datasource_uid, evaluator_type, params, for_duration, severity, summary,
+         no_data_state="OK"):
     return {
         "orgID": 1,
         "folderUID": ALERTS_FOLDER_UID,
@@ -159,7 +160,7 @@ def rule(uid, title, query, datasource_uid, evaluator_type, params, for_duration
             reduce_node("B", "A"),
             threshold_node("C", "B", evaluator_type, params),
         ],
-        "noDataState": "OK",
+        "noDataState": no_data_state,
         "execErrState": "Error",
         "for": for_duration,
         "labels": {"severity": severity},
@@ -257,6 +258,24 @@ RULES = [
         '  |> keep(columns: ["_time", "_value", "camera"])',
         "influxdb-observatory", "lt", [0.5], "5m", "warning",
         "{{ $labels.camera }} failed its liveness check - offline for at least 5 minutes.",
+    ),
+    rule(
+        "cwop-upload-silent", "CWOP Upload Silent",
+        # Counts *successful* publishes (scripts/cwop_publisher.py writes a
+        # `cwop` point with ok=true/false on every attempt) over a fixed 25m
+        # window - ~2.5 missed 10m cycles, so one hiccup doesn't page. Covers
+        # both failure modes: attempts failing (ok=false: station offline,
+        # CWOP unreachable) and the service being dead (no points at all, which
+        # yields an empty result - hence no_data_state="Alerting" below, the
+        # opposite of the other rules, since "no data" IS the failure here).
+        'from(bucket: "system")\n'
+        '  |> range(start: -25m)\n'
+        '  |> filter(fn: (r) => r._measurement == "cwop" and r._field == "ok" and r._value == true)\n'
+        '  |> group()\n'
+        '  |> count()',
+        "influxdb-system", "lt", [1], "5m", "warning",
+        "No successful CWOP upload in the last 25 minutes - check `journalctl -u cwop-publisher` (station offline, CWOP unreachable, or service down).",
+        no_data_state="Alerting",
     ),
 ]
 

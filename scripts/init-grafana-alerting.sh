@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Provisions Discord alerting (contact point, default notification policy,
-# 7 alert rules) into Grafana via its API - see init_grafana_alerting.py's
+# 8 alert rules) into Grafana via its API - see init_grafana_alerting.py's
 # docstring for why this is a script rather than committed YAML like every
 # other piece of Grafana config in this repo (confirmed Grafana bug: env
 # var expansion doesn't work in alerting provisioning files). Idempotent -
