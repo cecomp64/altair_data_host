@@ -10887,6 +10887,16 @@
                 "value": {
                   "type": "image"
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open full-size snapshot",
+                    "url": "${__value.text}"
+                  }
+                ]
               }
             ]
           }
